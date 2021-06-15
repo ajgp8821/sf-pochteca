@@ -1,0 +1,10 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" controller='CopySingleRecord'>
+    <aura:attribute name="recordId" type="String" />
+	<aura:attribute name="showSpinner" type="Boolean" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+     <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner variant="brand"/>
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,13 @@
+.THIS .POCH_Icon svg{
+    fill:WhiteSmoke !important;
+} 
+.THIS .POCH_Icon {
+    background-color:LightSeaGreen !important;
+}
+.THIS .text_size {
+    font-size: 50%;
+}
+.THIS .text_align {
+    text-align: center;
+    font-size: 85%;
+}

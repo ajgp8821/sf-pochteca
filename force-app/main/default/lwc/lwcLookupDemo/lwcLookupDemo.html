@@ -1,0 +1,10 @@
+<template>  
+    <div class="slds-box">  
+      <c-custom-lookup-lwc lookup-label="Account" object-api-name="account" icon-name="standard:account"  
+        onrecordselection={onAccountSelection}></c-custom-lookup-lwc>  
+    </div>  
+    <div class="slds-box">  
+      Selected Account Name : {accountName}  
+      Selected Account Id  : {accountRecordId}  
+    </div>  
+  </template>

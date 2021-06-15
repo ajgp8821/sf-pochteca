@@ -1,0 +1,34 @@
+<aura:component controller="AddProductoQueteLine" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!-- attributes -->
+    <aura:attribute name="data" type="Map"/>
+    <aura:attribute name="filteredData" type="Map"/>
+    <aura:attribute name="mycolumns" type="List"/>
+    <aura:attribute name="delIds" type="List"/>
+    <aura:attribute name="recordId" type="String" access="public"/>
+    <aura:attribute name="styl" type="String"/>
+    <aura:attribute name="height" type="Integer" default="100"/>
+    <aura:attribute name="width" type="Integer" default="100"/>
+    
+    <!-- handlers-->
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+    <aura:handler name="init" value="{!this }" action="{!c.init }"/>
+    
+    
+    <ltng:require styles="{!$Resource.ModalWidthCSS}"/>
+    
+    <div class="slds-grid slds-grid--align-end"> 
+        <lightning:button variant="brand" label="Agregar" onclick="{!c.doAddProd}"/>
+    </div>
+    
+    <span>
+        <lightning:input onchange="{!c.searchTable}" type="search" label="Searh" variant="label-hidden" placeholder="Enter search term" aura:id="SearchBox"/>
+    </span>
+    <br/>
+    <lightning:datatable
+                         columns="{!v.mycolumns}"
+                         data="{!v.filteredData}"
+                         keyField="id"
+                         onrowselection="{!c.handleRowAction }" />
+    
+    
+</aura:component>

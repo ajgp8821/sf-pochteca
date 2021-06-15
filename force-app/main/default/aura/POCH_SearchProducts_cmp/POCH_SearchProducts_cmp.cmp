@@ -1,0 +1,40 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,flexipage:availableForRecordHome,lightning:actionOverride" access="global" >
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="productIsCreating" type="boolean" default="false"/>
+    
+    <aura:attribute name="strIdSucAmp" type="String" default="" />
+    <aura:attribute name="idInvSheet"  type="String" default="" />
+    <aura:attribute name="indVentaM" type="boolean"/>
+
+    <aura:handler name="productCreated" event="c:POCH_AddProductsSheet_evt" action="{!c.handleComponentEvent}"/>
+
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="slds-m-around_xx-large" style="height:640px">
+            <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open cLookup">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                            onclick="{! c.closeModel }"
+                            alternativeText="Cerrar"
+                            variant="bare-inverse"
+                            class="slds-modal__close"/>
+                            <h2 id="header99" class="slds-text-heading--medium">Buscar Producto </h2>
+                            <br/>
+                    </div>
+                    <div class="slds-modal__content slds-p-around_medium"  style="height:200px">
+                        <c:POCH_CustomLookup_cmp  objectAPIName="Pricebookentry" IconName="standard:product" selectedRecord="{!v.selectedLookUpRecord}" label="Producto" parentId="{!v.strIdSucAmp}"
+                                                    indVentaM="{!v.indVentaM}" />
+                        <div class="showNewPricebookEntry" aura:id="recordEdit">
+                                {!v.body}
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer slds-modal__footer_directional">
+                        <lightning:button class="slds-button slds-button_brand" onclick="{!c.createProductComponent}" label="Agregar Producto"/> 
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,74 @@
+<aura:component controller="AddProductoQueteLine" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+	  <!--use JQuery Data Table css,Js and jQUERY js file in lightning component by using ltng:require component-->
+    <ltng:require styles="{! $Resource.	datatable + '/DataTables-1.10.16/media/css/jquery.dataTables.min.css'}" 
+                  scripts="{!join(',', 
+                           $Resource.jquery224 , 
+                           $Resource.datatable + '/DataTables-1.10.16/media/js/jquery.dataTables.min.js')
+                           }" afterScriptsLoaded="{!c.scriptsLoaded}" />
+    <aura:handler name="change" value="{!v.pageReference}"
+                  action="{!c.onPageReferenceChanged}" />
+     <!--aura handler with waiting and donewaiting events-->
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+     
+    <!--component attributs -->
+    <aura:attribute name="spinner" type="boolean" default="FALSE"/>
+    <aura:attribute name="accListToDisplay" type="Account[]" />
+     
+    <!--loading spinner start-->
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <p style="transform: translate(-32%, -50%) rotate(-90deg);width: 500px;text-align: center;">Por favor espere mientras cargan los Productos </p>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Loading spinner end-->   
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>  
+     <aura:attribute name="recordId" type="String" access="public"/>
+    <aura:attribute name="lstOpp" type="PricebookEntry[]"/>
+    <aura:attribute name="selIds" type="List"/>
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <ltng:require styles="{!$Resource.ModalWidthCSS}"/>
+    <div>
+            <br/>
+            <lightning:button label="Agregar" disabled="{!v.disabled}" class="slds-button_brand" onclick="{!c.handleSelectedProducts }"  />
+        </div>
+    <div class="slds-m-around_medium">
+        <table id="tableId" class="slds-table slds-table_bordered slds-table_cell-buffer" cellspacing="0" width="100%">
+            <thead>
+                <tr>  
+                     <th>OPCION</th>
+                     <th>CÓDIGO</th>
+                     <th>NOMBRE DEL PRODUCTO</th>
+                     <th>FAMILIA</th>
+                     <th>DESCRIPCIÓN DEL PRODUCTO</th>
+                     <th>TIPO DE PRODUCTO</th>
+                     <th>PRECIO DE LA LISTA</th>
+                </tr>
+            </thead>
+            <tbody>
+                  
+                <aura:iteration items="{!v.lstOpp}" var="acc">
+                    <tr>
+                       <td>
+                            <label class="slds-checkbox">
+                                <ui:inputCheckbox aura:id="checkAddProducto" value="" text="{!acc.ids}"/>
+                                <span class="slds-checkbox--faux" />
+                                <span class="slds-form-element__label"></span>
+                            </label>
+                        </td>
+                        <td >{!acc.ProductCodes}</td>
+                        <td>{!acc.names}</td>
+                        <td>{!acc.Familys}</td>
+                        <td>{!acc.Descriptions}</td>
+                        <td>{!acc.GrupodeMateriales}</td>
+                        <td>{!acc.UnitPrices}</td>
+                    </tr>
+                </aura:iteration>  
+            </tbody>
+        </table>
+    </div>
+</aura:component>

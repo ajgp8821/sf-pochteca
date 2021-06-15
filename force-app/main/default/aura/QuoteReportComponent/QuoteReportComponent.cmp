@@ -1,0 +1,21 @@
+<aura:component controller="QuoteReportController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+	<aura:attribute type="SBQQ__Quote__c[]" name="qtList"/>
+
+    <aura:attribute name="mycolumns" type="List"/>
+
+     
+
+    <aura:handler name="init" value="{!this}" action="{!c.fetchQuote}"/>
+
+     
+
+    <lightning:datatable data="{! v.qtList }"
+
+                         columns="{! v.mycolumns }"
+
+                         keyField="id"
+
+                         hideCheckboxColumn="true"
+
+                         />
+</aura:component>

@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="Use when a product is created">
+        <aura:attribute name="isDeleted" type="boolean"/>
+</aura:event>

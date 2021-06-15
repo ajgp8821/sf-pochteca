@@ -1,0 +1,29 @@
+<!--******************************************************************************* 
+Desarrollado por: Freeway Mexico
+Autor: Victor Jiménez
+Proyecto: Pochteca 
+Descripción: Detalle de Pedidos (Autorizacion).
+===================================================================================
+No.     Fecha     		 	Autor                	Descripción
+====== 	===========       	==================		==================
+1.0 	26-feb-2020			Victor Jiménez      	Creador
+******************************************************************************* -->
+
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" >
+    <aura:attribute name="objDetallePedido" type="POCH_DetalleAutorizacion__c" default="{'sobjectType':'POCH_DetalleAutorizacion__c'}" />
+
+    <div class="slds-grid slds-wrap text_size">        
+            <div class="slds-size--1-of-4"><p class="slds-truncate">Utilidad:</p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate"><strong>${!v.objDetallePedido.POCH_Utilidad__c + ' ' + v.objDetallePedido.CurrencyIsoCode}</strong></p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate">% Util.:</p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate"><strong>{!v.objDetallePedido.POCH_PorcentajeUtil__c + '%'}</strong></p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate">Precio:</p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate"><strong>${!v.objDetallePedido.POCH_Precio__c + ' ' + v.objDetallePedido.CurrencyIsoCode}</strong></p></div>        
+            <div class="slds-size--1-of-4"><p class="slds-truncate">Costo:</p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate"><strong>${!v.objDetallePedido.POCH_Costo__c + ' ' + v.objDetallePedido.CurrencyIsoCode}</strong></p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate">Cantidad:</p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate"><strong>{!v.objDetallePedido.POCH_Cantidad__c}</strong></p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate">Almacén:</p></div>
+            <div class="slds-size--1-of-4"><p class="slds-truncate"><strong>{!v.objDetallePedido.POCH_Almancen__c}</strong></p></div>
+    </div>    
+</aura:component>

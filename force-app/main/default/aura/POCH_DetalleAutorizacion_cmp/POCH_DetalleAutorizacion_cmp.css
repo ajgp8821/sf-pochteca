@@ -1,0 +1,8 @@
+.THIS .title-link {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.THIS.text_size {
+  font-size: 75%;
+}

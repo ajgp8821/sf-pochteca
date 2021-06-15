@@ -1,0 +1,178 @@
+<!--******************************************************************************* 
+Desarrollado por: Freeway Mexico
+Autor: Hector Diaz  (HD)
+Proyecto:  
+Descripción:  
+Comentarios ":
+===================================================================================
+No.     Fecha     		 	Autor                	Descripción
+====== 	===========       	==================		==================
+1.0 	19-Junio-2018 		Hector Diaz (HD)      	Creador.
+1.1 	03-Mayo-2021 		Jesús Azuaje (JA)      	Moneda competencia como picklist -> CAM-2090
+1.3 	07-Mayo-2021 		Jesús Azuaje (JA)      	se elimina action validateUM -> CAM-2091
+******************************************************************************* -->
+<aura:component controller="POCH_InventorySheet_cls" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
+
+    <aura:attribute name="ProductInstance" type="Sobject"/>
+    <aura:attribute name="rowIndex" type="String"/>
+    <aura:attribute name="strIdDetail" type="String"/>
+    <aura:attribute name="ListaProductsSelected" type="list"/>
+    <aura:attribute name="blnShowProducts" type="Boolean"  default="false"/>
+    <aura:attribute name="listControllingValuesUnidaM" type="list" default="[]" description="field values UM"/>
+    <aura:attribute name="listMonedaComp" type="list" default="[]" description="field values Moneda"/>
+    <aura:attribute name="listControllingValuesEstatus" type="list" default="[]" description="field values Estatus"/>
+    <aura:attribute name="listWhoBuy" type="list" default="[]" description="field values Who Buy"/>
+    <aura:attribute name="strFreQuote" type="String" default="1"/>
+    
+    <aura:attribute name="strIdSucursalAmp" type="String"  default="" /> 
+    <aura:attribute name="strIdHojaInv"     type="String"  default="" />
+    <aura:attribute name="blnProductOnlySF" type="Boolean" default="false" />
+    <aura:attribute name="strIdAcc"         type="String"  default=""/> 
+    <aura:attribute name="blnisEspPrecio"   type="Boolean" default="false"/> 
+    
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>                 
+
+    <aura:handler name="AddProductLookupDetail" event="c:POCH_AddProductInInventotySheet_evt" action="{!c.addNewProductSelected}"/>
+    <!-- Register 2 Lightning Event for handle add or Delete rows on Parent Component  --> 
+    <aura:registerEvent name="DeleteRowEvt" type="c:POCH_DeleteProductsSheet_evt"/> 
+    <!-- Table Row -->  
+      <tr class="slds-hint-parent">
+            <td data-label="icon">
+                  <div class="slds-align_absolute-center">
+                        <div class="slds-size_1-of-2 slds-align_absolute-center" >
+                              <a onclick="{!c.LookupProduct}">
+                                    <lightning:icon class="slds-input__icon slds-show" iconName="utility:search" size="x-small" alternativeText="Producto"/>
+                              </a>
+                        </div>
+                        <div class="slds-size_1-of-2 slds-align_absolute-center" >
+                              <a onclick="{!c.removeRow}">
+                                    <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                    <span class="slds-assistive-text">Delete Icon</span>
+                              </a>
+                        </div>
+                  </div>
+            </td>
+            <td data-label="Codigo">
+                  <div class="slds-truncate" title="Codigo" style="width: 100px;" >
+                        <lightning:input class="CustomClassAlignCenter"  type="text" name="codigo"  readonly="true"  value="{!v.ProductInstance.POCH_Codigo__c}" />
+                  </div>
+            </td>
+            <td data-label="Descripcion">
+                  <div class="slds-truncate" title="Descripcion" style="width: 180px;">
+                        <lightning:textarea  name="inputName"  readonly="true"  value="{!v.ProductInstance.Name}" />
+                  </div>
+            </td>
+            <td data-label="C.Potencial"  >
+                  <div class="slds-truncate" title="C.Potencial" style="width: 90px;">
+                      <ui:inputNumber class="CustomClassAlign" value="{!v.ProductInstance.POCH_CantidadPotencial__c}" format="#,###.00"  />
+                  </div>
+            </td>
+            <td data-label="C.Base">
+                  <div class="slds-truncate" title="C.Base" style="width: 90px;">
+                      <ui:inputNumber class="CustomClassAlign" value="{!v.ProductInstance.POCH_CantidadBase__c}" format="#,###.00"  />
+                  </div>
+            </td>
+          	<td data-label="UM">
+                  <div class="slds-truncate" title="UM" style="width: 50px;">
+                        <lightning:layoutItem size="12">    
+                              <lightning:select aura:id="requiredInputUM"  
+                                          name="UnidaMedida"
+                                          value="{!v.ProductInstance.UnidadMedida__c}">
+                              <aura:iteration items="{!v.listControllingValuesUnidaM}" var="val" >
+                                    <option value="{!val}">{!val}</option>
+                              </aura:iteration> 
+                              </lightning:select>
+                        </lightning:layoutItem>
+                  </div>
+            </td>          	
+          	<td data-label="Precio Lista">
+                <div class="slds-truncate slds-text-align_right" title="{!(!v.blnisEspPrecio ? 'Precio de Lista' : 'Precio Especial')}"  style="margin-top:17px;" >
+                    <!--<lightning:formattedNumber value="{!v.ProductInstance.POCH_PrecioLista__c}"  style="currency"  maximumFractionDigits="3"/>-->
+                    <ui:outputCurrency value="{!v.ProductInstance.POCH_PrecioLista__c}" format="$#,###.00" />
+                </div>
+            </td>
+           	<td data-label="Moneda">
+                  <div class="slds-truncate" title="Moneda" style="width: 50px;">
+                        <lightning:input  class="CustomClassAlignCenter" type="text" name="Moneda"  readonly="true" value="{!v.ProductInstance.POCH_Moneda__c}" />
+                  </div>
+            </td>                
+            <td data-label="UMP">
+                  <div class="slds-truncate" title="UMP" style="width: 40px;">
+                        <lightning:input type="text" name="UMP" value="{!v.ProductInstance.POCH_uma__c}" readonly="true" />
+                  </div>
+            </td>			
+            <td data-label="Esc Potencial">
+                  <div class="slds-truncate slds-text-align_right" title="Esc Potencial"  style="margin-top:17px;" >
+                      <!--<lightning:formattedNumber value="{!v.ProductInstance.POCH_EsPotencial__c}" style="currency" maximumFractionDigits="3" />-->
+                      <ui:outputCurrency value="{!v.ProductInstance.POCH_EsPotencial__c}" format="$#,###.00" />
+                  </div>
+            </td>
+            <td data-label="Esc Base">
+              <div class="slds-truncate slds-text-align_right" title="Esc Base"  style="margin-top:17px;" >
+                  <!--<lightning:formattedNumber value="{!v.ProductInstance.POCH_EsBase__c}" style="currency" maximumFractionDigits="3"/>-->
+                  <ui:outputCurrency value="{!v.ProductInstance.POCH_EsBase__c}" format="$#,###.00" />                  
+              </div>
+            </td> 
+            <td data-label="A quien compra">
+                  <div class="slds-truncate" title="A quien compra" style="width: 90px;">
+                        <lightning:layoutItem size="12">    
+                              <lightning:select aura:id="requiredInputAquien"  
+                              name="AQuienCompra"
+                              value="{!v.ProductInstance.POCH_AquienCompra__c}">
+                              <aura:iteration items="{!v.listWhoBuy}" var="val" >
+                                    <option value="{!val}" >{!val}</option>
+                              </aura:iteration>
+                              </lightning:select>
+                        </lightning:layoutItem>
+                  </div>
+            </td>
+            <td data-label="Estatus">
+                  <div class="slds-truncate" title="Estatus" style="width: 85px;">
+                      <aura:if isTrue="{!!v.blnProductOnlySF}">
+                          <lightning:layoutItem size="12">    
+                            <lightning:select aura:id="requiredInputEstatus"  
+                                              name="Estatus"
+                                              value="{!v.ProductInstance.POCH_Estatus__c}">
+                                <aura:iteration items="{!v.listControllingValuesEstatus}" var="val" >
+                                    <option value="{!val}" style="width: 100px;">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                      </aura:if>                    
+                      <aura:if isTrue="{!v.blnProductOnlySF}">
+                          <lightning:input class="CustomClassAlignCenter"  type="text" name="codigo"  readonly="true"  value="{!v.ProductInstance.POCH_Estatus__c}" />                          
+                      </aura:if>   
+                  </div>
+            </td>                        
+            <td data-label="Precio C">
+                  <div class="slds-truncate" title="Precio C" style="width: 80px;">
+                        <lightning:input class="CustomClassAlign" type="text" name="precioComp" value="{!v.ProductInstance.POCH_CantidadCompetencia__c}"/>
+                  </div>
+            </td>
+            <td data-label="Moneda Comp">
+                <div class="slds-truncate" title="Moneda Comp" style="width: 80px;">
+                    <!--<lightning:input    type="text" name="monedaCom" value="{!v.ProductInstance.POCH_MonedaCompetencia__c}"/>-->
+                	<lightning:layoutItem size="12">    
+                        <lightning:select aura:id="requiredInputMonedaComp"  
+                                          name="MonedaComp"
+                                          value="{!v.ProductInstance.Moneda_competencia__c}">
+                            <aura:iteration items="{!v.listMonedaComp}" var="val" >
+                                <option value="{!val}" >{!val}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                  </lightning:layoutItem>   
+                </div>
+            </td>
+          	<td data-label="Notas">
+                  <div class="slds-truncate" title="Notas" style="width: 150px;">
+                        <lightning:textarea name="inputNotas"  value="{!v.ProductInstance.POCH_Notas__c}"/>
+                  </div>
+            </td>
+      </tr>
+
+	<aura:if isTrue="{!v.blnShowProducts}">
+		<c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.strIdSucursalAmp}" idInvSheet="{!v.strIdHojaInv}" />
+	</aura:if>
+	
+	
+</aura:component>

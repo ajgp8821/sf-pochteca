@@ -1,0 +1,59 @@
+<!--******************************************************************************* 
+Desarrollado por: Freeway Mexico
+Autor: Victor Jiménez
+Proyecto: Pochteca 
+Descripción: Comentarios de Pedidos (Autorizacion).
+===================================================================================
+No.     Fecha     		 	Autor                	Descripción
+====== 	===========       	==================		==================
+1.0 	03-mar-2020			Victor Jiménez      	Creador
+******************************************************************************* -->
+
+<aura:component controller="POCH_AutorizacionMovilDetalle_ctrl" implements="flexipage:availableForAllPageTypes,force:appHostable,lightning:isUrlAddressable" >
+    <!--************************ ATTRIBUTES ********************-->      
+    <aura:attribute name="strIdPedido" type="String" /> 
+    <aura:attribute name="lstPISteps"  type="Object[]"/>
+    <aura:attribute name="strTxtInit"  type="String" default="Cargando..." />
+    <aura:attribute name="blnHasCmmts" type="Boolean" default="false" /> 
+	
+    <!--************************* HANDLERS **********************-->  
+    <aura:handler name="init"   value="{!this}" action="{!c.init}" />
+    
+    <!--************************* NAV URL **********************--> 
+    <lightning:navigation aura:id="navComponent"/>
+    
+    <!--************************* BUTTONS ***********************-->            
+    <div class="slds-grid slds-wrap slds-theme--default slds-p-vertical_small">                 
+        <div class="slds-size--1-of-3 slds-truncate">
+            <div class="slds-p-left_small slds-float_left">
+                <small><strong><lightning:button variant="base" class="title-link" label="Cerrar" title="Cerrar" onclick="{!c.regresarDetalles}" /></strong></small>
+            </div>
+        </div>             
+    </div> 
+    
+    <!--************************** BODY **************************-->
+    <aura:if isTrue="{!v.blnHasCmmts}">
+        <div class="slds-card">
+            <div class="slds-card__body">
+                <span><p class="slds-p-left_small slds-truncate"><strong>Comentarios del emisor</strong></p></span>
+
+                <aura:iteration items="{!v.lstPISteps}" var="appStep"> 
+                    <lightning:tile  label="{!appStep.pis.Actor.Name}" class="slds-p-horizontal_large slds-p-vertical_medium">
+                        <aura:set attribute="media">
+                            <lightning:avatar variant="circle" src="{!appStep.urlPhoto}" fallbackIconName="standard:person_account"/>
+                        </aura:set>
+                        <ul>
+                            <li class="slds-item"><p>{!appStep.pis.Comments}</p></li>
+                            <li class="slds-item text-date">{!appStep.fechaCreacion}</li>
+                        </ul>                            
+                    </lightning:tile>
+                    <br/>
+                </aura:iteration>                                  
+            </div>
+        </div>        
+        <aura:set attribute="else">
+            <span class="slds-truncate slds-p-around_small"><h1>{!v.strTxtInit}</h1></span>
+        </aura:set>
+    </aura:if>    
+    
+</aura:component>

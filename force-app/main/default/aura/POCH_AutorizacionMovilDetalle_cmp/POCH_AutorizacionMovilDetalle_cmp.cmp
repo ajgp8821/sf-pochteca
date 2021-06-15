@@ -1,0 +1,100 @@
+<!--******************************************************************************* 
+Desarrollado por: Freeway Mexico
+Autor: Victor Jiménez
+Proyecto: Pochteca 
+Descripción: Detalle de Pedidos (Autorizaciones). Es generado por Hyperlink Field en Approval Request Layout
+===================================================================================
+No.     Fecha     		 	Autor                	Descripción
+====== 	===========       	==================		==================
+1.0 	23-feb-2020			Victor Jiménez      	Creador
+******************************************************************************* -->
+
+<aura:component controller="POCH_AutorizacionMovilDetalle_ctrl" implements="flexipage:availableForAllPageTypes,force:appHostable,lightning:isUrlAddressable" >
+    
+    <!--************************ ATTRIBUTES ********************-->  
+    <aura:attribute name="objPedido"   type="POCH_AutorizacionMovil__c" default="{'sobjectType':'POCH_AutorizacionMovil__c'}" />
+    <aura:attribute name="strNoDetail" type="String"  default="Cargando detalles..." />    
+    <aura:attribute name="strResultPd" type="String"  default="Cargando..." />
+    <aura:attribute name="blnHasDetls" type="Boolean" default="false"/>
+    <aura:attribute name="lstActSctns" type="List"    default="[]" />
+    <aura:attribute name="strIdAprReq" type="String"  default="" /> 
+    
+    <!--************************* HANDLERS **********************-->  
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    
+    <!--************************* NAV CMP **********************--> 
+    <lightning:navigation aura:id="cmpResolution"/>
+    
+    <!--************************* BUTTONS ***********************-->        
+    <div class="slds-card">
+        <div class="slds-card__body">
+            <div class="slds-grid slds-wrap">  
+                <aura:if isTrue="{!and(v.strIdAprReq != '', v.strIdAprReq != null, v.strIdAprReq != undefined)}">
+                    <div id="acp" class="slds-size--1-of-3 slds-truncate">
+                        <div class="slds-align_absolute-center slds-p-bottom_none">
+                            <button class="slds-button slds-button_icon slds-button_icon-container" title="Aprobar Pedido" name="Aprobar" onclick="{!c.aprobar}">
+                                <lightning:icon iconName="action:approval" size="x-small" alternativeText="Aprobar Pedido"/>
+                                <span class="slds-assistive-text">Aprobar Pedido</span>
+                            </button>
+                        </div>
+                        <p class="text_align"><small>Aprobar</small></p>                    
+                    </div>
+                    <div id="rcz" class="slds-size--1-of-3 slds-truncate">
+                        <div class="slds-align_absolute-center slds-p-bottom_none">
+                            <button class="slds-button slds-button_icon slds-button_icon-container" title="Rechazar Pedido" name="Rechazar" onclick="{!c.rechazar}">
+                                <lightning:icon iconName="action:close" size="x-small" alternativeText="Rechazar Pedido"/>
+                                <span class="slds-assistive-text">Rechazar Pedido</span>
+                            </button>
+                        </div> 
+                        <p class="text_align"><small>Rechazar</small></p> 
+                    </div>
+                    <!--<div id="rsg" class="slds-size-****-1-of-4 slds-truncate">
+                        <div class="slds-align_absolute-center slds-p-bottom_none">
+                            <button class="slds-button slds-button_icon slds-button_icon-container" title="Reasignar Pedido" name="Reasignar" onclick="{!c.reasignar}">
+                                <lightning:icon iconName="action:change_owner" size="x-small" alternativeText="Reasignar Pedido"/>
+                                <span class="slds-assistive-text">Reasignar Pedido</span>
+                            </button>
+                        </div>  
+                        <p class="text_align"><small>Reasignar</small></p> 
+                    </div>-->
+                    <div id="cmt" class="slds-size--1-of-3 slds-truncate">
+                        <div class="slds-align_absolute-center slds-p-bottom_none">
+                            <button class="slds-button slds-button_icon slds-button_icon-container" title="Comentarios" name="Comentarios" onclick="{!c.comentarios}">
+                                <lightning:icon iconName="action:share_post" size="x-small" alternativeText="Comentarios"/>
+                                <span class="slds-assistive-text">Comentarioso</span>
+                            </button>
+                        </div> 
+                        <p class="text_align"><small>Comentarios</small></p>
+                    </div>
+                    <aura:set attribute="else">
+                        <span class="slds-align_absolute-center slds-truncate slds-p-around_small"><h1>{!v.strResultPd}</h1></span>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </div>
+    </div>     
+    
+    <!--************************* HEADER **********************-->     
+    <fieldset class="slds-box slds-theme--shade">  
+        <span class="slds-align_absolute-center slds-truncate"><h1>Pedido: <strong>{!v.objPedido.POCH_NumeroPedido__c}</strong></h1></span>
+    </fieldset>  
+    
+    <!--***********************  BODY LIST ********************-->
+    <aura:if isTrue="{!v.blnHasDetls}">
+        <div class="slds-card">
+            <div class="slds-card__body">
+                <lightning:accordion allowMultipleSectionsOpen="true" activeSectionName="{!v.lstActSctns}">            
+                    <aura:iteration items="{!v.objPedido.Detalles_de_autorizaciones__r}" var="detalle">                
+                        <lightning:accordionSection label="{!detalle.POCH_Producto__c}" name="{!detalle.Id}">                    
+                            <c:POCH_DetalleAutorizacion_cmp objDetallePedido="{!detalle}"/>                                   
+                        </lightning:accordionSection>                 
+                    </aura:iteration>                
+                </lightning:accordion> 
+            </div>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!!v.blnHasDetls}">
+        <p><strong>{!v.strNoDetail}</strong></p>
+    </aura:if>    
+
+</aura:component>

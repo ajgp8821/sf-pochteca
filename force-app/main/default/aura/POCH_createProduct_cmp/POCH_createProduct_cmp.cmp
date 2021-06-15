@@ -1,0 +1,50 @@
+<aura:component controller="POCH_InventorySheet_cls" access="global">
+
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:attribute name="textFields" type="Object[]" description="Recibe el objeto de campos texto definidos en metadata"/> 
+    <aura:attribute name="pickListFields" type="Object[]" description="Recibe el objeto de campos picklist definidos en metadata"/> 
+    
+    <aura:attribute name="idHojaInventario" type="String" default="" />
+    <aura:attribute name="idSucursal"       type="String" default="" />
+
+    <aura:registerEvent name="productCreated" type="c:POCH_AddProductsSheet_evt"/>
+    <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open cLookup">
+        <div class="slds-modal__container" style="width: 100%;">
+            <div class="slds-modal__header">
+                <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }" alternativeText="Cerrar" variant="bare-inverse" class="slds-modal__close"/>
+                <h2 id="header99" class="slds-text-heading--medium">Creación de producto</h2>
+                <br/>
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small" size="12">
+                        <div aria-labelledby="newProductForm">
+                            <fieldset class="slds-box slds-theme--default slds-container--small">
+                                <legend id="newProductForm" class="slds-text-heading--small slds-p-vertical--medium">Nuevo producto</legend>
+                                <form class="slds-form--stacked">
+                                    <div class="slds-grid" style="width: 100%;">
+                                        <div class="slds-col slds-size_1-of-2 textFields">
+                                            <aura:iteration items="{!v.textFields}" var="field" indexVar="key">
+                                                <lightning:input aura:id="productValue" label="{!field.MasterLabel}" name="{!field.Nombre_del_campo__c}" 
+                                                                 class="{!field.Objeto__c}" required="{!field.Nombre_del_campo__c == 'ProductCode' ? false : true}"/>
+                                            </aura:iteration>                
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2 selectFields" style="margin-left :5px;">
+                                            <aura:iteration items="{!v.pickListFields}" var="field" indexVar="key">
+                                                <lightning:select aura:id="productValue" label="{!field.MasterLabel}" name="{!field.Nombre_del_campo__c}" 
+                                                                  class="{!field.Objeto__c}" required="true">
+                                                    <aura:iteration items="{!field.PickListValues__c}" var="value" indexVar="index">
+                                                        <option value="{!value}">{!value}</option>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </aura:iteration>        
+                                        </div>
+                                    </div>
+                                    <lightning:button label="Crear producto" class="slds-m-top--medium" variant="brand" onclick="{!c.createProduct}"/>
+                                </form>
+                            </fieldset>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </div>
+    </div>
+</aura:component>

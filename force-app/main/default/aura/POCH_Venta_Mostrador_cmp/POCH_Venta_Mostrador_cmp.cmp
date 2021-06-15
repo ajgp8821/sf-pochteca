@@ -1,0 +1,417 @@
+<aura:component controller="POCH_VentaMostrador_cls" implements="lightning:actionOverride,force:hasRecordId,lightning:isUrlAddressable,force:lightningQuickActionWithoutHeader" access="global" >    
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    
+    <!--Events Handler-->    
+    <aura:handler name="DeleteRowEvt" event="c:POCH_DeleteProductsSheet_evt" action="{!c.removeDeletedRow}"/>
+    <!--<aura:handler name="AddRowEvt" event="c:POCH_AddProductsSheet_evt" action="{!c.addNewRow}"/>-->
+    <aura:attribute name="ventasMostrador" type="SObject"/> 
+    <aura:attribute name="ventasMostradorList" type="SObject[]"/> 
+    <aura:attribute name="ventasMostradorDetalleList" type="SObject[]"/> 
+    <aura:attribute name="selectedLookUpRecord" type="sObject" default="{}"/>
+    <aura:attribute name="blnMonthlyQuote" type="Boolean" default="false"/> 
+    <aura:attribute name="strIdAccount" type="String" default=""/>
+    <aura:attribute name="strIdSucursal" type="String" default=""/>
+    <aura:attribute name="strIdBranch" type="String" default=""/>     
+    <aura:attribute name="blnRecordExisteShowDetail" type="Boolean" default="false"/> 
+    <aura:attribute name="strFrecuencyQuot" type="String" /> 
+    <aura:attribute name="listFrecuencyQuoxProfile" type="list" default="['1']" description="field values months Coti"/>
+    <aura:attribute name="blnBorderColorCP" type="Boolean"  default="true"/>
+    <aura:attribute name="blnBorderColorSuc" type="Boolean"  default="true"/>
+    <aura:attribute name="blnBorderColorDesc" type="Boolean"  default="true"/>
+    <aura:attribute name="strErrores" type="String"  default=""/>
+    <aura:attribute name="blnErrores" type="Boolean"  default="false"/>
+    <aura:attribute name="simpleRecord" type="Object" />
+    <aura:attribute name="blnUpdatePrices" type="Boolean" default="false"/>    
+    <aura:attribute name="blnShowButtons"  type="Boolean" default="true"/>
+    <aura:attribute name="isStatusCancel"  type="Boolean" default="false"/>
+    <aura:attribute name="accountName" type="String" default=""/>
+    <aura:attribute name="idSap" type="String" default=""/>
+    <aura:attribute name="email" type="String" default=""/>
+    <aura:attribute name="currency" type="String" default=""/>
+    <aura:attribute name="creditLine" type="String" default=""/>
+    <aura:attribute name="conditionPago" type="String" default=""/>
+    <aura:attribute name="listViaPago" type="list" default="[]" description="field values via of pago"/>
+    <aura:attribute name="listMetPago" type="list" default="[]" description="field values via of Metodo pago"/>
+    <aura:attribute name="listMoneda" type="list" default="[]" description="field values Moneda"/>
+    
+    
+    <div class="slds-page-header">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-grid">
+                    <div class="slds-col slds-has-flexi-truncate">
+                        <div class="slds-media slds-no-space slds-grow">
+                            <div class="slds-media__figure">
+                                <lightning:icon
+                                                iconName="doctype:gsheet"
+                                                alternativeText="Call"
+                                                size="medium"
+                                                />
+                            </div>
+                            
+                            <div class="slds-media__body">
+                                <p class="slds-text-title--caps slds-line-height--reset"></p>
+                                <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate">
+                                    {!(v.blnRecordExisteShowDetail ? v.simpleRecord.Name : 'Venta Mostrador')}
+                                </h1>
+                                <!--$Label.c.POCH_InventorySheet -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            
+            <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                <div class="slds-truncate" title="test" style="width: 300px;">
+                    <lightning:outputField fieldName="{!v.strTest}" />
+                </div>
+                <lightning:button
+                                  variant="brand"
+                                  title="Cancelar"
+                                  onclick="{!c.Save}"
+                                  label="Cancelar Venta"
+                                  disabled="{!v.blnShowButtons}"
+                                  />
+                
+                <lightning:button
+                                  variant="brand"
+                                  title="Save"
+                                  onclick="{!c.Save}"
+                                  label="Guardar"
+                                  disabled="{!v.blnShowButtons}"
+                                  />
+                <lightning:button
+                                  variant="brand"
+                                  title="Save"
+                                  onclick="{!c.Save}"
+                                  label="Enviar a SAP"
+                                  disabled="{!v.blnShowButtons}"
+                                  />
+            </aura:if>
+            <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                <force:recordData
+                                  aura:id="recordLoader"
+                                  layoutType="FULL"
+                                  recordId="{!v.recordId}"
+                                  targetFields="{!v.simpleRecord}"
+                                  mode="VIEW"
+                                  />
+                <lightning:button
+                                  variant="brand"
+                                  title="Update"
+                                  onclick="{!c.Update}"
+                                  label="Guardar"
+                                  disabled="{!v.blnShowButtons}"
+                                  />
+            </aura:if>
+        </div>
+    </div>
+    <br />
+    
+    <div class="c-container">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Cliente:</div>
+                <div class="slds-truncate" title="cliente" style="width: 300px;">
+                    <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.accountName}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.ventasMostrador.Name_Cliente__c}" />
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Id de cliente SAP</div>
+                <div class="slds-text-heading_medium" title="cliente">
+                    <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.idSap}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.ventasMostrador.Id_cliente_SAP__c}" />
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Linea de credito del cliente</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                        <ui:outputNumber  class="CustomClassAlign" value="{!v.creditLine}" format="#,###.00" />
+                        <!--<lightning:input label="Input" type="number" formatter="currency" variant="label-hidden" value="{!v.creditLine}" step="1" readonly="true" />-->
+                    </aura:if>
+                    <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                        <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Credito_disponible__c}" format="#,###.00" />    
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Condicion de pago</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.conditionPago}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.ventasMostrador.Condicion_de_Pago__c}" />
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Moneda del pedido</div>
+                <!--<div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.currency}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="true" value="{!v.ventasMostrador.CurrencyIsoCode}" />
+                    </aura:if>
+                </div>-->   
+                <lightning:select aura:id="requiredInputMonedaComp"  
+                                name="Moneda"
+                                value="{!v.ventasMostrador.CurrencyIsoCode}"
+                                disabled="{!v.isStatusCancel}">
+                    <aura:iteration items="{!v.listMoneda}" var="val" >
+                        <option value="{!val}" >{!val}</option>
+                    </aura:iteration>
+                </lightning:select>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Via de pago</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <!--<lightning:layoutItem size="12">-->   
+                        <lightning:select aura:id="requiredInputMonedaComp"  
+                          <lightning:select aura:id="requiredInputMonedaComp"  
+                        <lightning:select aura:id="requiredInputMonedaComp"  
+                                        name="viaPago"
+                                        value="{!v.ventasMostrador.Via_de_pago__c}"
+                                        disabled="{!v.isStatusCancel}">
+                            <aura:iteration items="{!v.listViaPago}" var="val" >
+                                <option value="{!val}" >{!val}</option>
+                        </aura:iteration>
+                          </lightning:select>
+                    <!--</lightning:layoutItem>-->   
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Ultimos 4 digitos de tarjeta</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:inputNumber label="Digitos de tarjeta: " value="{!v.ventasMostrador.Digitos_tarjeta__c}" updateOn="keyup"
+                                    disabled="{!v.isStatusCancel}" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Uso de CFDI</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <h3>XXXX</h3>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Correo electronico</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="false" value="{!v.email}" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                        <lightning:input type="text" readonly="{!v.isStatusCancel}" value="{!v.ventasMostrador.Email__c}" />    
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Métodos de Pago</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <!--<lightning:layoutItem size="12">-->    
+                        <lightning:select aura:id="requiredInputMonedaComp"  
+                          <lightning:select aura:id="requiredInputMonedaComp"  
+                        <lightning:select aura:id="requiredInputMonedaComp"  
+                                    name="metPago"
+                                    value="{!v.ventasMostrador.Metodo_de_Pago__c}"
+                                    disabled="{!v.isStatusCancel}">
+                            <aura:iteration items="{!v.listMetPago}" var="val" >
+                                <option value="{!val}" >{!val}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    <!--</lightning:layoutItem>-->  
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Importe </div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:inputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Importe__c}" format="#,###.00" 
+                            disabled="{!v.isStatusCancel}" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Obs. Pago</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago__c}" disabled="{!v.isStatusCancel}" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Métodos de Pago 2</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <lightning:layoutItem size="12">    
+                          <lightning:select aura:id="requiredInputMonedaComp"  
+                                            name="metPago2"
+                                            value="{!v.ventasMostrador.Metodo_de_Pago2__c}"
+                                            disabled="{!v.isStatusCancel}">
+                              <aura:iteration items="{!v.listMetPago}" var="val" >
+                                  <option value="{!val}" >{!val}</option>
+                              </aura:iteration>
+                          </lightning:select>
+                    </lightning:layoutItem>   
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Importe 2</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:inputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Importe_2__c}" format="#,###.00" 
+                                disabled="{!v.isStatusCancel}"/>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Obs. Pago 2</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago_2__c}" disabled="{!v.isStatusCancel}" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Métodos de Pago 3</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <lightning:layoutItem size="12">    
+                          <lightning:select aura:id="requiredInputMonedaComp"  
+                                            name="metPago3"
+                                            value="{!v.ventasMostrador.Metodo_de_Pago3__c}"
+                                            disabled="{!v.isStatusCancel}">
+                              <aura:iteration items="{!v.listMetPago}" var="val" >
+                                  <option value="{!val}" >{!val}</option>
+                              </aura:iteration>
+                          </lightning:select>
+                    </lightning:layoutItem>   
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Importe 3</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:inputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Importe_3__c}" format="#,###.00" disabled="{!v.isStatusCancel}"/>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Obs. Pago 3</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago_3__c}" disabled="{!v.isStatusCancel}"/>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Valor neto</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Valor_Neto__c}" format="#,###.00" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Descuento</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Descuento__c}" format="#,###.00" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Subtotal</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Subtotal__c}" format="#,###.00" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">importe impuesto </div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.IVA__c}" format="#,###.00" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Precio total </div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Precio_total__c}" format="#,###.00" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <div class="custom-box">Id registro SAP de Ventas mostrador</div>
+                <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
+                    <lightning:input type="text" readonly="true" value="{!v.ventasMostrador.Id_Registro_SAP__c}" />
+                </div>
+            </lightning:layoutItem>     
+        </lightning:layout>
+    </div>
+    <br/>
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+        <thead >
+            <tr class="slds-line-height_reset ">
+                
+                <th class="" scope="col">
+                    <div class="slds-truncate" title="Agregar">
+                        <a onclick="{!c.addNewRow}">
+                            <lightning:icon iconName="utility:add" class="slds-icon slds-icon_small" size="small" alternativeText="add"/>
+                            <span class="slds-assistive-text">Add Icon</span> 
+                        </a>
+                    </div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Material">Material</div>
+                </th>
+                <th scope="col" >
+                    <div  class="{!v.blnBorderColorDesc == true ? 'slds-form-element slds-truncate slds-align_absolute-center' : 'slds-has-error slds-truncate slds-align_absolute-center'}"  title="Descripcion">Descripción</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Cantidad ">Cantidad</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="UM Venta">UM Venta</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Precio">Precio</div>
+                </th> 
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Moneda ">Moneda </div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Centro ">Centro </div>
+                </th>   
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Almacen">Almacen</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Porcentaje de descuento">% descuento</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Valor Neto">Valor Neto</div>
+                </th>  
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Stock">Stock</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate slds-align_absolute-center" title="Stock consignacion">Stock consignacion</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>  
+            
+            <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
+                    <c:POCH_VentaMostradorAddAndDeleteStock_cmp strIdSucursalAmp="{!v.strIdSucursal}" VentaInstance="{!item}" rowIndex="{!index}"
+                                                                ListaVentaSelected="{!v.ventasMostradorList}" />
+                <!--<aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
+                    <c:POCH_VentaMostradorAddAndDeleteStock_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}" 
+                                                                ListaVentaSelected="{!v.ventasMostradorList}" blnBorderColorCP="{!v.blnBorderColorDesc}"
+                                                                strIdSucursalAmp="{!v.strIdSucursal}"/>      
+                </aura:iteration>-->
+                </aura:iteration>
+            </aura:if>
+            <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
+                    <c:POCH_VentaMostradorDetailsEdit_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}"
+                                                          ListaVentaSelected="{!v.ventasMostradorList}" strIdSucursalAmp="{!v.strIdSucursal}"
+                                                          VentaMostrador="{!v.ventasMostrador}"/>      
+                </aura:iteration>
+            </aura:if>  
+        </tbody>
+    </table> 
+    
+</aura:component>
