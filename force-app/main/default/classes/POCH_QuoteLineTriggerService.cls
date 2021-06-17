@@ -56,11 +56,11 @@ QL.POCH_EstatusPartida__c = 'Abierta';
         
     }
     
-    public static void noChangeStatusAfterCancel(List<SBQQ__QuoteLine__c> lCPQQuoteLines){
+    public static void noChangeStatusAfterCancel(SBQQ__QuoteLine__c lCPQQuoteLines){
         // system.debug('quoteLL=>I am lCPQQuoteLines'+ lCPQQuoteLines);
         Map<Id,SBQQ__QuoteLine__c>  mapOldQuoteLine = (Map<Id,SBQQ__QuoteLine__c>) Trigger.oldMap; 
         set<Id> quoteIds = new set<Id>();
-        for(SBQQ__QuoteLine__c ql : lCPQQuoteLines){            
+     /*   for(SBQQ__QuoteLine__c ql : lCPQQuoteLines){            
             quoteIds.add(ql.SBQQ__Quote__c);
         }
       
@@ -82,13 +82,13 @@ QL.POCH_EstatusPartida__c = 'Abierta';
                                                                               || quoteLineCPQ.Descuento__c <> mapOldQuoteLine.get(quoteLineCPQ.Id).Descuento__c))
                         
                         quoteLineCPQ.addError('No puede cambiar el precio unitario y el descuento en este estado.');
-                }*/
+                }
             }
         }
         catch (Exception e) {
             System.debug('The following exception has occurred: ' + e.getMessage());
         }
-        
+        */
          system.debug('====================noChangeStatusAfterCancel====================');             
     }
     

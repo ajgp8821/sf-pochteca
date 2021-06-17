@@ -101,15 +101,15 @@ public class POCH_QuoteLineWFHelper {
         }
     }
     private void getFechaCancelado() {
-        set<Id> setIdPrecio = new set<Id>();
+        set<Id> setIdQoute = new set<Id>();
         this.mapQouteFechaCancel = new   Map<Id,String>();     
         for(SBQQ__QuoteLine__c ql : this.lQuoteLinesCPQ) {
             if(String.isNotBlank(ql.id))
-                setIdPrecio.add(ql.id);
+                setIdQoute.add(ql.id);
         } 
         
       for(SBQQ__QuoteLine__c  quoteLineCPQ : [select id,SBQQ__Quote__r.Tiempo_cancelacion__c,WF_Total_Paso__c,SBQQ__EndDate__c, SBQQ__StartDate__c, POCH_WF__c from SBQQ__QuoteLine__c where 
-                                                 SBQQ__Quote__r.Tiempo_cancelacion__c <> null and id =: setIdPrecio ]){
+                                                 SBQQ__Quote__r.Tiempo_cancelacion__c <> null and id =: setIdQoute ]){
                     this.mapQouteFechaCancel.put(quoteLineCPQ.Id, quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c);  
           }
     }
@@ -262,22 +262,27 @@ public class POCH_QuoteLineWFHelper {
     
      private void getAprobadoresWFGS() {
          Set<String> setIdOrVenta = new Set<String>();
-           Set<Boolean> setIdCuentaClave = new Set<Boolean>();
+           Set<Boolean> setIdCuentaClaveTV = new Set<Boolean>();
+           Set<Boolean> setIdGteCom1 = new Set<Boolean>();
          string orvent = '';
         for(SBQQ__QuoteLine__c ql : this.lQuoteLinesCPQ) {
           
             if(String.isNotBlank(ql.POCH_OrgVentasQuote__c)){
                 setIdOrVenta.add(ql.POCH_OrgVentasQuote__c);
-                setIdCuentaClave.add(ql.SBQQ__Quote__r.SBQQ__Account__r.POCH_CuentaClave__c);
+                setIdCuentaClaveTV.add(ql.SBQQ__Quote__r.SBQQ__Account__r.TV__c);
+                setIdGteCom1.add(ql.SBQQ__Quote__r.SBQQ__Account__r.Gte_Com1__c);
                 orvent = ql.POCH_OrgVentasQuote__c;
         }   
                }
        
         this.mapDirectorEjecutivoGS  = new Map<String,Id>();        
         List<POCH_WFAprobador__c> allWfaProb = new List<POCH_WFAprobador__c>();
-        if(setIdCuentaClave.contains(true)){
+        if(setIdCuentaClaveTV.contains(true) && setIdGteCom1.contains(false)){
             
-          allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and Cuenta_Clave__c =: true LIMIT 50000];
+          allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c,TV__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and TV__c =: true LIMIT 50000];
+        }else if(setIdCuentaClaveTV.contains(false) && setIdGteCom1.contains(true)){
+            
+          allWfaProb = [SELECT id, RecordType.Name, Gte_Com1__c,POCH_OrganizacionVentas__c,TV__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and Gte_Com1__c =: true LIMIT 50000];
         }else{
            allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta  LIMIT 50000];
             

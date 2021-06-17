@@ -11,12 +11,15 @@
    selectRecord : function(component, event, helper){    
       var getSelectRecord = component.get("v.oRecord");
       var getSelectIconName = component.get("v.IconName");
-      var compEvent = component.getEvent("oSelectedRecordEvent");
-      var compEventProductDetail = component.getEvent("AddProductLookupDetail");
       var isVentaMostrador = component.get("v.indVentaM");
+      var compEvent = component.getEvent("oSelectedRecordEvent");
       if (isVentaMostrador){
-         compEventProductDetail = component.getEvent("AddProductLookupDetail2");
+         var compEventProductDetail = component.getEvent("AddProductLookupDetail2");
+      } else {
+         var compEventProductDetail = component.getEvent("AddProductLookupDetail");
       }
+      
+      
       // para lookup de Sucursales
       compEvent.setParams({"recordByEvent" : getSelectRecord });  
 

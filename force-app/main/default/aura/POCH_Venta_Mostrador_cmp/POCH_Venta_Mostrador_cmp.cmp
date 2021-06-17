@@ -31,6 +31,7 @@
     <aura:attribute name="creditLine" type="String" default=""/>
     <aura:attribute name="conditionPago" type="String" default=""/>
     <aura:attribute name="listViaPago" type="list" default="[]" description="field values via of pago"/>
+    <aura:attribute name="listCFDI" type="list" default="[]" description="field values via of CFDI"/>
     <aura:attribute name="listMetPago" type="list" default="[]" description="field values via of Metodo pago"/>
     <aura:attribute name="listMoneda" type="list" default="[]" description="field values Moneda"/>
     
@@ -167,29 +168,40 @@
                         <lightning:input type="text" readonly="true" value="{!v.ventasMostrador.CurrencyIsoCode}" />
                     </aura:if>
                 </div>-->   
-                <lightning:select aura:id="requiredInputMonedaComp"  
+                <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
+                    <lightning:select aura:id="requiredInputMonedaComp"  
+                                name="Moneda"
+                                value="{!v.currency}"
+                                disabled="{!v.isStatusCancel}"
+                                onchange="{!c.validarMoneda}">
+                        <aura:iteration items="{!v.listMoneda}" var="val" >
+                            <option value="{!val}" >{!val}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </aura:if>
+                <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
+                    <lightning:select aura:id="requiredInputMonedaComp"  
                                 name="Moneda"
                                 value="{!v.ventasMostrador.CurrencyIsoCode}"
                                 disabled="{!v.isStatusCancel}">
-                    <aura:iteration items="{!v.listMoneda}" var="val" >
-                        <option value="{!val}" >{!val}</option>
-                    </aura:iteration>
-                </lightning:select>
+                        <aura:iteration items="{!v.listMoneda}" var="val" >
+                            <option value="{!val}" >{!val}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </aura:if>
             </lightning:layoutItem>
             <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                 <div class="custom-box">Via de pago</div>
                 <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
                     <!--<lightning:layoutItem size="12">-->   
                         <lightning:select aura:id="requiredInputMonedaComp"  
-                          <lightning:select aura:id="requiredInputMonedaComp"  
-                        <lightning:select aura:id="requiredInputMonedaComp"  
                                         name="viaPago"
                                         value="{!v.ventasMostrador.Via_de_pago__c}"
                                         disabled="{!v.isStatusCancel}">
                             <aura:iteration items="{!v.listViaPago}" var="val" >
                                 <option value="{!val}" >{!val}</option>
-                        </aura:iteration>
-                          </lightning:select>
+                            </aura:iteration>
+                        </lightning:select>
                     <!--</lightning:layoutItem>-->   
                 </div>
             </lightning:layoutItem>
@@ -203,7 +215,14 @@
             <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                 <div class="custom-box">Uso de CFDI</div>
                 <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
-                    <h3>XXXX</h3>
+                    <lightning:select aura:id="cfdi"  
+                                        name="cfdi"
+                                        value="{!v.ventasMostrador.Uso_de_CFDI__c}"
+                                        disabled="{!v.isStatusCancel}">
+                            <aura:iteration items="{!v.listCFDI}" var="val" >
+                                <option value="{!val}" >{!val}</option>
+                            </aura:iteration>
+                    </lightning:select>
                 </div>
             </lightning:layoutItem>
             <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
@@ -221,8 +240,6 @@
                 <div class="custom-box">Métodos de Pago</div>
                 <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
                     <!--<lightning:layoutItem size="12">-->    
-                        <lightning:select aura:id="requiredInputMonedaComp"  
-                          <lightning:select aura:id="requiredInputMonedaComp"  
                         <lightning:select aura:id="requiredInputMonedaComp"  
                                     name="metPago"
                                     value="{!v.ventasMostrador.Metodo_de_Pago__c}"
@@ -407,8 +424,8 @@
             <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
                 <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
                     <c:POCH_VentaMostradorDetailsEdit_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}"
-                                                          ListaVentaSelected="{!v.ventasMostradorList}" strIdSucursalAmp="{!v.strIdSucursal}"
-                                                          VentaMostrador="{!v.ventasMostrador}"/>      
+                                                          ListaVentaSelected="{!v.ventasMostradorList}" ventasMostrador="{!v.ventasMostrador}"
+                                                           />      
                 </aura:iteration>
             </aura:if>  
         </tbody>

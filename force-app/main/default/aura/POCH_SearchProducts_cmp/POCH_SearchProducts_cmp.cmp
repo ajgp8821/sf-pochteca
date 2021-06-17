@@ -8,6 +8,7 @@
     <aura:attribute name="indVentaM" type="boolean"/>
 
     <aura:handler name="productCreated" event="c:POCH_AddProductsSheet_evt" action="{!c.handleComponentEvent}"/>
+    <aura:handler name="productCreated" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.handleComponentEvent2}"/>
 
     <aura:if isTrue="{!v.isOpen}">
         <div class="slds-m-around_xx-large" style="height:640px">

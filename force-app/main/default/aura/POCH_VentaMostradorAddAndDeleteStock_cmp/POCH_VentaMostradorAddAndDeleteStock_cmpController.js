@@ -19,7 +19,7 @@
 		var blnShowPopupProd = event.getParam("evtShowPopUpProductLookup");	
 		var selectedProductFromEvent = event.getParam("recordByEvent");	
 		component.set("v.VentaInstance.POCH_Producto__c" , selectedProductFromEvent.Product2.Id); 
-		var productsSelected =  component.get("v.ListaProductsSelected");	
+		var productsSelected =  component.get("v.ListaVentaSelected");	
 		var strlastId =  component.get("v.VentaInstance.POCH_Producto__c");
 		var equalsvalues = [];
 
@@ -33,38 +33,24 @@
 			component.set("v.blnShowProducts" , blnShowPopupProd);
 			helper.showToast(component, event, helper,'No se pueden agregar productos iguales');			
 		} else {
-			component.set("v.VentaInstance.Name" , selectedProductFromEvent.Product2.Name); 		
-			component.set("v.VentaInstance.POCH_CantidadPotencial__c" , '0'); //selectedProductFromEvent.POCH_CantidadPotencial__c
-			component.set("v.VentaInstance.POCH_CantidadBase__c" , '0'); //selectedProductFromEvent.POCH_CantidadBase__c
-            component.set("v.VentaInstance.POCH_EsBase__c" , '0'); 
-			component.set("v.VentaInstance.POCH_EsPotencial__c" , '0'); 	
-			component.set("v.VentaInstance.POCH_Moneda__c" , selectedProductFromEvent.CurrencyIsoCode); 		
-			component.set("v.VentaInstance.POCH_PrecioLista__c",selectedProductFromEvent.UnitPrice);
-			component.set("v.VentaInstance.POCH_AquienCompra__c" , ''); 
-			component.set("v.VentaInstance.POCH_Estatus__c" , ''); 	
-			component.set("v.VentaInstance.POCH_Notas__c" , ''); 	
-			//component.set("v.ProductInstance.POCH_MonedaCompetencia__c" , ''); 
-            component.set("v.VentaInstance.Moneda_competencia__c" , '');
-			component.set("v.VentaInstance.POCH_CantidadCompetencia__c" , '');
-            console.log("-- UM " + selectedProductFromEvent.POCH_UnidadMedida__c);
-            if(selectedProductFromEvent.POCH_UnidadMedida__c == 'Kg' || selectedProductFromEvent.POCH_UnidadMedida__c == 'L' || selectedProductFromEvent.POCH_UnidadMedida__c == 'Lt') {
-                component.set("v.VentaInstance.POCH_UnidadMedida__c" , selectedProductFromEvent.POCH_UnidadMedida__c); 
-            }
+
             if(selectedProductFromEvent.Product2.ProductCode != '' && selectedProductFromEvent.Product2.ProductCode != null && selectedProductFromEvent.Product2.ProductCode != undefined ) {
-            	component.set("v.VentaInstance.POCH_Codigo__c" , selectedProductFromEvent.Product2.ProductCode.replace(/^0+/, ''));    
+            	component.set("v.VentaInstance.Material__c" , selectedProductFromEvent.Product2.ProductCode.replace(/^0+/, ''));    
             }
-            component.set("v.blnProductOnlySF", selectedProductFromEvent.Product2.onlyInSalesforce__c);
+            if(selectedProductFromEvent.Product2.Name != '' && selectedProductFromEvent.Product2.Name != null && selectedProductFromEvent.Product2.Name != undefined) {
+            	component.set("v.VentaInstance.Descripcion__c", selectedProductFromEvent.Product2.Name.replace(/^0+/, ''));
+            }
             if(selectedProductFromEvent.POCH_UnidadMedida__c != '' && selectedProductFromEvent.POCH_UnidadMedida__c != null && selectedProductFromEvent.POCH_UnidadMedida__c != undefined) {
-            	component.set("v.VentaInstance.POCH_uma__c", selectedProductFromEvent.POCH_UnidadMedida__c);  
-            } else {
-                component.set("v.VentaInstance.POCH_uma__c", selectedProductFromEvent.Product2.QuantityUnitOfMeasure);
+                component.set("v.VentaInstance.UnidadMedida__c" , selectedProductFromEvent.POCH_UnidadMedida__c);
             }
-            if(!!selectedProductFromEvent.Product2.onlyInSalesforce__c) {
-                component.set("v.VentaInstance.POCH_Estatus__c" , 'Inactivo'); 
+            // selectedProductFromEvent.CurrencyIsoCode
+            if(selectedProductFromEvent.CurrencyIsoCode != '' && selectedProductFromEvent.CurrencyIsoCode != null && selectedProductFromEvent.CurrencyIsoCode != undefined) {
+                component.set("v.VentaInstance.CurrencyIsoCode" , selectedProductFromEvent.CurrencyIsoCode);
             }
-			
-			component.set("v.blnShowProducts" , blnShowPopupProd);
-		}
+
+            component.set("v.blnShowProducts" , blnShowPopupProd);
+        
+        }
 	},
 
     validateUM : function(component, event, helper) {

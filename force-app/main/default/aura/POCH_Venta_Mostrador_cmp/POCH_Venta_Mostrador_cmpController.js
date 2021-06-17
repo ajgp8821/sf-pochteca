@@ -8,6 +8,7 @@
         helper.getPicklistValuesOneLevel(component,'Ventas_Mostrador__c','Via_de_pago__c', null); 
         helper.getPicklistValuesOneLevel(component,'Ventas_Mostrador__c','Metodo_de_Pago__c', null);
         helper.getPicklistValuesOneLevel(component,'Ventas_Mostrador__c','CurrencyIsoCode', null);
+        helper.getPicklistValuesOneLevel(component,'Ventas_Mostrador__c','Uso_de_CFDI__c', null);
         helper.assignParentId(component, event, helper);
         if (idVentasMostrador != null && idVentasMostrador != "") {
             component.set("v.blnRecordExisteShowDetail", true);
@@ -52,5 +53,10 @@
 
     refresh: function(component, event, helper) {
         $A.get('e.force:refreshView').fire();
+    },
+
+    validarMoneda: function(component, event, helper) { 
+        var indutry = component.get("v.currency");
+        var test = indutry;     
     }
 })

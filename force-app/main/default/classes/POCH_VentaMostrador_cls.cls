@@ -35,7 +35,9 @@ public class POCH_VentaMostrador_cls {
                         Precio_total__c,
                         Id_Registro_SAP__c,
                         Status__c,
-                        POCH_Sucursal__c
+                        POCH_Sucursal__c,
+                        Uso_de_CFDI__c,
+                        Enviado_SAP__c
                     FROM Ventas_Mostrador__c 
                     WHERE id =: idCabeceraVentaMostrador];
         system.debug(cabecera); 
@@ -150,7 +152,8 @@ public class POCH_VentaMostrador_cls {
                                 Name, 
                                 POCH_IDClienteSAP__c,
                                 CurrencyIsoCode,
-                                POCH_CorreoElectronico__c
+                                POCH_CorreoElectronico__c,
+                                POCH_ClasificacionFiscal__c
                             FROM Account 
                             WHERE Id =: idAccount];
         return cliente;
@@ -229,5 +232,37 @@ public class POCH_VentaMostrador_cls {
         }
             
         return listDescription;
+    }
+
+    /**
+    Metodo para validar la moneda vs la moneda de la sucursal 
+    */
+    @AuraEnabled        
+    public static Boolean validarCurrency(String idAccount, String moneda) {
+        Boolean currencyCorrect = false;
+        User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId()];
+        POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
+                                                    Id, 
+                                                    Poch_Sucursal__c 
+                                                FROM POCH_SucursalAmpliada__c 
+                                                WHERE POCH_Cliente__c =: idAccount
+                                                AND POCH_IdOrgVenta__c = '0029'];
+        POCH_Sucursal__c sucursal = [SELECT Id, CurrencyIsoCode FROM POCH_Sucursal__c WHERE Id =: sucursalAmp.Poch_Sucursal__c];
+        if (moneda == sucursal.CurrencyIsoCode){
+            currencyCorrect = true;
+        }
+        return currencyCorrect;
+    }
+
+    /**
+    Metodo para obtener listado de rate of currency 
+    */
+    @AuraEnabled        
+    public static List<String> getRates() {
+        List<String> listDescriptions = new List<String>();
+        for(CurrencyType listRates :[SELECT Id, ConversionRate, IsCorporate, IsActive, IsoCode FROM CurrencyType WHERE IsActive = true]){
+            listDescriptions.add(listRates.IsoCode + listRates.ConversionRate);
+        }
+        return listDescriptions;
     }
 }

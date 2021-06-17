@@ -23,6 +23,7 @@
                     let sucursalId = response.getReturnValue();
                     if(sucursalId !== null && sucursalId !== undefined) {
                         component.set("v.strIdSucursal",sucursalId);
+                        component.set('v.blnShowButtons', false);
                     }
                 } else {
                     console.log("--- Algo salio mal ---");
@@ -43,9 +44,10 @@
                 let cabeceraVentas = response.getReturnValue();
                 if(cabeceraVentas !== null && cabeceraVentas !== undefined) {
                     component.set("v.ventasMostrador",cabeceraVentas);
-                    if (cabeceraVentas.Status__c == 'Cancelado'){
+                    if (cabeceraVentas.Status__c == 'Cancelado' || cabeceraVentas.Enviado_SAP__c == true){
                         component.set('v.isStatusCancel', true);
                     }
+                    this.getDescriptionPicklist(component, 'Ventas_Mostrador__c','CurrencyIsoCode');
                 }
             } else {
                 console.log("--- Algo salio mal ---");
@@ -166,6 +168,7 @@
                     component.set("v.idSap", cliente.POCH_IDClienteSAP__c);
                     component.set("v.email", cliente.POCH_CorreoElectronico__c);
                     component.set("v.currency", cliente.CurrencyIsoCode);
+                    this.getDescriptionPicklist(component, 'Accouunt','CurrencyIsoCode');
                 }
             } else {
                 console.log("--- Algo salio mal ---");
@@ -248,9 +251,92 @@
                     component.set("v.listMoneda", ControllerFieldOneLevel);
                     
                 }
+                if(StrnNameField == 'Uso_de_CFDI__c'){
+                    component.set("v.listCFDI", ControllerFieldOneLevel);
+                    
+                }
                 
             }
         });
         $A.enqueueAction(action);
+    },
+
+    getDescriptionPicklist: function (component, StrObject,StrnNameField) {
+        var isNewRecord = component.get("v.blnRecordExisteShowDetail");
+        var regCabecera = component.get("v.ventasMostrador");
+        var action = component.get("c.getDescription");
+        var listApiField = new Array();
+        if (isNewRecord){
+            listApiField.push(regCabecera.CurrencyIsoCode);     
+        } else {
+            listApiField.push(component.get("v.currency"));    
+        }
+        listApiField.push(component.get("v.currency"));
+        action.setParams({
+            objectType: 'Ventas_Mostrador__c',
+            selectedField: 'CurrencyIsoCode',
+            listApiField: listApiField
+        });
+        action.setCallback(this, function (response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                let labelPicklist = response.getReturnValue();
+                if(labelPicklist !== null && labelPicklist !== undefined && labelPicklist.length > 0) {
+                    for (let index = 0; index < labelPicklist.length; index++) {
+                        if (isNewRecord){
+                            regCabecera.CurrencyIsoCode = labelPicklist[index];
+                            component.set("v.ventasMostrador", regCabecera);       
+                        } else {
+                            component.set("v.currency", labelPicklist[index]);  
+                        }
+                        
+                    }
+                }
+            } else {
+                console.log("--- Algo salio mal ---");
+            }
+        });
+        $A.enqueueAction(action);
+    },
+
+    calcularTotales: function (component, StrObject,StrnNameField) {
+        var action = component.get("c.getRates");
+        var detalleVentaMostrador =  component.get("v.ventasMostradorList");
+        var ventaMostrador =  component.get("v.ventasMostrador");
+        var sumatoriaDescuento = 0;
+        var sumatoriaValorNeto = 0;
+        var subTotal = 0;
+        action.setParams({
+
+        });
+        action.setCallback(this, function (response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                let listRates = response.getReturnValue();
+                if(listRates !== null && listRates !== undefined && listRates.length > 0) {
+                    sumatoriaDescuento = sumatoriaDescuento + detalleVentaMostrador.Descuento_Monto__c;
+                    for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
+                        if (detalleVentaMostrador.CurrencyIsoCode == ventaMostrador.CurrencyIsoCode){
+                            sumatoriaValorNeto = sumatoriaValorNeto + detalleVentaMostrador.Descuento_Monto__c;
+                        }else{
+                            for (var i = 0; i < listRates.length; i++) {
+                                if (listRates[i].substr(0,2) == detalleVentaMostrador[indexVar]){
+                                    sumatoriaValorNeto = sumatoriaValorNeto + (detalleVentaMostrador.Descuento_Monto__c / listRates[i].substr(3));
+                                }
+                            }
+                        }
+                    }
+                    ventaMostrador.Descuento__c = sumatoriaDescuento;
+                    ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
+                    subTotal = sumatoriaValorNeto - sumatoriaDescuento;
+                    ventaMostrador.Subtotal__c = subTotal;
+                    component.set("v.ventasMostrador", ventaMostrador);
+                }
+            } else {
+                console.log("--- Algo salio mal ---");
+            }
+        });
+        $A.enqueueAction(action);
+        
     }
 })

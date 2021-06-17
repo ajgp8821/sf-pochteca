@@ -14,7 +14,7 @@ public class POCH_QuoteLineTriggerHandler {
         POCH_QuoteLineTriggerService.calculateUnitPrice(triggerNew);
         POCH_QuoteLineTriggerService.calculateUtilityMargin(triggerNew);
         POCH_QuoteLineTriggerService.actualizacionCentros(triggerNew);
-        
+     
         // POCH_QuoteLineTriggerService.updateQLStatus(triggerNew);
     }    
     public static void beforeUpdate(List<SBQQ__QuoteLine__c> triggerNew) {
@@ -28,19 +28,17 @@ public class POCH_QuoteLineTriggerHandler {
         if(!procede){POCH_QuoteLineTriggerService.handleAlternateUniteMeasurement(triggerNew);}
         POCH_QuoteLineTriggerService.calculateUnitPrice(triggerNew);
         POCH_QuoteLineTriggerService.calculateUtilityMargin(triggerNew);
-        //if(!procede){ POCH_QuoteLineTriggerService.handleWFQuoteLinesAutorizadas(triggerNew);}
+        POCH_QuoteLineTriggerService.handleWFQuoteLinesAutorizadas(triggerNew);
         POCH_QuoteLineTriggerService.handleQuoteLinesApprovers(triggerNew);
         if(!procede){POCH_QuoteLineTriggerService.handleQuoteLinesComments(triggerNew);}
         if(!procede){POCH_QuoteLineTriggerService.preventFieldsToEdit(triggerNew);}
         if(!procede){POCH_QuoteLineTriggerService.handlePrecioEspecialDisable(triggerNew);}
-        if(!procede){POCH_QuoteLineTriggerService.actualizacionCentros(triggerNew);}
-        
-       //noChangeStatusAfterCancel POCH_QuoteLineWF.handleApprovalQuoteLine(triggerNew);        
+        if(!procede){POCH_QuoteLineTriggerService.actualizacionCentros(triggerNew);}        
+        //POCH_QuoteLineTriggerService.handleCommentAppproval(triggerNew);
+       // POCH_QuoteLineWF.handleApprovalQuoteLine(triggerNew);        
     }
     public static void afterUpdate(List<SBQQ__QuoteLine__c> triggerNew) {
-        POCH_QuoteLineTriggerService.noChangeStatusAfterCancel(triggerNew);
+        
         POCH_QuoteLineTriggerService.handleQuoteLinesWF(triggerNew);
-		
-		
       }
  }

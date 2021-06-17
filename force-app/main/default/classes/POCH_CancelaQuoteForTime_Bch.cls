@@ -24,7 +24,7 @@ AND StageName <> 'Orden de Compra' AND StageName <> 'Pago' AND StageName <> 'Cer
             quoteIds.add(QT.id);
         }system.debug('pasasndo por quoteIds'+quoteIds);
        
-        for(SBQQ__QuoteLine__c  quoteLineCPQ : [select id,fecha_inicio__c,SBQQ__Quote__r.id,fecha_cancelacion__c,SBQQ__Quote__r.Tiempo_cancelacion__c,WF_Total_Paso__c,SBQQ__EndDate__c, SBQQ__StartDate__c, POCH_WF__c from SBQQ__QuoteLine__c where SBQQ__Quote__c  IN : quoteIds 
+        for(SBQQ__QuoteLine__c  quoteLineCPQ : [select id,fecha_inicio__c,SBQQ__Quote__r.id,fecha_cancelacion__c,SBQQ__Quote__r.Tiempo_cancelacion__c,SBQQ__EndDate__c, SBQQ__StartDate__c, POCH_WF__c from SBQQ__QuoteLine__c where SBQQ__Quote__c  IN : quoteIds 
                                                 and SBQQ__Quote__r.Tiempo_cancelacion__c <> null and  POCH_EstatusCotizacion__c = 'Por Autorizar' and fecha_inicio__c <> null and fecha_cancelacion__c <> null limit 100]){
                                                     SBQQ__QuoteLine__c  quoteLineC  = new SBQQ__QuoteLine__c();
                                                     quoteLineC.id = quoteLineCPQ.id;
@@ -38,9 +38,7 @@ AND StageName <> 'Orden de Compra' AND StageName <> 'Pago' AND StageName <> 'Cer
         update lQuoteLinesWF;
         for(SBQQ__QuoteLine__c  lQuoteLinesW : lQuoteLinesWF){
             SBQQ__QuoteLine__c  quoteLineAC  = new SBQQ__QuoteLine__c();
-            system.debug('pasasndo por fecha_inicio__c'+lQuoteLinesW.fecha_inicio__c);
-            system.debug('pasasndo por fecha_cancelacion__c'+lQuoteLinesW.fecha_cancelacion__c);
-            if(lQuoteLinesW.fecha_inicio__c >= lQuoteLinesW.fecha_cancelacion__c){
+             if(lQuoteLinesW.fecha_inicio__c >= lQuoteLinesW.fecha_cancelacion__c){
                 system.debug('pasasndo por fecha_cancelacion__c despues de la comparacion'+lQuoteLinesW.fecha_cancelacion__c);
                 quoteLineAC.id  = lQuoteLinesW.id;
                 quoteLineAC.POCH_EstatusPartida__c = 'Cancelado';
