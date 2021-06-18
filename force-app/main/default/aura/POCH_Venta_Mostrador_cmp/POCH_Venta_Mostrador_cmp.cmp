@@ -409,7 +409,7 @@
             </tr>
         </thead>
         <tbody>  
-            
+            <!-- Nuevo -->
             <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
                 <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
                     <c:POCH_VentaMostradorAddAndDeleteStock_cmp strIdSucursalAmp="{!v.strIdSucursal}" VentaInstance="{!item}" rowIndex="{!index}"
@@ -421,6 +421,7 @@
                 </aura:iteration>-->
                 </aura:iteration>
             </aura:if>
+            <!-- Editar -->
             <aura:if isTrue="{!v.blnRecordExisteShowDetail}">
                 <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
                     <c:POCH_VentaMostradorDetailsEdit_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}"

@@ -95,7 +95,7 @@
         </td>
         <td data-label="% descuento">
                 <div class="slds-truncate slds-text-align_right" title="% descuento"  style="margin-top:17px;" >
-                    <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" />   
+                    <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" max="10" maxlength="2" />   
                 </div>
         </td>              
         <td data-label="Valor Neto">
