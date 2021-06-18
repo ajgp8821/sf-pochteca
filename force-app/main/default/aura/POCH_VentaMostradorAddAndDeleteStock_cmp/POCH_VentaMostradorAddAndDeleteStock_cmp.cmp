@@ -1,4 +1,4 @@
-<aura:component controller="POCH_VentaMostrador_cls" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">    
+<aura:component controller="POCH_VentaMostrador_cls" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId">
 
     <aura:attribute name="VentaInstance" type="Sobject"/>
     <aura:attribute name="rowIndex" type="String"/>
@@ -51,71 +51,69 @@
             </div>
         </td>
         <td data-label="Descripcion">
-                <div class="slds-truncate" title="Descripcion" style="width: 180px;">
-                    <lightning:textarea    name="inputDescripcion"  readonly="true"  value="{!v.VentaInstance.Descripcion__c }" />
-                </div>
+            <div class="slds-truncate" title="Descripcion" style="width: 180px;">
+                <lightning:textarea    name="inputDescripcion"  readonly="true"  value="{!v.VentaInstance.Descripcion__c }" />
+            </div>
         </td>
         <td data-label="Cantidad"  >
-                <div class="slds-truncate" title="Cantidad" style="width: 90px;">
-                    <ui:inputNumber required="true" class="CustomClassAlign" value="{!v.VentaInstance.POCH_Cantidad__c}" format="#,###.00" change="{!c.validateUM}"/>
-                </div>
+            <div class="slds-truncate" title="Cantidad" style="width: 90px;">
+                <ui:inputNumber required="true" class="CustomClassAlign" value="{!v.VentaInstance.POCH_Cantidad__c}" format="#,###.00" change="{!c.validateUM}"/>
+            </div>
         </td>
         <td data-label="UM Venta">
-                <div class="slds-truncate" title="UM Venta" style="width: 50px;">
-                    <lightning:layoutItem size="12">    
-                            <lightning:select aura:id="requiredInputUM"  
+            <div class="slds-truncate" title="UM Venta" style="width: 50px;">
+                <lightning:layoutItem size="12">
+                    <lightning:select aura:id="requiredInputUM"
                                         name="UnidaMedida"
                                         value="{!v.VentaInstance.UnidadMedida__c}">
-                            <aura:iteration items="{!v.listControllingValuesUnidaM}" var="val" >
-                                <option value="{!val}">{!val}</option>
-                            </aura:iteration> 
-                            </lightning:select>
-                    </lightning:layoutItem>
-                </div>
+                        <aura:iteration items="{!v.listControllingValuesUnidaM}" var="val" >
+                            <option value="{!val}">{!val}</option>
+                        </aura:iteration> 
+                    </lightning:select>
+                </lightning:layoutItem>
+            </div>
         </td>
         <td data-label="Precio">
-                <div class="slds-truncate slds-text-align_right" title="Precio Unitario"  style="margin-top:17px;" >
-                    <ui:outputCurrency value="{!v.VentaInstance.Precio__c}" format="$#,###.00" />
-                </div>
+            <div class="slds-truncate slds-text-align_right" title="Precio Unitario"  style="margin-top:17px;" >
+                <ui:outputCurrency value="{!v.VentaInstance.Precio__c}" format="$#,###.00" />
+            </div>
         </td>
         <td data-label="Moneda">
-                <div class="slds-truncate" title="Moneda" style="width: 80px;">
+            <div class="slds-truncate" title="Moneda" style="width: 80px;">
                 <lightning:input type="text" name="UMP" value="{!v.VentaInstance.CurrencyIsoCode}" readonly="true" />
-                </div>
+            </div>
         </td>
         <td data-label="Centro">
-                <div class="slds-truncate" title="Centro" style="width: 40px;">
-                    <lightning:input type="text" name="UMP" value="{!v.VentaInstance.POCH_uma__c}" readonly="true" />
-                </div>
-        </td>	
+            <div class="slds-truncate" title="Centro" style="width: 40px;">
+                <lightning:input type="text" name="UMP" value="{!v.VentaInstance.POCH_uma__c}" readonly="true" />
+            </div>
+        </td>
         <td data-label="Almacen">
-                <div class="slds-truncate slds-text-align_right" title="Almacen"  style="margin-top:17px;" >
-                    <ui:outputCurrency value="{!v.VentaInstance.POCH_EsPotencial__c}" format="$#,###.00" />
-                </div>
+            <div class="slds-truncate slds-text-align_right" title="Almacen"  style="margin-top:17px;" >
+                <ui:outputCurrency value="{!v.VentaInstance.POCH_EsPotencial__c}" format="$#,###.00" />
+            </div>
         </td>
         <td data-label="% descuento">
-                <div class="slds-truncate slds-text-align_right" title="% descuento"  style="margin-top:17px;" >
-                    <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" max="10" maxlength="2" />   
-                </div>
-        </td>              
+            <div class="slds-truncate slds-text-align_right" title="% descuento"  style="margin-top:17px;" >
+                <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" max="10" maxlength="2" />
+            </div>
+        </td>
         <td data-label="Valor Neto">
-                <div class="slds-truncate" title="Valor Neto" style="width: 90px;">
-                </div>
+            <div class="slds-truncate" title="Valor Neto" style="width: 90px;"></div>
         </td>
         <td data-label="Stock">
-                <div class="slds-truncate" title="Stock" style="width: 85px;">
-                </div>
-        </td>                
+            <div class="slds-truncate" title="Stock" style="width: 85px;"></div>
+        </td>
         <td data-label="Stock consignacion">
-                <div class="slds-truncate" title="Stock consignacion" style="width: 80px;">
-                    <lightning:input class="CustomClassAlign" type="text" name="precioComp" value="{!v.VentaInstance.POCH_CantidadCompetencia__c}"/>
-                </div>
+            <div class="slds-truncate" title="Stock consignacion" style="width: 80px;">
+                <lightning:input class="CustomClassAlign" type="text" name="precioComp" value="{!v.VentaInstance.POCH_CantidadCompetencia__c}"/>
+            </div>
         </td>
     </tr>
     <lightning:input type="text" name="9999" value="7777" readonly="true" />
     <lightning:input type="text" name="strIdSucursalAmp" value="{!v.strIdSucursalAmp}" readonly="true" />
-	<aura:if isTrue="{!v.blnShowProducts}">
-		<c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.strIdSucursalAmp}" idInvSheet="{!v.strIdHojaInv}" 
+    <aura:if isTrue="{!v.blnShowProducts}">
+        <c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.strIdSucursalAmp}" idInvSheet="{!v.strIdHojaInv}" 
                                     indVentaM="{!v.indVentaM}"/>
-	</aura:if>
+    </aura:if>
 </aura:component>
