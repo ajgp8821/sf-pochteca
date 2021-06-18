@@ -17,9 +17,15 @@
 		component.set("v.listMoneda" ,component.get("v.VentaInstance.CurrencyIsoCode"));
 	},
 	
-	removeRow : function(component, event, helper){
-		helper.RemoveRecordToDetail(component, event, helper); 
-	},
+	// removeRow : function(component, event, helper){
+	// 	helper.RemoveRecordToDetail(component, event, helper); 
+	// },
+
+	removeRow : function(component, event, helper) {
+		component.getEvent("DeleteRowEvt").setParams(
+				{"indexVar" : component.get("v.rowIndex") }
+		).fire();
+},
 	
 	LookupProduct : function(component, event, helper){
 		component.set("v.blnShowProducts", true);	 

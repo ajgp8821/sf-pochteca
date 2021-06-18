@@ -30,15 +30,24 @@
     <tr class="slds-hint-parent">
         
         <td data-label="icon">
-            <div class="slds-truncate" title="icon" style="margin-top:17px;" >
-                <a onclick="{!c.LookupProduct}">
-                    <lightning:icon class="slds-show" iconName="utility:search" size="x-small" alternativeText="Producto"/>
-                </a>
+            <div class="slds-align_absolute-center">
+                <div class="slds-size_1-of-2 slds-align_absolute-center" >
+                    <a onclick="{!c.LookupProduct}">
+                        <lightning:icon class="slds-input__icon slds-show" iconName="utility:search" size="x-small" alternativeText="Producto"/>
+                    </a>
+                </div>
+                <div class="slds-size_1-of-2 slds-align_absolute-center" >
+                    <a onclick="{!c.removeRow}">
+                        <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                        <span class="slds-assistive-text">Delete Icon</span>
+                    </a>
+                </div>
             </div>
         </td>
+        
         <td data-label="Codigo">
             <div class="slds-truncate" title="Codigo" style="width: 100px;">
-                  <lightning:input  class="CustomClassAlignCenter"  type="text" name="input001"  readonly="true"  value="{!v.VentaInstance.Material__c}" />
+                <lightning:input  class="CustomClassAlignCenter"  type="text" name="input001"  readonly="true"  value="{!v.VentaInstance.Material__c}" />
             </div>
         </td>
         <td data-label="Descripcion">
@@ -71,15 +80,6 @@
         </td>
         <td data-label="Moneda">
                 <div class="slds-truncate" title="Moneda" style="width: 80px;">
-                    <!-- <lightning:layoutItem size="12">    
-                        <lightning:select aura:id="requiredInputMonedaComp"  
-                                        name="Moneda"
-                                        value="{!v.VentaInstance.CurrencyIsoCode}">
-                            <aura:iteration items="{!v.listMoneda}" var="val" >
-                                <option value="{!val}" >{!val}</option>
-                            </aura:iteration>
-                        </lightning:select>
-                </lightning:layoutItem>    -->
                 <lightning:input type="text" name="UMP" value="{!v.VentaInstance.CurrencyIsoCode}" readonly="true" />
                 </div>
         </td>

@@ -1,32 +1,32 @@
 <aura:component controller="POCH_VentaMostrador_cls" implements="force:hasRecordId,flexipage:availableForRecordHome" access="global">
 
-    <aura:attribute name="VentaInstance" type="Sobject"/>
-    <aura:attribute name="ventasMostrador" type="Sobject"/>
-    <aura:attribute name="rowIndex" type="String"/>
-    <aura:attribute name="strIdDetail" type="String"/>
-    <aura:attribute name="ListaVentaSelected" type="list"/>
-    <aura:attribute name="blnShowProducts" type="Boolean"  default="false"/>
-    <aura:attribute name="listControllingValuesUnidaM" type="list" default="[]" description="field values UM"/>
-    <aura:attribute name="listMoneda" type="list" default="[]" description="field values Moneda"/>
-    <aura:attribute name="listControllingValuesEstatus" type="list" default="[]" description="field values Estatus"/>
-    <aura:attribute name="listWhoBuy" type="list" default="[]" description="field values Who Buy"/>
-    <aura:attribute name="strFreQuote" type="String" default="1"/>
-    <aura:attribute name="isStatusCancel"  type="Boolean" default="false"/>
-    
-    <aura:attribute name="strIdSucursalAmp" type="String"  default="" /> 
-    <aura:attribute name="strIdVentaMostrador"     type="String"  default="" />
-    <aura:attribute name="blnProductOnlySF" type="Boolean" default="false" />
-    <aura:attribute name="strIdAcc"         type="String"  default=""/> 
-    <aura:attribute name="blnisEspPrecio"   type="Boolean" default="false"/>
-    <aura:attribute name="indVentaM" type="Boolean"  default="true"/>
-    
-    <aura:handler name="init" value="this" action="{!c.doInit}"/>                 
+      <aura:attribute name="VentaInstance" type="Sobject"/>
+      <aura:attribute name="ventasMostrador" type="Sobject"/>
+      <aura:attribute name="rowIndex" type="String"/>
+      <aura:attribute name="strIdDetail" type="String"/>
+      <aura:attribute name="ListaVentaSelected" type="list"/>
+      <aura:attribute name="blnShowProducts" type="Boolean"  default="false"/>
+      <aura:attribute name="listControllingValuesUnidaM" type="list" default="[]" description="field values UM"/>
+      <aura:attribute name="listMoneda" type="list" default="[]" description="field values Moneda"/>
+      <aura:attribute name="listControllingValuesEstatus" type="list" default="[]" description="field values Estatus"/>
+      <aura:attribute name="listWhoBuy" type="list" default="[]" description="field values Who Buy"/>
+      <aura:attribute name="strFreQuote" type="String" default="1"/>
+      <aura:attribute name="isStatusCancel"  type="Boolean" default="false"/>
+      
+      <aura:attribute name="strIdSucursalAmp" type="String"  default="" /> 
+      <aura:attribute name="strIdVentaMostrador"     type="String"  default="" />
+      <aura:attribute name="blnProductOnlySF" type="Boolean" default="false" />
+      <aura:attribute name="strIdAcc"         type="String"  default=""/> 
+      <aura:attribute name="blnisEspPrecio"   type="Boolean" default="false"/>
+      <aura:attribute name="indVentaM" type="Boolean"  default="true"/>
+      
+      <aura:handler name="init" value="this" action="{!c.doInit}"/>                 
 
-    <aura:handler name="AddProductLookupDetail" event="c:POCH_AddProductInInventotySheet_evt" action="{!c.addNewProductSelected}"/>
-    <aura:handler name="AddProductLookupDetail2" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.addNewProductSelected}"/>
-    <!-- Register 2 Lightning Event for handle add or Delete rows on Parent Component  --> 
-    <aura:registerEvent name="DeleteRowEvt" type="c:POCH_DeleteProductsSheet_evt"/> 
-    <!-- Table Row -->  
+      <aura:handler name="AddProductLookupDetail" event="c:POCH_AddProductInInventotySheet_evt" action="{!c.addNewProductSelected}"/>
+      <aura:handler name="AddProductLookupDetail2" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.addNewProductSelected}"/>
+      <!-- Register 2 Lightning Event for handle add or Delete rows on Parent Component  --> 
+      <aura:registerEvent name="DeleteRowEvt" type="c:POCH_DeleteProductsSheet_evt"/> 
+      <!-- Table Row -->  
       <tr class="slds-hint-parent">
             <td data-label="icon">
                   <div class="slds-align_absolute-center">
