@@ -44,6 +44,7 @@
                 let cabeceraVentas = response.getReturnValue();
                 if(cabeceraVentas !== null && cabeceraVentas !== undefined) {
                     component.set("v.ventasMostrador",cabeceraVentas);
+                    component.set("v.strIdAccount", cabeceraVentas.Cliente__c);
                     if (cabeceraVentas.Status__c == 'Cancelado' || cabeceraVentas.Enviado_SAP__c == true){
                         component.set('v.isStatusCancel', true);
                     }
@@ -168,6 +169,9 @@
                     component.set("v.idSap", cliente.POCH_IDClienteSAP__c);
                     component.set("v.email", cliente.POCH_CorreoElectronico__c);
                     component.set("v.currency", cliente.CurrencyIsoCode);
+                    if (cliente.POCH_ClasificacionFiscal__c == 0){
+                        component.set("v.isExento", true);
+                    }
                     this.getDescriptionPicklist(component, 'Accouunt','CurrencyIsoCode');
                 }
             } else {
@@ -234,9 +238,9 @@
                     listOneLevel.push(StoreResponse[i]);
                 }  
             	//
-                if (listOneLevel != undefined && listOneLevel.length > 0) {
+                /*if (listOneLevel != undefined && listOneLevel.length > 0) {
                     ControllerFieldOneLevel.push('-NA-');        
-                }
+                }*/
                 
                 for (var i = 0; i < listOneLevel.length; i++) {
                     ControllerFieldOneLevel.push(listOneLevel[i]);
@@ -300,43 +304,139 @@
     },
 
     calcularTotales: function (component, StrObject,StrnNameField) {
-        var action = component.get("c.getRates");
+        var isNewRecord = component.get("v.blnRecordExisteShowDetail");
         var detalleVentaMostrador =  component.get("v.ventasMostradorList");
         var ventaMostrador =  component.get("v.ventasMostrador");
+        var action2 = component.get("c.getApiName");
+        var action = component.get("c.getRates");
+        var sumatoriaIVA = 0;
         var sumatoriaDescuento = 0;
         var sumatoriaValorNeto = 0;
-        var subTotal = 0;
-        action.setParams({
-
+        if (isNewRecord){
+            if (ventaMostrador.IVA__c > 0) {
+                exento = false;
+            }else {
+                var exento = true;
+            }   
+        } else {
+            var exento = component.get("v.isExento");   
+        }
+        
+        var currencyAux = "";
+        action2.setParams({
+            objectType: 'Ventas_Mostrador__c',
+            selectedField: 'CurrencyIsoCode',
+            apiLabel: ventaMostrador.CurrencyIsoCode
         });
-        action.setCallback(this, function (response) {
-            var state = response.getState();
-            if (state === "SUCCESS") {
-                let listRates = response.getReturnValue();
-                if(listRates !== null && listRates !== undefined && listRates.length > 0) {
-                    sumatoriaDescuento = sumatoriaDescuento + detalleVentaMostrador.Descuento_Monto__c;
-                    for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
-                        if (detalleVentaMostrador.CurrencyIsoCode == ventaMostrador.CurrencyIsoCode){
-                            sumatoriaValorNeto = sumatoriaValorNeto + detalleVentaMostrador.Descuento_Monto__c;
-                        }else{
-                            for (var i = 0; i < listRates.length; i++) {
-                                if (listRates[i].substr(0,2) == detalleVentaMostrador[indexVar]){
-                                    sumatoriaValorNeto = sumatoriaValorNeto + (detalleVentaMostrador.Descuento_Monto__c / listRates[i].substr(3));
+        action2.setCallback(this, function(response) {
+            if (response.getState() == "SUCCESS") {
+                currencyAux =  response.getReturnValue();
+                action.setParams({
+                });
+                action.setCallback(this, function (response) {
+                    var state = response.getState();
+                    if (state === "SUCCESS") {
+                        let listRates = response.getReturnValue();
+                        if(listRates !== null && listRates !== undefined && listRates.length > 0) {
+                            
+                            for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
+                                sumatoriaDescuento = sumatoriaDescuento + detalleVentaMostrador[indexVar].Descuento_Monto__c;
+                                if (detalleVentaMostrador[indexVar].CurrencyIsoCode == currencyAux){
+                                    sumatoriaValorNeto = sumatoriaValorNeto + detalleVentaMostrador[indexVar].Precio__c;
+                                    if (exento == false){
+                                        sumatoriaIVA = sumatoriaIVA + detalleVentaMostrador[indexVar].IVA__c;              
+                                    }
+                                    
+                                }else{
+                                    for (var i = 0; i < listRates.length; i++) {
+                                        var temp = listRates[i].substr(0,3);
+                                        var temp2 = listRates[i].substr(3);
+                                        var temp3 = detalleVentaMostrador[indexVar].CurrencyIsoCode;
+                                        if (listRates[i].substr(0,3) == detalleVentaMostrador[indexVar].CurrencyIsoCode){
+                                            sumatoriaValorNeto = sumatoriaValorNeto + (detalleVentaMostrador[indexVar].Precio__c / listRates[i].substr(3));
+                                            if (exento == false){
+                                                sumatoriaIVA = sumatoriaIVA + (detalleVentaMostrador[indexVar].IVA__c / listRates[i].substr(3));              
+                                            }
+                                        }
+                                    }
                                 }
                             }
+                            ventaMostrador.Descuento__c = sumatoriaDescuento;
+                            ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
+                            ventaMostrador.Subtotal__c = sumatoriaValorNeto - sumatoriaDescuento;
+                            ventaMostrador.IVA__c = sumatoriaIVA;
+                            ventaMostrador.Precio_total__c = ventaMostrador.Subtotal__c + ventaMostrador.IVA__c;
+                            component.set("v.ventasMostrador", ventaMostrador);
                         }
+                    } else {
+                        console.log("--- Algo salio mal ---");
                     }
-                    ventaMostrador.Descuento__c = sumatoriaDescuento;
-                    ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
-                    subTotal = sumatoriaValorNeto - sumatoriaDescuento;
-                    ventaMostrador.Subtotal__c = subTotal;
-                    component.set("v.ventasMostrador", ventaMostrador);
+                });
+                $A.enqueueAction(action);
+            }
+        });
+        $A.enqueueAction(action2);
+        
+    },
+
+    getApiName: function(component,StrObject,StrnNameField, label) {
+        var action = component.get("c.getApiName"); 
+        action.setParams({
+            objectType: StrObject,
+            selectedField: StrnNameField,
+            apiLabel: label
+        });
+        action.setCallback(this, function(response) {
+            if (response.getState() == "SUCCESS") {
+                var StoreResponse =  response.getReturnValue();
+                if(StrnNameField == 'CurrencyIsoCode'){
+                    this.validarCurrency(component, StoreResponse);       
                 }
-            } else {
-                console.log("--- Algo salio mal ---");
+                
             }
         });
         $A.enqueueAction(action);
-        
+    },
+
+    validarCurrency: function(component,StrnNameField) {
+        var action = component.get("c.validarCurrency"); 
+        var msj = '';
+        var lst = '<ul> Error :';
+        var noNewRecord = component.get("v.blnRecordExisteShowDetail");
+        if (noNewRecord){
+            var aux = component.get("v.ventasMostrador")
+            var idAccount = aux.Cliente__c;
+        }else {
+            var idAccount = component.get("v.strIdAccount");
+        }
+        action.setParams({
+            idAccount: idAccount,
+            moneda: StrnNameField
+        });
+        action.setCallback(this, function(response) {
+            if (response.getState() == "SUCCESS") {
+                var StoreResponse =  response.getReturnValue();
+                if(StoreResponse == false){
+                    msj +=' Moneda no permitida'
+                    var errores =  msj;
+                    //component.set("v.blnErrores", true);  
+                    component.set("v.strErrores", errores);
+                    component.set('v.blnShowButtons',true);
+                    this.showToast('Error', 'Error!', msj);
+                }
+                
+            }
+        });
+        $A.enqueueAction(action);
+    },
+
+    showToast : function(tipomsj,titlemsj,Mensaje) {
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+            "type": tipomsj,
+            "title": titlemsj,
+            "message": Mensaje
+        });
+        toastEvent.fire();        
     }
 })

@@ -15,7 +15,15 @@ public class POCH_QuoteLineWF {
         System.debug('::: IN POCH_QuoteLineWF.handleApprovalQuoteLine : lCPQQuoteLines --> ' + lCPQQuoteLines); 
         
         POCH_QuoteLineWFHelper helperQL = new POCH_QuoteLineWFHelper(lCPQQuoteLines);                    
-        for(SBQQ__QuoteLine__c quoteLineCPQ : lCPQQuoteLines) {              
+        for(SBQQ__QuoteLine__c quoteLineCPQ : lCPQQuoteLines) { 
+                           if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
+                                System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
+                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
+                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
+                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
+                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
+                                
+                            }		
             handleWFMaterialesCriticos(quoteLineCPQ, helperQL);
             System.debug('::: OUT POCH_QuoteLineWF.mapPrecioEntradaLibro'+quoteLineCPQ.Precio_del_D_a__c);
         }
@@ -162,14 +170,7 @@ public class POCH_QuoteLineWF {
                         
                     }                                                        
                 }
-                 if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
-                                     System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
-                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
-                                
-                            }
+                
                 /*  if(quoteLineCPQ.POCH_MargenUtilidad__c <= helperQL.mapMargenesPolitica.get(quoteLineCPQ.POCH_ClasePedido__c).POCH_MargenGR__c) {
 if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'))) { quoteLineCPQ.POCH_WFAprobador2__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'); }                                        
 //quoteLineCPQ.POCH_WFAprobador2__c = '0055C000002K5e5QAC';
@@ -202,7 +203,7 @@ activaWF = true;
 }*/
             } else handleWFExcepciones(quoteLineCPQ, helperQL); 
         } else handleWFExcepciones(quoteLineCPQ, helperQL);                                  
-        
+       
         System.debug('::: OUT POCH_QuoteLineWF.handleWFMaterialesCriticos');
     }
     
@@ -228,13 +229,10 @@ activaWF = true;
                 if(tieneExcepcion && quoteLineCPQ.POCH_MargenUtilidad__c <> 0 && quoteLineCPQ.POCH_MargenUtilidad__c <> null && quoteLineCPQ.POCH_MargenUtilidad__c < margenExcepcion) {
                      if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
                                      System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
-                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
-                                
+                              
                             }
-                    
+                               
+                                
                     System.debug('::: IN POCH_QuoteLineWF.handleWFExcepciones : tiene 97 --> ');
                     System.debug('--> 3. Entra a WF de Excepciones ::: APROBADORES ASIGNADOS : ' + quoteLineCPQ.Id);
                     quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
@@ -242,8 +240,9 @@ activaWF = true;
                     quoteLineCPQ.POCH_WFComentarios__c = helperQL.configuracionWF.POCH_ComentariosWFExcepciones__c;			        
                 } else handleWFPreciosEspeciales(quoteLineCPQ, helperQL);
             } else handleWFPreciosEspeciales(quoteLineCPQ, helperQL);
-        } else handleWFPreciosEspeciales(quoteLineCPQ, helperQL);               
+        } else handleWFPreciosEspeciales(quoteLineCPQ, helperQL);  
         
+     
         System.debug('::: OUT POCH_QuoteLineWF.handleWFExcepciones');
     }
     
@@ -262,6 +261,9 @@ activaWF = true;
             if(quoteLineCPQ.POCH_PrecioUnitario__c >= helperQL.mapPreciosEspeciales.get(setIdContartedPrice)) {               
                 System.debug('::: SE COMPRUEBA QUE UNITARIO MENOR QUE PRECIO ESPECIAL NULL --> ' + quoteLineCPQ);
                 System.debug('--> 4. Es Precio Especial ::: PARTIDA AUTORIZADA --> ' + quoteLineCPQ.Id);
+                
+              
+                
                 quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
                 quoteLineCPQ.POCH_EstatusPartida__c            = 'Precio Especial Vigente';
                 quoteLineCPQ.POCH_WFMaterialCriticoAprobado__c = true;
@@ -279,6 +281,8 @@ activaWF = true;
             
             if(quoteLineCPQ.POCH_MargenUtilidad__c > helperQL.mapPreciosMargen.get(setIdContartedPrice)) {
                 System.debug('--> 4. Es Precio Especial ::: PARTIDA AUTORIZADA --> ' + quoteLineCPQ.Id);
+            
+                
                 quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
                 quoteLineCPQ.POCH_EstatusPartida__c            = 'Precio Especial Vigente';
                 quoteLineCPQ.POCH_WFMaterialCriticoAprobado__c = true;
@@ -291,7 +295,7 @@ activaWF = true;
             }
             
         }
-        
+       
         System.debug('::: IN POCH_QuoteLineWF.handleWFPreciosEspeciales');
     }
     //:::::::::::::::::::::::: 5. WF Lista de Precios por Volumen ::::::::::::::::::::::::::::: 
@@ -515,26 +519,12 @@ saltos = 5;
                                 //quoteLineCPQ.POCH_WFAprobador5__c = '0055C000002MpeUQAS';  //Test
                             }
                              System.debug('PASA POR helperQL.mapQouteFechaCancel'+helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)); 
-                              if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
-                                     System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
-                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
-                                
-                            }
+                             
                             System.debug('--> 5. Entra a WF de Escala x Volumen ::: APROBADORES ASIGNADOS --> ' + quoteLineCPQ.Id);                            
                             quoteLineCPQ.POCH_WF__c            = helperQL.configuracionWF.POCH_WFEscalaVolumen__c;
                             quoteLineCPQ.POCH_WFComentarios__c = helperQL.configuracionWF.POCH_ComentariosWFEscalaVolumen__c;
                         } else {
-                             if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
-                                     System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
-                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
-                                
-                            }
+                             
                             quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
                             System.debug('--> 5._1 ES Precio de Lista ::: PARTIDA AUTORIZADA --> ' + quoteLineCPQ.Id);
                             quoteLineCPQ.POCH_EstatusPartida__c            = 'Precio de Lista';
@@ -612,10 +602,7 @@ saltos = 5;
                                System.debug('PASA POR helperQL.mapQouteFechaCancel'+helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)); 
                               if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
                                      System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
-                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
+                              
                                 
                             }
                             System.debug('--> 5. Entra a WF de Escala x Volumen ::: APROBADORES ASIGNADOS --> ' + quoteLineCPQ.Id);                            
@@ -625,14 +612,7 @@ saltos = 5;
                              quoteLineCPQ.POCH_WF__c             = helperQL.configuracionWF.POCH_WFEscalaVolumen__c;
                             quoteLineCPQ.POCH_WFComentarios__c = helperQL.configuracionWF.POCH_ComentariosWFEscalaVolumen__c;
                         } else {
-                             if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
-                                     System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
-                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
-                                
-                            }
+                             
                             quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
                             System.debug('--> 5._1 ES Precio de Lista ::: PARTIDA AUTORIZADA --> ' + quoteLineCPQ.Id);
                             quoteLineCPQ.POCH_EstatusPartida__c            = 'Precio de Lista';
@@ -646,11 +626,7 @@ saltos = 5;
                 } else {
                      if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
                                      System.debug('String.isNotBlank(quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c'); 
-                                quoteLineCPQ.fecha_inicio__c = Datetime.now();
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='24'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(1);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='48'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(2);}
-                                if(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)=='72'){quoteLineCPQ.fecha_cancelacion__c = quoteLineCPQ.fecha_inicio__c.addDays(3);}
-                                
+                            
                             }
                     System.debug('--> 5._E2 El producto no tiene Discount Schedule');
                     if(quoteLineCPQ.SBQQ__CustomerPrice__c >= quoteLineCPQ.SBQQ__ListPrice__c) {
@@ -664,7 +640,7 @@ saltos = 5;
                 }
             } else handleWFPoliticaMargen(quoteLineCPQ, helperQL);
         } else handleWFPoliticaMargen(quoteLineCPQ, helperQL);        
-        
+          
         System.debug('::: OUT POCH_QuoteLineWF.handleWFListadePrecios');
     }          
     
@@ -703,7 +679,7 @@ saltos = 5;
                     //quoteLineCPQ.POCH_WFAprobador5__c = '0055C000002MpeUQAS';
                     activaWF = true;
                 }                                                
-                
+               
                 if(activaWF) {
                     System.debug('--> 6. Entra a WF de Politica ::: APROBADORES ASIGNADOS : ' + quoteLineCPQ);
                     quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
@@ -731,7 +707,7 @@ saltos = 5;
             quoteLineCPQ.POCH_WFPrecioMenorAprobado__c     = true;
             quoteLineCPQ.POCH_WFMargenAprobado__c		   = true;
         }
-        
+       
         System.debug('::: OUT POCH_QuoteLineWF.handleWFPoliticaMargen');
     }
     
@@ -761,6 +737,7 @@ saltos = 5;
                             for(POCH_WFAprobador__c apr : aprobadorWF){
                                 if(!aprobadorWF.isEmpty()){
                                     System.debug('--> VALIDA QUE CONSIGUIO EN EL WFAPROBADORE-->');
+                                 
                                     isNotIndivi = true;
                                     quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
                                     quoteLineCPQ.POCH_WFAprobador1__c =  apr.POCH_Aprobador__c;
@@ -775,6 +752,7 @@ saltos = 5;
                                 
                                 System.debug('--> 7.TODOS. Entra a WF de Papel ::: INDIVIDUALES ' + isNotIndivi); 
                             }else{
+                               
                                 System.debug('--> 7.PASA. Entra a WF de Papel ::: INDIVIDUALES ' + isNotIndivi); 
                                 quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
                                 quoteLineCPQ.POCH_WF__c            = helperQL.configuracionWF.POCH_WFPapel__c;
@@ -805,7 +783,7 @@ saltos = 5;
             isNotInWF = true;                        
         }      
         //Si no entra a WF, actualiza estatus
-        
+         
         if(isNotInWF) {
             
             quoteLineCPQ.POCH_EstatusPartida__c            = 'Solicitado Autorizado';
@@ -815,7 +793,7 @@ saltos = 5;
             quoteLineCPQ.POCH_WFPrecioMenorAprobado__c     = true;
             quoteLineCPQ.POCH_WFMargenAprobado__c		   = true;
         }
-        
+     
         System.debug('::: OUT POCH_QuoteLineWF.handleWFMargenPapel');
     }
     

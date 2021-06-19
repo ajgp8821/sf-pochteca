@@ -9,6 +9,7 @@ public class POCH_VentaMostrador_cls {
         cabecera = [SELECT 
                         Id, 
                         Name,
+                        Cliente__c,
                         Name_Cliente__c,
                         Id_cliente_SAP__c,
                         POCH_Sucursal__r.Name,
@@ -62,7 +63,9 @@ public class POCH_VentaMostrador_cls {
                         POCH_Cantidad__c, 
                         UnidadMedida__c, 
                         Sucursal__c, 
-                        Status__c  
+                        Status__c,
+                        IVA__c,
+                        Descuento_Monto__c  
                     FROM Venta_Mostrador_Detalle__c 
                     WHERE Ventas_Mostrador__c =: idVentaMostrador];
         return lstDetail;
@@ -137,8 +140,8 @@ public class POCH_VentaMostrador_cls {
                                                     Poch_Sucursal__c 
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                AND POCH_IdOrgVenta__c = '0029'];
-                                                //AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+                                                //AND POCH_IdOrgVenta__c = '0029'];
+                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
         return sucursalAmp.Poch_Sucursal__c;
     }
 
@@ -171,8 +174,8 @@ public class POCH_VentaMostrador_cls {
                                                     POCH_AreaControlCreditos__c 
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                AND POCH_IdOrgVenta__c = '0029'];
-                                                //AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+                                                //AND POCH_IdOrgVenta__c = '0029'];
+                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
 
         POCH_InformacionCredito__c creditLine = [SELECT 
                                                     Id,
@@ -195,8 +198,8 @@ public class POCH_VentaMostrador_cls {
                                                     Condici_n_de_Pago__c
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                AND POCH_IdOrgVenta__c = '0029'];
-                                                //AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+                                                //AND POCH_IdOrgVenta__c = '0029'];
+                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
 
         List<String> listDescription = new List<String>();
         Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get('POCH_SucursalAmpliada__c');
@@ -246,7 +249,8 @@ public class POCH_VentaMostrador_cls {
                                                     Poch_Sucursal__c 
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                AND POCH_IdOrgVenta__c = '0029'];
+                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+                                                //AND POCH_IdOrgVenta__c = '0029'];
         POCH_Sucursal__c sucursal = [SELECT Id, CurrencyIsoCode FROM POCH_Sucursal__c WHERE Id =: sucursalAmp.Poch_Sucursal__c];
         if (moneda == sucursal.CurrencyIsoCode){
             currencyCorrect = true;
@@ -264,5 +268,24 @@ public class POCH_VentaMostrador_cls {
             listDescriptions.add(listRates.IsoCode + listRates.ConversionRate);
         }
         return listDescriptions;
+    }
+
+    /**
+    Metodo para obtener el apiName de un picklist dado el label
+    */
+    @AuraEnabled        
+    public static String getApiName(String objectType, String selectedField, String apiLabel) {
+        String description = '';
+        Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get(objectType);
+        Schema.DescribeSObjectResult res = convertToObj.getDescribe();
+        Schema.DescribeFieldResult fieldResult = res.fields.getMap().get(selectedField).getDescribe();
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        for(Schema.PicklistEntry pickListVal : ple) {
+            if (apiLabel == pickListVal.getLabel()){
+                description = pickListVal.getValue();
+            } 
+        }
+            
+        return description;
     }
 }

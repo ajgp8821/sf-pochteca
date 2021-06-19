@@ -26,6 +26,8 @@
 
     <!-- Register 2 Lightning Event for handle add or Delete rows on Parent Component  --> 
     <aura:registerEvent name="DeleteRowEvt" type="c:POCH_DeleteProductsSheet_evt"/> 
+    <aura:registerEvent name="calcularTotales" type="c:POCH_Venta_Mostrador_evt"/>
+    
     <!-- Table Row -->  
     <tr class="slds-hint-parent">
         
@@ -57,7 +59,7 @@
         </td>
         <td data-label="Cantidad"  >
             <div class="slds-truncate" title="Cantidad" style="width: 90px;">
-                <ui:inputNumber required="true" class="CustomClassAlign" value="{!v.VentaInstance.POCH_Cantidad__c}" format="#,###.00" change="{!c.validateUM}"/>
+                <ui:inputNumber required="true" class="CustomClassAlign" value="{!v.VentaInstance.POCH_Cantidad__c}" format="#,###.00" change="{!c.calcularTotales}"/>
             </div>
         </td>
         <td data-label="UM Venta">

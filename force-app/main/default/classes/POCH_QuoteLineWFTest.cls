@@ -12,6 +12,7 @@ public class POCH_QuoteLineWFTest {
         acc.POCH_TipoRegistro__c = 'Prospecto';
         acc.POCH_Region__c = reg.Id;
         acc.POCH_OrganizacionVentas__c ='0015';
+        acc.POCH_CuentaClave__c = false;
         insert acc;
         
       
@@ -55,6 +56,7 @@ insert opp;*/
         qt.SBQQ__Account__c      = acc.Id;
         //qt.SBQQ__Opportunity2__c = opp.Id;
         qt.SBQQ__PriceBook__c    = pb.Id;
+        qt.Tiempo_cancelacion__c   = '24';
         qt.POCH_Sucursal__c      = suc.Id;
         insert qt;
         
@@ -99,6 +101,8 @@ insert opp;*/
         ql.SBQQ__Product__c   = prd.Id;
         ql.SBQQ__Quote__c     = qt.Id;
         ql.SBQQ__ContractedPrice__c = cprec.id;
+        ql.fecha_inicio__c    =  Date.today() +1;
+        ql.fecha_cancelacion__c  =  Date.today();
       //  ql.SBQQ__PricebookEntryId__c = pbe.Id;       
         insert ql;
         
@@ -466,7 +470,7 @@ public static testMethod void testHandleWFListadePreciosSudamerica() {
         	POCH_QuoteLineWF.handleWFPreciosEspeciales(ql, hlp);
         Test.stopTest();
     }
-     public static testMethod void testWFPrecioEspecialSinMargen() {
+     public static testMethod void testWFPrecioEspecialMargen() {
         Test.startTest();
         WFData wfd  = new WFData();  
         SBQQ__ContractedPrice__c cps = POCH_DataCreationTest.getPrecioEspecial();
@@ -474,8 +478,31 @@ public static testMethod void testHandleWFListadePreciosSudamerica() {
         cps.SBQQ__Account__c         = wfd.acc.Id;
         cps.SBQQ__Product__c			= wfd.prd.Id;
         cps.POCH_Sucursal__c			= wfd.suc.Id;
-        cps.SBQQ__Price__c           = 500;
-        cps.Margen__c                = 0;
+        cps.SBQQ__Price__c           = 80;
+        cps.Margen__c                = 100;
+        insert cps;
+        
+        SBQQ__QuoteLine__c ql 		= wfd.ql;
+        ql.SBQQ__ContractedPrice__c = cps.Id;
+        ql.POCH_MargenUtilidad__c    = 500;
+    
+        ql.SBQQ__CustomerPrice__c   = 100;
+        POCH_QuoteLineWF.handleApprovalQuoteLine(new List<SBQQ__QuoteLine__c>{wfd.ql});
+          POCH_QuoteLineWFHelper hlp = new POCH_QuoteLineWFHelper(new List<SBQQ__QuoteLine__c>{wfd.ql});
+			
+        	POCH_QuoteLineWF.handleWFPreciosEspeciales(ql, hlp);
+        Test.stopTest();
+    }
+     public static testMethod void testWFPrecioEspecialSinMargen() {
+        Test.startTest();
+        WFData wfd  = new WFData();  
+        SBQQ__ContractedPrice__c cps = POCH_DataCreationTest.getPrecioEspecial();
+         
+        cps.SBQQ__Account__c            =   wfd.acc.Id;
+        cps.SBQQ__Product__c			= wfd.prd.Id;
+        cps.POCH_Sucursal__c			= wfd.suc.Id;
+        cps.SBQQ__Price__c           = 80;
+        cps.Margen__c                = 100;
         insert cps;
         
         SBQQ__QuoteLine__c ql 		= wfd.ql;

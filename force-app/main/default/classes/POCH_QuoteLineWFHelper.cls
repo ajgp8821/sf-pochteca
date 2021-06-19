@@ -51,7 +51,7 @@ public class POCH_QuoteLineWFHelper {
         getPreciosXEscala();
         //Obtiene un mapa con la del aprobador ejecutivo 
         getAprobadoresWFDe();
-        getAprobadoresWFGS();
+      //  getAprobadoresWFGS();
         //Retorna la configuración personalizada general de los WF (Nombre del WF, Comentarios y Aprobadores de Mat. Critico y Excepciones)
         this.configuracionWF = POCH_WFSettings__c.getOrgDefaults();
         //Obtiene los grupos de materiales por sucursal 
@@ -108,7 +108,7 @@ public class POCH_QuoteLineWFHelper {
                 setIdQoute.add(ql.id);
         } 
         
-      for(SBQQ__QuoteLine__c  quoteLineCPQ : [select id,SBQQ__Quote__r.Tiempo_cancelacion__c,WF_Total_Paso__c,SBQQ__EndDate__c, SBQQ__StartDate__c, POCH_WF__c from SBQQ__QuoteLine__c where 
+      for(SBQQ__QuoteLine__c  quoteLineCPQ : [select id,SBQQ__Quote__r.Tiempo_cancelacion__c,SBQQ__EndDate__c, SBQQ__StartDate__c, POCH_WF__c from SBQQ__QuoteLine__c where 
                                                  SBQQ__Quote__r.Tiempo_cancelacion__c <> null and id =: setIdQoute ]){
                     this.mapQouteFechaCancel.put(quoteLineCPQ.Id, quoteLineCPQ.SBQQ__Quote__r.Tiempo_cancelacion__c);  
           }
@@ -237,20 +237,20 @@ public class POCH_QuoteLineWFHelper {
           
             if(String.isNotBlank(ql.POCH_OrgVentasQuote__c)){
                 setIdOrVenta.add(ql.POCH_OrgVentasQuote__c);
-                setIdCuentaClave.add(ql.SBQQ__Quote__r.SBQQ__Account__r.POCH_CuentaClave__c);
+              //  setIdCuentaClave.add(ql.SBQQ__Quote__r.SBQQ__Account__r.POCH_CuentaClave__c);
                 orvent = ql.POCH_OrgVentasQuote__c;
         }   
                }
        
         this.mapDirectorEjecutivoDe  = new Map<String,Id>();        
         List<POCH_WFAprobador__c> allWfaProb = new List<POCH_WFAprobador__c>();
-        if(setIdCuentaClave.contains(true)){
+        //if(setIdCuentaClave.contains(true)){
             
-          allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and Cuenta_Clave__c =: true LIMIT 50000];
-        }else{
+      //    allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and Cuenta_Clave__c =: true LIMIT 50000];
+       // }else{
            allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta  LIMIT 50000];
             
-        }
+        //}
         for(POCH_WFAprobador__c aprobadorWF : allWfaProb) {
         
             if(aprobadorWF.RecordType.Name == 'Aprobador Director Ejecutivo') {
@@ -260,7 +260,7 @@ public class POCH_QuoteLineWFHelper {
       //getAprobadoresWFGS  
     }
     
-     private void getAprobadoresWFGS() {
+/*     private void getAprobadoresWFGS() {
          Set<String> setIdOrVenta = new Set<String>();
            Set<Boolean> setIdCuentaClaveTV = new Set<Boolean>();
            Set<Boolean> setIdGteCom1 = new Set<Boolean>();
@@ -296,7 +296,7 @@ public class POCH_QuoteLineWFHelper {
       //getAprobadoresWFGS  
     }
 
-    
+    */
     //Obtiene las listas de aprobadores
     private void getAprobadoresWF() {
         this.mapGerenteSucursal    = new Map<String,Id>();

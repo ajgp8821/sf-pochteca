@@ -73,6 +73,13 @@
             } else { console.log('--- Algo salio mal UM ---'); }
         });
         $A.enqueueAction(action);
+    },
+
+    calcularTotales : function(component, event, helper) {
+        var calcularTotalesEvent = component.getEvent("calcularTotales");
+        var test = " test";
+        calcularTotalesEvent.setParams({testParam: test});
+        calcularTotalesEvent.fire();
     }
 
 })

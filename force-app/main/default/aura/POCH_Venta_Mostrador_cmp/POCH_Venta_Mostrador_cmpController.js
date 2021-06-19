@@ -56,7 +56,21 @@
     },
 
     validarMoneda: function(component, event, helper) { 
-        var indutry = component.get("v.currency");
-        var test = indutry;     
+        var noIsNewRecord = component.get("v.blnRecordExisteShowDetail");
+        if (noIsNewRecord){
+            var aux = component.get("v.ventasMostrador");
+            var label = aux.CurrencyIsoCode;
+        }else {
+            var label = component.get("v.currency"); 
+        }
+        if (label != "U.S. Dollar") {
+            helper.getApiName(component,'Ventas_Mostrador__c','CurrencyIsoCode', label);            
+        }            
+    },
+
+    calcularTotales: function(component, event, helper) {
+        var blnShowPopupProd = event.getParam("testParam");
+        //var selectedProductFromEvent = event.getParam("recordByEvent");
+        helper.calcularTotales(component, event, helper); 
     }
 })
