@@ -25,6 +25,11 @@
 		component.getEvent("DeleteRowEvt").setParams(
 				{"indexVar" : component.get("v.rowIndex") }
 		).fire();
+
+		var recalcularTotalesEvent = component.getEvent("recalcularTotales");
+		var test = " test";
+		recalcularTotalesEvent.setParams({testParam: test});
+		recalcularTotalesEvent.fire();
 },
 	
 	LookupProduct : function(component, event, helper){

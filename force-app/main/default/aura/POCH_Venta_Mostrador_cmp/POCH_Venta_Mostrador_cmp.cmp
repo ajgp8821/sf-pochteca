@@ -2,7 +2,8 @@
     <aura:handler name="init" value="this" action="{!c.doInit}"/>
     
     <!--Events Handler-->    
-    <aura:handler name="DeleteRowEvt" event="c:POCH_DeleteProductsSheet_evt" action="{!c.removeDeletedRow}"/>
+    <!-- <aura:handler name="DeleteRowEvt" event="c:POCH_DeleteProductsSheet_evt" action="{!c.removeDeletedRow}"/> -->
+    <aura:handler name="DeleteRowEvt" event="c:POCH_DeleteProductVentaMostrador_evt" action="{!c.removeDeletedRow}"/>
     <!--<aura:handler name="AddRowEvt" event="c:POCH_AddProductsSheet_evt" action="{!c.addNewRow}"/>-->
     <aura:attribute name="ventasMostrador" type="SObject"/> 
     <aura:attribute name="ventasMostradorList" type="SObject[]"/> 
@@ -38,6 +39,7 @@
     <aura:attribute name="listMoneda" type="list" default="[]" description="field values Moneda"/>
 
     <aura:handler name="calcularTotales" event="c:POCH_Venta_Mostrador_evt" action="{!c.calcularTotales}"/>
+    <aura:handler name="recalcularTotales" event="c:POCH_DeleteProductVentaMostrador_evt" action="{!c.calcularTotales}"/>
     
     
     <div class="slds-page-header">
