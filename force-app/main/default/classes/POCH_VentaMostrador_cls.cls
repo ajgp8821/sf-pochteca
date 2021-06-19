@@ -38,7 +38,8 @@ public class POCH_VentaMostrador_cls {
                         Status__c,
                         POCH_Sucursal__c,
                         Uso_de_CFDI__c,
-                        Enviado_SAP__c
+                        Enviado_SAP__c,
+                        OrganizacionVentas__c
                     FROM Ventas_Mostrador__c 
                     WHERE id =: idCabeceraVentaMostrador];
         system.debug(cabecera); 
@@ -133,16 +134,18 @@ public class POCH_VentaMostrador_cls {
     Metodo para obtener sucursal
     */
     @AuraEnabled
-    public static String getSucursal(String idAccount) {
+    public static Poch_Sucursal__c getSucursal(String idAccount) {
         User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId()];
         POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
                                                     Id, 
-                                                    Poch_Sucursal__c 
+                                                    Poch_Sucursal__c,
+                                                    Poch_Sucursal__r.POCH_OrganizacionVentas__c
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                //AND POCH_IdOrgVenta__c = '0029'];
-                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
-        return sucursalAmp.Poch_Sucursal__c;
+                                                AND POCH_IdOrgVenta__c = '0029'];
+                                                // AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+        Poch_Sucursal__c organizacionVentas = [SELECT id, POCH_OrganizacionVentas__c FROM Poch_Sucursal__c WHERE id =: sucursalAmp.Poch_Sucursal__c];
+        return organizacionVentas;
     }
 
     /**

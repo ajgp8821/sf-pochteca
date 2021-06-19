@@ -10,6 +10,8 @@
     <aura:attribute name="Message" type="String" default=""/>
     <aura:attribute name="parentId" type="String" default=""/>
     <aura:attribute name="indVentaM" type="boolean"/>
+
+    <aura:attribute name="organizacionVentas" type="String" default=""/>
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
     

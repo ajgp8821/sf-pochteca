@@ -7,6 +7,8 @@
     <aura:attribute name="idInvSheet"  type="String" default="" />
     <aura:attribute name="indVentaM" type="boolean"/>
 
+    <aura:attribute name="organizacionVentas" type="String" default=""/>
+
     <aura:handler name="productCreated" event="c:POCH_AddProductsSheet_evt" action="{!c.handleComponentEvent}"/>
     <aura:handler name="productCreated" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.handleComponentEvent2}"/>
 
@@ -25,7 +27,7 @@
                     </div>
                     <div class="slds-modal__content slds-p-around_medium"  style="height:200px">
                         <c:POCH_CustomLookup_cmp  objectAPIName="Pricebookentry" IconName="standard:product" selectedRecord="{!v.selectedLookUpRecord}" label="Producto" parentId="{!v.strIdSucAmp}"
-                                                    indVentaM="{!v.indVentaM}" />
+                                                    indVentaM="{!v.indVentaM}" organizacionVentas="{!v.organizacionVentas}" />
                         <div class="showNewPricebookEntry" aura:id="recordEdit">
                                 {!v.body}
                         </div>

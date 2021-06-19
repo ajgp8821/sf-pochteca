@@ -20,10 +20,11 @@
             action.setCallback(this, function (response) {
                 var state = response.getState();
                 if (state === "SUCCESS") {
-                    let sucursalId = response.getReturnValue();
-                    if(sucursalId !== null && sucursalId !== undefined) {
-                        component.set("v.strIdSucursal",sucursalId);
+                    let sucursal = response.getReturnValue();
+                    if(sucursal !== null && sucursal !== undefined) {
+                        component.set("v.strIdSucursal",sucursal.Id);
                         component.set('v.blnShowButtons', false);
+                        component.set("v.organizacionVentas",sucursal.POCH_OrganizacionVentas__c);
                     }
                 } else {
                     console.log("--- Algo salio mal ---");
@@ -45,6 +46,7 @@
                 if(cabeceraVentas !== null && cabeceraVentas !== undefined) {
                     component.set("v.ventasMostrador",cabeceraVentas);
                     component.set("v.strIdAccount", cabeceraVentas.Cliente__c);
+                    component.set("v.organizacionVentas", cabeceraVentas.OrganizacionVentas__c);
                     if (cabeceraVentas.Status__c == 'Cancelado' || cabeceraVentas.Enviado_SAP__c == true){
                         component.set('v.isStatusCancel', true);
                     }

@@ -27,6 +27,7 @@
     <aura:attribute name="isExento"  type="Boolean" default="false"/>
     <aura:attribute name="accountName" type="String" default=""/>
     <aura:attribute name="idSap" type="String" default=""/>
+    <aura:attribute name="organizacionVentas" type="String" default=""/>
     <aura:attribute name="email" type="String" default=""/>
     <aura:attribute name="currency" type="String" default=""/>
     <aura:attribute name="creditLine" type="String" default=""/>
@@ -213,7 +214,7 @@
                 <div class="custom-box">Ultimos 4 digitos de tarjeta</div>
                 <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
                     <ui:inputNumber label="Digitos de tarjeta: " value="{!v.ventasMostrador.Digitos_tarjeta__c}" updateOn="keyup"
-                                    disabled="{!v.isStatusCancel}" type="number" maxlength="4" />
+                                    disabled="{!v.isStatusCancel}" maxlength="4"/>
                 </div>
             </lightning:layoutItem>
             <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
@@ -419,7 +420,7 @@
             <aura:if isTrue="{!!v.blnRecordExisteShowDetail}">
                 <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
                     <c:POCH_VentaMostradorAddAndDeleteStock_cmp strIdSucursalAmp="{!v.strIdSucursal}" VentaInstance="{!item}" rowIndex="{!index}"
-                                                                ListaVentaSelected="{!v.ventasMostradorList}" />
+                                                                ListaVentaSelected="{!v.ventasMostradorList}" organizacionVentas="{!v.organizacionVentas}" />
                 <!--<aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
                     <c:POCH_VentaMostradorAddAndDeleteStock_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}" 
                                                                 ListaVentaSelected="{!v.ventasMostradorList}" blnBorderColorCP="{!v.blnBorderColorDesc}"
@@ -432,7 +433,7 @@
                 <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
                     <c:POCH_VentaMostradorDetailsEdit_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}"
                                                           ListaVentaSelected="{!v.ventasMostradorList}" ventasMostrador="{!v.ventasMostrador}"
-                                                           />      
+                                                          organizacionVentas="{!v.organizacionVentas}" />      
                 </aura:iteration>
             </aura:if>  
         </tbody>

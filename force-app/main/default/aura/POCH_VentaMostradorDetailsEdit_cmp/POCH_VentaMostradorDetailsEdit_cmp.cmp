@@ -20,7 +20,9 @@
       <aura:attribute name="blnisEspPrecio"   type="Boolean" default="false"/>
       <aura:attribute name="indVentaM" type="Boolean"  default="true"/>
       
-      <aura:handler name="init" value="this" action="{!c.doInit}"/>                 
+      <aura:handler name="init" value="this" action="{!c.doInit}"/>
+
+      <aura:attribute name="organizacionVentas" type="String" default=""/>
 
       <aura:handler name="AddProductLookupDetail" event="c:POCH_AddProductInInventotySheet_evt" action="{!c.addNewProductSelected}"/>
       <aura:handler name="AddProductLookupDetail2" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.addNewProductSelected}"/>
@@ -113,7 +115,7 @@
             </td>
             <td data-label="% descuento">
                   <div class="slds-truncate slds-text-align_right" title="% descuento"  style="margin-top:17px;" >
-                      <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" disabled="{!v.isStatusCancel}" type="number" max="10" maxlength="2" />   
+                      <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" disabled="{!v.isStatusCancel}" type="number" max="10" maxlength="2"  onblur="Malo" />   
                   </div>
             </td>              
             <td data-label="Valor Neto">
@@ -134,7 +136,7 @@
 
 	<aura:if isTrue="{!v.blnShowProducts}">
             <c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.strIdSucursalAmp}" idInvSheet="{!v.strIdHojaInv}" 
-                                    indVentaM="{!v.indVentaM}"/>
+                                    indVentaM="{!v.indVentaM}" organizacionVentas="{!v.organizacionVentas}"/>
 	</aura:if>
 	
 	

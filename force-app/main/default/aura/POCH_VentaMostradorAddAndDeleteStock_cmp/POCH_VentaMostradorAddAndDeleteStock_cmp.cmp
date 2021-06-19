@@ -21,6 +21,8 @@
     <aura:attribute name="strIdAcc"         type="String"  default=""/> 
     <aura:attribute name="blnisEspPrecio"   type="Boolean" default="false"/> 
 
+    <aura:attribute name="organizacionVentas" type="String" default=""/>
+
     <aura:handler name="init" value="this" action="{!c.doInit}"/>
     <aura:handler name="AddProductLookupDetail2" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.addNewProductSelected}"/>
 
@@ -116,6 +118,6 @@
     <lightning:input type="text" name="strIdSucursalAmp" value="{!v.strIdSucursalAmp}" readonly="true" />
     <aura:if isTrue="{!v.blnShowProducts}">
         <c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.strIdSucursalAmp}" idInvSheet="{!v.strIdHojaInv}" 
-                                    indVentaM="{!v.indVentaM}"/>
+                                    indVentaM="{!v.indVentaM}" organizacionVentas="{!v.organizacionVentas}" />
     </aura:if>
 </aura:component>
