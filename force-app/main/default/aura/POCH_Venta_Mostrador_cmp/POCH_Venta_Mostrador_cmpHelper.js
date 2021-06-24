@@ -1,6 +1,6 @@
 ({
     assignParentId : function(component, event, helper) {
-        var action = component.get("c.getSucursal");
+        // var action = component.get("c.getSucursal");
         var pageRef = component.get("v.pageReference");
         var state = pageRef.state; // state holds any query params
         var base64Context = state.inContextOfRef;
@@ -10,28 +10,57 @@
         if(base64Context) {
             var addressableContext = JSON.parse(window.atob(base64Context));   
             component.set("v.strIdAccount", addressableContext.attributes.recordId);
+            if (component.get("v.strIdAccount") != null || component.get("v.strIdAccount") != '' || component.get("v.strIdAccount") != undefined) {
+                this.createObjectDataCabecera(component, event);
+            }
+            this.getSucursal(component, event);
             this.getInfoAccount(component, event, helper);
             this.getCreditLine(component, event, helper);
             this.getConditionPago(component, event, helper);
-            //this.createObjectCabecera(component, event);
-            action.setParams({
-                idAccount: component.get("v.strIdAccount")
-            });
-            action.setCallback(this, function (response) {
-                var state = response.getState();
-                if (state === "SUCCESS") {
-                    let sucursal = response.getReturnValue();
-                    if(sucursal !== null && sucursal !== undefined) {
-                        component.set("v.strIdSucursal",sucursal.Id);
-                        component.set('v.blnShowButtons', false);
-                        component.set("v.organizacionVentas",sucursal.POCH_OrganizacionVentas__c);
-                    }
-                } else {
-                    console.log("--- Algo salio mal ---");
-                }
-            });
-            $A.enqueueAction(action);  
+            // action.setParams({
+            //     idAccount: component.get("v.strIdAccount")
+            // });
+            // action.setCallback(this, function (response) {
+            //     component.set("v.showSpinner", true);
+            //     var state = response.getState();
+            //     if (state === "SUCCESS") {
+            //         let sucursal = response.getReturnValue();
+            //         if(sucursal !== null && sucursal !== undefined) {
+            //             component.set("v.strIdSucursal",sucursal.Id);
+            //             component.set('v.blnShowButtons', false);
+            //             component.set("v.organizacionVentas",sucursal.POCH_OrganizacionVentas__c);
+            //         }
+            //     } else {
+            //         console.log("--- Algo salio mal ---");
+            //     }
+            //     component.set("v.showSpinner", false);
+            // });
+            // $A.enqueueAction(action);  
         }
+    },
+
+    getSucursal: function (component, event) {
+        var action = component.get("c.getSucursal");
+        action.setParams({
+            idAccount: component.get("v.strIdAccount")
+        });
+        action.setCallback(this, function (response) {
+            // component.set("v.showSpinner", false);
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                let sucursal = response.getReturnValue();
+                if(sucursal !== null && sucursal !== undefined) {
+                    component.set("v.strIdSucursal",sucursal.Id);
+                    component.set('v.blnShowButtons', false);
+                    component.set("v.organizacionVentas",sucursal.POCH_OrganizacionVentas__c);
+                    component.set("v.oficinaVentas",sucursal.POCH_OficinaVentas__c);
+                }
+            } else {
+                console.log("--- Algo salio mal ---");
+            }
+            // component.set("v.showSpinner", false);
+        });
+        $A.enqueueAction(action);
     },
     
     showCabeceraVentaMostrador: function (component, event, helper) {
@@ -40,6 +69,7 @@
             idCabeceraVentaMostrador: component.get("v.recordId")
         });
         action.setCallback(this, function (response) {
+            console.log("showCabeceraVentaMostrador");
             var state = response.getState();
             if (state === "SUCCESS") {
                 let cabeceraVentas = response.getReturnValue();
@@ -77,6 +107,44 @@
         });
         $A.enqueueAction(action);
     },
+
+    createObjectDataCabecera: function(component, event) {
+        var RowItemList = component.get("v.ventasMostradorListTemp");
+        RowItemList.unshift({    //push
+            sobjectType:'Ventas_Mostrador__c', 
+            Name: '',
+            Cliente__c: component.get("v.strIdAccount"),
+            Name_Cliente__c: '',
+            Id_cliente_SAP__c: '',
+            CurrencyIsoCode: '',
+            Email__c: '',
+            Credito_disponible__c: '',
+            Digitos_tarjeta__c: '',
+            Via_de_pago__c: '',
+            Condicion_de_Pago__c: '',
+            Metodo_de_Pago__c: '',
+            Metodo_de_Pago2__c: '',
+            Metodo_de_Pago3__c: '',
+            Importe__c: 0,
+            Importe_2__c: 0,
+            Importe_3__c: 0,
+            Obs_Pago__c: '',
+            Obs_Pago_2__c: '',
+            Obs_Pago_3__c: '',
+            Valor_Neto__c: 0,
+            Descuento__c: 0,
+            Subtotal__c: 0,
+            IVA__c: 0,
+            Precio_total__c: 0,
+            Id_Registro_SAP__c: '',
+            Status__c: '',
+            POCH_Sucursal__c: '',
+            Uso_de_CFDI__c: '',
+            Enviado_SAP__c: '',
+            OrganizacionVentas__c: ''
+        });
+        component.set("v.ventasMostrador", RowItemList[0]);
+    },
     
     createObjectData: function(component, event) {
         // get the contactList from component and add(push) New Object to List  
@@ -84,12 +152,19 @@
         RowItemList.unshift({   //push
             sobjectType:'Venta_Mostrador_Detalle__c', 
             Material__c:'',
-            Descto__c:'',
-            Precio__c:'',
+            Descto__c: 0.0,
+            Precio__c: 0.0,
             Descripcion__c:'',
-            POCH_Cantidad__c:'',
+            POCH_Cantidad__c: 0,
             UnidadMedida__c:'',
-            Sucursal__c: ''
+            Sucursal__c: '',
+            POCH_Centro__c: '',
+            Almacen__c: '',
+            Valor_neto__c: 0.0,
+            IVA__c: 0.0,
+            Product__c: '',
+            Stock__c: 0,
+            Stock_Consignacion__c: 0
         });
         // set the updated list to attribute (contactList) again
         component.set("v.ventasMostradorList", RowItemList);
@@ -167,10 +242,16 @@
             if (state === "SUCCESS") {
                 let cliente = response.getReturnValue();
                 if(cliente !== null && cliente !== undefined) {
-                    component.set("v.accountName", cliente.Name);
-                    component.set("v.idSap", cliente.POCH_IDClienteSAP__c);
-                    component.set("v.email", cliente.POCH_CorreoElectronico__c);
-                    component.set("v.currency", cliente.CurrencyIsoCode);
+                    var ventaMostrador = component.get("v.ventasMostrador");
+                    ventaMostrador.Name_Cliente__c = cliente.Name;
+                    ventaMostrador.Id_cliente_SAP__c = cliente.POCH_IDClienteSAP__c;
+                    ventaMostrador.Email__c = cliente.POCH_CorreoElectronico__c;
+                    ventaMostrador.CurrencyIsoCode = cliente.CurrencyIsoCode;
+                    // component.set("v.accountName", cliente.Name);
+                    // component.set("v.idSap", cliente.POCH_IDClienteSAP__c);
+                    // component.set("v.email", cliente.POCH_CorreoElectronico__c);
+                    // component.set("v.currency", cliente.CurrencyIsoCode);
+                    component.set("v.ventasMostrador", ventaMostrador);
                     if (cliente.POCH_ClasificacionFiscal__c == 0){
                         component.set("v.isExento", true);
                     }
@@ -193,9 +274,17 @@
             if (state === "SUCCESS") {
                 let creditLine = response.getReturnValue();
                 if(creditLine !== null && creditLine !== undefined) {
-                    component.set("v.creditLine", creditLine.POCH_SaldoDisponible__c);
+                    var ventaMostrador = component.get("v.ventasMostrador");
+                    ventaMostrador.Credito_disponible__c = creditLine.POCH_SaldoDisponible__c;
+                    component.set("v.ventasMostrador", ventaMostrador);
+
+                    // component.set("v.creditLine", creditLine.POCH_SaldoDisponible__c);
+
                 }else{
-                    component.set("v.creditLine", "0");
+                    var ventaMostrador = component.get("v.ventasMostrador");
+                    ventaMostrador.Credito_disponible__c = 0;
+                    component.set("v.ventasMostrador", ventaMostrador);
+                    // component.set("v.creditLine", "0");
                 }
             } else {
                 console.log("--- Algo salio mal ---");
@@ -214,7 +303,11 @@
             if (state === "SUCCESS") {
                 let conditionP = response.getReturnValue();
                 if(conditionP !== null && conditionP !== undefined) {
-                    component.set("v.conditionPago", conditionP);
+                    var ventasMostrador = component.get("v.ventasMostrador");
+                    ventasMostrador.Condicion_de_Pago__c = conditionP;
+                    component.set("v.ventasMostrador", ventaMostrador);
+
+                    // component.set("v.conditionPago", conditionP);
                 }
             } else {
                 console.log("--- Algo salio mal ---");
@@ -224,12 +317,15 @@
     },
 
     getPicklistValuesOneLevel: function(component,StrObject,StrnNameField) {
-        var action = component.get("c.PickListValuesIntoList"); 
+        var isNewRecord = component.get("v.blnRecordExisteShowDetail");
+        var action = component.get("c.PickListValuesIntoList");
+        component.set("v.showSpinner", true);
         action.setParams({
             objectType: StrObject,
             selectedField: StrnNameField
         });
         action.setCallback(this, function(response) {
+            component.set("v.showSpinner", true);
             if (response.getState() == "SUCCESS") {
                 var StoreResponse =  response.getReturnValue();
                 
@@ -238,11 +334,20 @@
                 
                 for (var i = 0; i < StoreResponse.length; i++) {
                     listOneLevel.push(StoreResponse[i]);
+                    if (isNewRecord == false){
+                        if (StoreResponse[i] == "Por definir"){
+                            component.set("v.ventasMostrador.Via_de_pago__c", StoreResponse[i]);
+                        } 
+                        if (StoreResponse[i] == "G01 Adquisición de mercancias"){
+                            component.set("v.ventasMostrador.Uso_de_CFDI__c", StoreResponse[i]);
+                        }    
+                    }
                 }  
-            	//
-                /*if (listOneLevel != undefined && listOneLevel.length > 0) {
-                    ControllerFieldOneLevel.push('-NA-');        
-                }*/
+            	if(StrnNameField == 'Metodo_de_Pago__c' && isNewRecord == false){
+                    if (listOneLevel != undefined && listOneLevel.length > 0) {
+                        ControllerFieldOneLevel.push(' ');        
+                    }
+                }
                 
                 for (var i = 0; i < listOneLevel.length; i++) {
                     ControllerFieldOneLevel.push(listOneLevel[i]);
@@ -263,8 +368,10 @@
                 }
                 
             }
+            component.set("v.showSpinner", false);
         });
         $A.enqueueAction(action);
+        component.set("v.showSpinner", false);
     },
 
     getDescriptionPicklist: function (component, StrObject,StrnNameField) {
@@ -272,11 +379,11 @@
         var regCabecera = component.get("v.ventasMostrador");
         var action = component.get("c.getDescription");
         var listApiField = new Array();
-        if (isNewRecord){
+        // if (isNewRecord){
             listApiField.push(regCabecera.CurrencyIsoCode);     
-        } else {
-            listApiField.push(component.get("v.currency"));    
-        }
+        // } else {
+        //     listApiField.push(component.get("v.currency"));    
+        // }
         listApiField.push(component.get("v.currency"));
         action.setParams({
             objectType: 'Ventas_Mostrador__c',
@@ -289,12 +396,16 @@
                 let labelPicklist = response.getReturnValue();
                 if(labelPicklist !== null && labelPicklist !== undefined && labelPicklist.length > 0) {
                     for (let index = 0; index < labelPicklist.length; index++) {
-                        if (isNewRecord){
+                        // if (isNewRecord){
                             regCabecera.CurrencyIsoCode = labelPicklist[index];
                             component.set("v.ventasMostrador", regCabecera);       
-                        } else {
-                            component.set("v.currency", labelPicklist[index]);  
-                        }
+                        // } else {
+                        //     // var ventaMostrador = component.get("v.ventasMostrador");
+                        //     regCabecera.CurrencyIsoCode = labelPicklist[index];
+                        //     component.set("v.ventasMostrador", regCabecera);
+
+                        //     // component.set("v.currency", labelPicklist[index]);  
+                        // }
                         
                     }
                 }
@@ -344,7 +455,7 @@
                             for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
                                 sumatoriaDescuento = sumatoriaDescuento + detalleVentaMostrador[indexVar].Descuento_Monto__c;
                                 if (detalleVentaMostrador[indexVar].CurrencyIsoCode == currencyAux){
-                                    sumatoriaValorNeto = sumatoriaValorNeto + detalleVentaMostrador[indexVar].Precio__c;
+                                    sumatoriaValorNeto = sumatoriaValorNeto + detalleVentaMostrador[indexVar].Valor_neto__c;
                                     if (exento == false){
                                         sumatoriaIVA = sumatoriaIVA + detalleVentaMostrador[indexVar].IVA__c;              
                                     }
@@ -355,7 +466,7 @@
                                         var temp2 = listRates[i].substr(3);
                                         var temp3 = detalleVentaMostrador[indexVar].CurrencyIsoCode;
                                         if (listRates[i].substr(0,3) == detalleVentaMostrador[indexVar].CurrencyIsoCode){
-                                            sumatoriaValorNeto = sumatoriaValorNeto + (detalleVentaMostrador[indexVar].Precio__c / listRates[i].substr(3));
+                                            sumatoriaValorNeto = sumatoriaValorNeto + (detalleVentaMostrador[indexVar].Valor_neto__c / listRates[i].substr(3));
                                             if (exento == false){
                                                 sumatoriaIVA = sumatoriaIVA + (detalleVentaMostrador[indexVar].IVA__c / listRates[i].substr(3));              
                                             }
@@ -382,6 +493,7 @@
     },
 
     getApiName: function(component,StrObject,StrnNameField, label) {
+        
         var action = component.get("c.getApiName"); 
         action.setParams({
             objectType: StrObject,
@@ -391,29 +503,34 @@
         action.setCallback(this, function(response) {
             if (response.getState() == "SUCCESS") {
                 var StoreResponse =  response.getReturnValue();
+                var ventaMostrador =  component.get("v.ventasMostrador");
                 if(StrnNameField == 'CurrencyIsoCode'){
-                    this.validarCurrency(component, StoreResponse);       
+                    this.validarCurrency(component, StoreResponse);
+                    ventaMostrador.CurrencyIsoCode = StoreResponse
                 }
-                
+                component.set("v.ventasMostrador", ventaMostrador)
             }
         });
         $A.enqueueAction(action);
     },
 
-    validarCurrency: function(component,StrnNameField) {
+    validarCurrency: function(component,StrnNameField, notIsApiField, objectType, selectedField) {
         var action = component.get("c.validarCurrency"); 
         var msj = '';
         var lst = '<ul> Error :';
         var noNewRecord = component.get("v.blnRecordExisteShowDetail");
-        if (noNewRecord){
-            var aux = component.get("v.ventasMostrador")
-            var idAccount = aux.Cliente__c;
-        }else {
-            var idAccount = component.get("v.strIdAccount");
-        }
+        //if (noNewRecord){
+            var idAccount = component.get("v.ventasMostrador.Cliente__c")
+            //var idAccount = aux.Cliente__c;
+        //}else {
+        //    var idAccount = component.get("v.strIdAccount");
+        //}
         action.setParams({
             idAccount: idAccount,
-            moneda: StrnNameField
+            moneda: StrnNameField,
+            notIsApiField: notIsApiField,
+            objectType: objectType,
+            selectedField: selectedField
         });
         action.setCallback(this, function(response) {
             if (response.getState() == "SUCCESS") {
@@ -423,13 +540,41 @@
                     var errores =  msj;
                     //component.set("v.blnErrores", true);  
                     component.set("v.strErrores", errores);
-                    component.set('v.blnShowButtons',true);
+                    //component.set('v.blnShowButtons',true);
                     this.showToast('Error', 'Error!', msj);
                 }
                 
             }
         });
         $A.enqueueAction(action);
+    },
+
+    saveVentasMostrador: function (component, event) {
+
+        let action = component.get('c.saveVentasMostrador');
+        action.setParams({
+            "ventasMostrador": component.get("v.ventasMostrador"),
+            "ventasMostradorDetalle": component.get('v.ventasMostradorList')
+        });       
+        action.setCallback(this, function(response) {
+            component.set("v.showSpinner", true);
+            if (response.getState() == "SUCCESS") {
+                if (response.getReturnValue() == true){
+                    this.showToast('success', 'Guardado!', 'Se ha guardado con éxito!')
+                }
+                console.log(response);
+                console.log(response.getState);
+            
+            } else {
+                this.showToast('Error', 'Error!', 'Ocurrio un error al intentar guardar');
+                console.log("--- Algo salio mal ---");
+            }
+            component.set("v.showSpinner", false);
+        });
+        $A.enqueueAction(action);
+
+        var ventaMostrador =  component.get("v.ventasMostrador");
+        console.log('ventaMostrador', JSON.stringify(ventaMostrador));
     },
 
     showToast : function(tipomsj,titlemsj,Mensaje) {

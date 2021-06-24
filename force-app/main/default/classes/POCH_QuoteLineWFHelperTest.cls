@@ -12,6 +12,9 @@ public class POCH_QuoteLineWFHelperTest {
         acc.POCH_TipoRegistro__c = 'Prospecto';
         acc.POCH_Region__c = reg.Id;
         acc.POCH_CuentaClave__c = false;
+        acc.Gte_Com1__c = false;
+        acc.TV__c = true;
+        
         insert acc;
         
         POCH_Sucursal__c suc = POCH_DataCreationTest.getSucursal();
@@ -74,6 +77,8 @@ insert opp;*/
         POCH_WFAprobador__c ap4 = POCH_DataCreationTest.getAprobador();
         POCH_WFAprobador__c ap5 = POCH_DataCreationTest.getAprobador();
         ap1.RecordTypeId        = Schema.SObjectType.POCH_WFAprobador__c.getRecordTypeInfosByName().get('Aprobador Gerente Sucursal').getRecordTypeId(); 
+        ap1.TV__c = true;
+        ap1.Gte_Com1__c = false;
         ap2.RecordTypeId        = Schema.SObjectType.POCH_WFAprobador__c.getRecordTypeInfosByName().get('Aprobador Gerente Regional').getRecordTypeId();
         ap3.RecordTypeId        = Schema.SObjectType.POCH_WFAprobador__c.getRecordTypeInfosByName().get('Aprobador Gerente Linea').getRecordTypeId();
         ap4.RecordTypeId        = Schema.SObjectType.POCH_WFAprobador__c.getRecordTypeInfosByName().get('Aprobador Director Division').getRecordTypeId();
@@ -286,7 +291,9 @@ insert opp;*/
     }
      public static testMethod void testWFPrecioEspecialSinMargen() {
         Test.startTest();
-        WFData wfd  = new WFData();  
+        WFData wfd  = new WFData(); 
+         
+         
         SBQQ__ContractedPrice__c cps = POCH_DataCreationTest.getPrecioEspecial();
          
         cps.SBQQ__Account__c         = wfd.acc.Id;

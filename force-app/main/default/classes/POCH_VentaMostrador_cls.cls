@@ -42,7 +42,13 @@ public class POCH_VentaMostrador_cls {
                         OrganizacionVentas__c
                     FROM Ventas_Mostrador__c 
                     WHERE id =: idCabeceraVentaMostrador];
-        system.debug(cabecera); 
+        system.debug(cabecera);
+        cabecera.Uso_de_CFDI__c = getDescriptionString('Ventas_Mostrador__c', 'Uso_de_CFDI__c', cabecera.Uso_de_CFDI__c);
+        cabecera.Metodo_de_Pago__c = getDescriptionString('Ventas_Mostrador__c', 'Metodo_de_Pago__c', cabecera.Metodo_de_Pago__c);
+        cabecera.Metodo_de_Pago2__c = getDescriptionString('Ventas_Mostrador__c', 'Metodo_de_Pago2__c', cabecera.Metodo_de_Pago2__c);
+        cabecera.Metodo_de_Pago3__c = getDescriptionString('Ventas_Mostrador__c', 'Metodo_de_Pago3__c', cabecera.Metodo_de_Pago3__c);
+        cabecera.Via_de_pago__c = getDescriptionString('Ventas_Mostrador__c', 'Via_de_pago__c', cabecera.Via_de_pago__c);
+        system.debug(cabecera);
         return cabecera; 
     }
     
@@ -63,10 +69,15 @@ public class POCH_VentaMostrador_cls {
                         Descripcion__c, 
                         POCH_Cantidad__c, 
                         UnidadMedida__c, 
-                        Sucursal__c, 
-                        Status__c,
+                        Sucursal__c,
                         IVA__c,
-                        Descuento_Monto__c  
+                        Descuento_Monto__c,
+                        Oficina_de_Venta__c,
+                        POCH_Centro__c,
+                        Almacen__c,
+                        Stock__c,
+                        Stock_Consignacion__c,
+                        Valor_neto__c
                     FROM Venta_Mostrador_Detalle__c 
                     WHERE Ventas_Mostrador__c =: idVentaMostrador];
         return lstDetail;
@@ -139,12 +150,13 @@ public class POCH_VentaMostrador_cls {
         POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
                                                     Id, 
                                                     Poch_Sucursal__c,
+                                                    Name,
                                                     Poch_Sucursal__r.POCH_OrganizacionVentas__c
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
                                                 AND POCH_IdOrgVenta__c = '0029'];
                                                 // AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
-        Poch_Sucursal__c organizacionVentas = [SELECT id, POCH_OrganizacionVentas__c FROM Poch_Sucursal__c WHERE id =: sucursalAmp.Poch_Sucursal__c];
+        Poch_Sucursal__c organizacionVentas = [SELECT id, POCH_OrganizacionVentas__c, POCH_OficinaVentas__c FROM Poch_Sucursal__c WHERE id =: sucursalAmp.Poch_Sucursal__c];
         return organizacionVentas;
     }
 
@@ -177,8 +189,8 @@ public class POCH_VentaMostrador_cls {
                                                     POCH_AreaControlCreditos__c 
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                //AND POCH_IdOrgVenta__c = '0029'];
-                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+                                                AND POCH_IdOrgVenta__c = '0029'];
+                                                // AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
 
         POCH_InformacionCredito__c creditLine = [SELECT 
                                                     Id,
@@ -201,8 +213,8 @@ public class POCH_VentaMostrador_cls {
                                                     Condici_n_de_Pago__c
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                //AND POCH_IdOrgVenta__c = '0029'];
-                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+                                                AND POCH_IdOrgVenta__c = '0029'];
+                                                // AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
 
         List<String> listDescription = new List<String>();
         Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get('POCH_SucursalAmpliada__c');
@@ -216,6 +228,25 @@ public class POCH_VentaMostrador_cls {
                 //pickListValuesList.add(pickListVal.getLabel());
             }   
         return conditionPago;
+    }
+
+    /**
+    Metodo para obtener el apiName de un picklist dado el label
+    */
+    @AuraEnabled        
+    public static String getApiName(String objectType, String selectedField, String apiLabel) {
+        String description = '';
+        Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get(objectType);
+        Schema.DescribeSObjectResult res = convertToObj.getDescribe();
+        Schema.DescribeFieldResult fieldResult = res.fields.getMap().get(selectedField).getDescribe();
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        for(Schema.PicklistEntry pickListVal : ple) {
+            if (apiLabel == pickListVal.getLabel()){
+                description = pickListVal.getValue();
+            } 
+        }
+            
+        return description;
     }
     
     /**
@@ -241,10 +272,36 @@ public class POCH_VentaMostrador_cls {
     }
 
     /**
+    Metodo para obtener el description de un api name 
+    */
+    @AuraEnabled        
+    public static String getDescriptionString(String objectType, String selectedField, String apiField) {
+        String description = '';
+        //List<String> listDescription = new List<String>();
+        Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get(objectType);
+        Schema.DescribeSObjectResult res = convertToObj.getDescribe();
+        Schema.DescribeFieldResult fieldResult = res.fields.getMap().get(selectedField).getDescribe();
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        //for (String apiField : listApiField) {
+            for(Schema.PicklistEntry pickListVal : ple) {
+                if (apiField == pickListVal.getValue()){
+                    description = pickListVal.getLabel();
+                }
+                //pickListValuesList.add(pickListVal.getLabel());
+            }   
+        //}
+            
+        return description;
+    }
+
+    /**
     Metodo para validar la moneda vs la moneda de la sucursal 
     */
     @AuraEnabled        
-    public static Boolean validarCurrency(String idAccount, String moneda) {
+    public static Boolean validarCurrency(String idAccount, String moneda, Boolean notIsApiField, String objectType, String selectedField) {
+        if (notIsApiField){
+            moneda = getApiName(objectType, selectedField, moneda);
+        }
         Boolean currencyCorrect = false;
         User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId()];
         POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
@@ -252,8 +309,8 @@ public class POCH_VentaMostrador_cls {
                                                     Poch_Sucursal__c 
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
-                                                //AND POCH_IdOrgVenta__c = '0029'];
+                                                // AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
+                                                AND POCH_IdOrgVenta__c = '0029'];
         POCH_Sucursal__c sucursal = [SELECT Id, CurrencyIsoCode FROM POCH_Sucursal__c WHERE Id =: sucursalAmp.Poch_Sucursal__c];
         if (moneda == sucursal.CurrencyIsoCode){
             currencyCorrect = true;
@@ -273,22 +330,244 @@ public class POCH_VentaMostrador_cls {
         return listDescriptions;
     }
 
+    @AuraEnabled
+    public static Boolean saveVentasMostrador(Ventas_Mostrador__c ventasMostrador, Venta_Mostrador_Detalle__c[] ventasMostradorDetalle) {
+        Boolean saveDetails = true;
+        // ventasMostrador.Status = 'On Hold';
+        // insert(ventasMostrador);
+        if (!string.isBlank(ventasMostrador.Metodo_de_Pago__c)){
+            ventasMostrador.Metodo_de_Pago__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago__c', ventasMostrador.Metodo_de_Pago__c);
+        }
+        if (!string.isBlank(ventasMostrador.Metodo_de_Pago2__c)){
+            ventasMostrador.Metodo_de_Pago2__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago2__c', ventasMostrador.Metodo_de_Pago2__c);
+        }
+        if (!string.isBlank(ventasMostrador.Metodo_de_Pago3__c)){
+            ventasMostrador.Metodo_de_Pago3__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago3__c', ventasMostrador.Metodo_de_Pago3__c);
+        }
+        ventasMostrador.CurrencyIsoCode = getApiName('Ventas_Mostrador__c', 'CurrencyIsoCode', ventasMostrador.CurrencyIsoCode);
+        ventasMostrador.Via_de_pago__c = getApiName('Ventas_Mostrador__c', 'Via_de_pago__c', ventasMostrador.Via_de_pago__c);
+        ventasMostrador.Uso_de_CFDI__c = getApiName('Ventas_Mostrador__c', 'Uso_de_CFDI__c', ventasMostrador.Uso_de_CFDI__c);
+        ventasMostrador.Digitos_tarjeta__c = String.valueOf(ventasMostrador.Digitos_tarjeta__c);
+        //System.debug(JSON.serializePretty(ventasMostrador));
+        //System.debug(JSON.serializePretty(ventasMostradorDetalle));
+        Database.SaveResult ventasM = Database.insert(ventasMostrador, false);
+        System.debug('print respuesta insert Cabecera : ' + ventasM);
+
+        if (ventasMostradorDetalle.size() > 0){
+            for (Venta_Mostrador_Detalle__c detalle : ventasMostradorDetalle) {
+                System.debug('print centro--> : ' + detalle.POCH_Centro__c);
+                detalle.Almacen__c = getApiName('Venta_Mostrador_Detalle__c', 'Almacen__c', detalle.Almacen__c);
+                detalle.POCH_Centro__c = getApiName('Venta_Mostrador_Detalle__c', 'POCH_Centro__c', detalle.POCH_Centro__c);
+                detalle.UnidadMedida__c = getApiName('Venta_Mostrador_Detalle__c', 'UnidadMedida__c', detalle.UnidadMedida__c);
+                detalle.Cte_Consigna__c = 0;
+                System.debug('print centro salida --> : ' + detalle.POCH_Centro__c);
+            }
+            saveDetails = saveVentasMostradorDetalle(ventasM.getId(), ventasMostradorDetalle);
+            
+            if(saveDetails == false) {
+                delete(ventasMostrador);
+            }
+        }
+        // System.debug('print respuesta insert detalle : ' + saveDetails);
+        // System.debug('print ventasM.isSuccess() : ' + ventasM.isSuccess() + ' saveDetails -> '+ saveDetails);
+        if (ventasM.isSuccess() && saveDetails == true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @AuraEnabled
+    public static Boolean saveVentasMostradorDetalle(Id idVentasMostrador, List<Venta_Mostrador_Detalle__c> ventasMostradorDetalle) {
+        
+        for (Venta_Mostrador_Detalle__c detail: ventasMostradorDetalle) {
+            System.debug('print2 Material__c: ' + detail.Material__c);
+            System.debug('print2 POCH_Cantidad__c: ' + detail.POCH_Cantidad__c);
+            System.debug('print2 UnidadMedida__c: ' + detail.UnidadMedida__c);
+            System.debug('print2 Precio__c: ' + detail.Precio__c);
+            System.debug('print2 CurrencyIsoCode: ' + detail.CurrencyIsoCode);
+            System.debug('print2 POCH_Centro__c: ' + detail.POCH_Centro__c);
+            System.debug('print2 Almacen__c: ' + detail.Almacen__c);
+            System.debug('print2 Descto__c: ' + detail.Descto__c);
+            System.debug('print2 Valor_neto__c: ' + detail.Valor_neto__c);
+            System.debug('print2 Stock__c: ' + detail.Stock__c);
+            System.debug('print2 Stock_Consignacion__c: ' + detail.Stock_Consignacion__c);
+            System.debug('print2 Cte_Consigna__c: ' + detail.Stock_Consignacion__c);
+            System.debug('print2 Descuento_Monto__c: ' + detail.Descuento_Monto__c);
+            System.debug('print2 IVA__c: ' + detail.IVA__c);
+            System.debug('print2 Oficina_de_Venta__c: ' + detail.Oficina_de_Venta__c);
+            System.debug('print2 Product__c: ' + detail.Product__c);
+            System.debug('print2 Sucursal__c: ' + detail.Sucursal__c);
+            detail.Ventas_Mostrador__c = idVentasMostrador;
+        }
+        // insert(ventasMostradorDetalle);
+        System.debug(JSON.serializePretty(ventasMostradorDetalle));
+        
+        System.debug('print  idPadre andtes -> : ' +idVentasMostrador);
+        
+        System.debug('print  idPadre -> : ' + ventasMostradorDetalle[0].Ventas_Mostrador__c);
+        Database.SaveResult[] srList = Database.insert(ventasMostradorDetalle, false);
+        System.debug('print result' + srList[0].isSuccess());
+
+        if (srList[0].isSuccess()) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @AuraEnabled
+    public static Boolean editVentasMostrador(Ventas_Mostrador__c ventasMostrador, Venta_Mostrador_Detalle__c[] ventasMostradorDetalle) {
+
+        Database.SaveResult ventasM = Database.update(ventasMostrador, false);
+        Boolean editDetails = editVentasMostradorDetalle(ventasMostrador.Id, ventasMostradorDetalle);
+        if (ventasM.isSuccess() && editDetails == true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+        // editVentasMostradorDetalle(ventasMostrador.Id, ventasMostradorDetalle);
+
+    }
+
+    @AuraEnabled
+    public static Boolean editVentasMostradorDetalle(Id idVentasMostrador, List<Venta_Mostrador_Detalle__c> deploymentDetails) {
+        
+        // System.debug('idVentasMostrador = ' + idVentasMostrador);
+        Database.DeleteResult[] deleteVentasM = Database.delete(deploymentDetails, false);
+        // delete
+        // delete [SELECT Id FROM Venta_Mostrador_Detalle__c where Ventas_Mostrador__c.Id =: idVentasMostrador];
+        
+        saveVentasMostradorDetalle(idVentasMostrador, deploymentDetails);
+
+        if (deleteVentasM[0].isSuccess()) {
+            Boolean saveVMD = saveVentasMostradorDetalle(idVentasMostrador, deploymentDetails);
+            if (saveVMD == true){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
-    Metodo para obtener el apiName de un picklist dado el label
+    Metodo para obtener stock 
     */
     @AuraEnabled        
-    public static String getApiName(String objectType, String selectedField, String apiLabel) {
-        String description = '';
+    public static Double getStock(Id product, String centro, String almacen, String stockConsigna) {
+        Double stock = 0.0;
+        almacen = getApiName('Venta_Mostrador_Detalle__c', 'Almacen__c', almacen);
+        centro = getApiName('Venta_Mostrador_Detalle__c', 'POCH_Centro__c', centro);
+        Stock_of_matrials__c stockCabecera = [SELECT Id FROM Stock_of_matrials__c WHERE Product__c =: product AND POCH_Centro__c =: centro];
+        for(Stock_details__c listStockDatalle :[SELECT 
+                                                    Id,
+                                                    POCH_Stock_valorado_libre_utilizacion__c 
+                                                FROM Stock_details__c 
+                                                WHERE POCH_Almacen__c =: almacen 
+                                                AND POCH_Indicador_stock_especial__c =: stockConsigna 
+                                                AND Stock_of_matrials__c =: stockCabecera.Id]){
+            stock = stock + listStockDatalle.POCH_Stock_valorado_libre_utilizacion__c;
+        }
+        return stock;
+    }
+
+    /**
+    Metodo para obtener IVA 
+    */
+    @AuraEnabled        
+    public static Double getIVA(Id product, Id sucursal, Double valorNeto) {
+        Double iva = 0.0;
+        System.debug('print  IVA product: ' + product + ' sucursal -> '+ sucursal + ' valorNeto -> ' + valorNeto);
+        for(POCH_ProductoSucursal__c sucursalProducto :[SELECT 
+                                                            Id,
+                                                            IMPUESTO_PRODUCTO__c 
+                                                        FROM POCH_ProductoSucursal__c 
+                                                        WHERE POCH_Producto__c =: product 
+                                                        AND POCH_Sucursal__c =: sucursal
+                                                        AND POCH_CanalDistribucion__c = '12']){
+            if (sucursalProducto.IMPUESTO_PRODUCTO__c != null){
+                iva = valorNeto * sucursalProducto.IMPUESTO_PRODUCTO__c;
+            }
+        }
+        return iva;
+    }
+    
+    @AuraEnabled 
+    public static List<String> getDependentPicklistValues(String objectType, String firstField, String selectedField, String filter, Boolean isApiField) {
+        if (isApiField){
+            filter = getDescriptionString(objectType, firstField, filter);
+        }
         Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get(objectType);
         Schema.DescribeSObjectResult res = convertToObj.getDescribe();
-        Schema.DescribeFieldResult fieldResult = res.fields.getMap().get(selectedField).getDescribe();
-        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
-        for(Schema.PicklistEntry pickListVal : ple) {
-            if (apiLabel == pickListVal.getLabel()){
-                description = pickListVal.getValue();
-            } 
+        Schema.DescribeFieldResult depend = res.fields.getMap().get(selectedField).getDescribe();
+        Schema.sObjectField controlToken = depend.getController();
+        if (controlToken == null) {
+            return new List<String>();
+        }
+        
+        Schema.DescribeFieldResult control = controlToken.getDescribe();
+        List<Schema.PicklistEntry> controlEntries;
+        if(control.getType() != Schema.DisplayType.Boolean) {
+            controlEntries = control.getPicklistValues();
+        }
+        
+        String base64map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+        Map<String,List<String>> dependentPicklistValues = new Map<String,List<String>>();
+        for (Schema.PicklistEntry entry : depend.getPicklistValues()) {
+            if (entry.isActive() && String.isNotEmpty(String.valueOf(((Map<String,Object>) JSON.deserializeUntyped(JSON.serialize(entry))).get('validFor')))) {
+                List<String> base64chars =
+                        String.valueOf(((Map<String,Object>) JSON.deserializeUntyped(JSON.serialize(entry))).get('validFor')).split('');
+                for (Integer index = 0; index < (controlEntries != null ? controlEntries.size() : 2); index++) {
+                    Object controlValue =
+                            (controlEntries == null
+                                    ?   (Object) (index == 1)
+                                    :   (Object) (controlEntries[index].isActive() ? controlEntries[index].getLabel() : null)
+                            );
+                    Integer bitIndex = index / 6;
+                    if (bitIndex > base64chars.size() - 1) {
+                        break;
+                    }
+                    Integer bitShift = 5 - Math.mod(index, 6);
+                    if  (controlValue == null || (base64map.indexOf( base64chars[ bitIndex ] ) & (1 << bitShift)) == 0)
+                        continue;
+                    if (!dependentPicklistValues.containsKey((String) controlValue)) {
+                        dependentPicklistValues.put((String) controlValue, new List<String>());
+                    }
+                    dependentPicklistValues.get((String) controlValue).add(entry.getLabel());
+                }
+            }
+        }
+        
+        List<String> filters = new List<String>();
+        filters.addall(dependentPicklistValues.get(filter));
+        return filters;
+    }
+
+    /**
+    Metodo para calcular el precio segun la cantidad 
+    */
+    @AuraEnabled        
+    public static Double getPrice(Id product, Id sucursal, Integer cantidad, Id account, String unidadMedida, Boolean notIsApiField, String objectType, String selectedField) {
+        Double precio = 0.0;
+        if (notIsApiField){
+            unidadMedida = getApiName(objectType, selectedField, unidadMedida);
         }
             
-        return description;
+        for(SBQQ__ContractedPrice__c listContractedPrice :[SELECT Id,
+                                                                SBQQ__Price__c,
+                                                                POCH_UnidadMedidaEscala__c
+                                                            FROM SBQQ__ContractedPrice__c
+                                                            WHERE POCH_Sucursal__c =: sucursal 
+                                                            AND SBQQ__Product__c =: product
+                                                            AND SBQQ__Account__c =: account]){
+            if (unidadMedida == listContractedPrice.POCH_UnidadMedidaEscala__c){
+                precio = listContractedPrice.SBQQ__Price__c;
+            }
+                                                                 
+        }
+
+        return precio;
     }
 }
