@@ -26,7 +26,7 @@
     },
 
     getPicklistValuesOneLevel: function(component,StrObject,StrnNameField) {
-        var action = component.get("c.PickListValuesIntoList"); 
+        var action = component.get("c.PickListValuesIntoList");
         action.setParams({
             objectType: StrObject,
             selectedField: StrnNameField
@@ -40,22 +40,21 @@
                 
                 for (var i = 0; i < StoreResponse.length; i++) {
                     listOneLevel.push(StoreResponse[i]);
-                }  
-            	//
-                if (listOneLevel != undefined && listOneLevel.length > 0) {
-                    ControllerFieldOneLevel.push('-NA-');        
                 }
                 
                 for (var i = 0; i < listOneLevel.length; i++) {
                     ControllerFieldOneLevel.push(listOneLevel[i]);
-                } 
+                }
                 if(StrnNameField == 'UnidadMedida__c'){
                     component.set("v.listControllingValuesUnidaM", ControllerFieldOneLevel);
                 }
-                if(StrnNameField == 'CurrencyIsoCode'){
-                    component.set("v.listMoneda", ControllerFieldOneLevel);
-                    
+                if(StrnNameField == 'POCH_Centro__c'){
+                    component.set("v.listCentro", ControllerFieldOneLevel);
                 }
+                // if(StrnNameField == 'CurrencyIsoCode'){
+                //     component.set("v.listMoneda", ControllerFieldOneLevel);
+                // }
+            
             }
         });
         $A.enqueueAction(action);
@@ -104,10 +103,11 @@
                 let listValues = response.getReturnValue();
                 if(listValues !== null && listValues !== undefined && listValues.length > 0) {
                     if (selectedField == 'POCH_Centro__c'){
+                        component.set("v.VentaInstance.POCH_Centro__c",listValues[0]);
                         var instanceVenta = component.get("v.VentaInstance");
-                        // instanceVenta.POCH_Centro__c = listValues[0];
+                        instanceVenta.POCH_Centro__c = listValues[0];
                         component.set("v.listCentro", listValues)
-                        /* var action2 = component.get("c.getDependentPicklistValues");
+                        var action2 = component.get("c.getDependentPicklistValues");
                         action2.setParams({
                             objectType: objectType,
                             firstField: 'POCH_Centro__c',
@@ -123,10 +123,11 @@
                                     instanceVenta.Almacen__c = listValues2[0];
                                     component.set("v.listAlmacen", listValues2);
                                     component.set("v.VentaInstance", instanceVenta);
+                                    component.set();
                                 }
                             }
                         });
-                        $A.enqueueAction(action2); */
+                        $A.enqueueAction(action2);
 
                     }
                     if (selectedField == 'Almacen__c'){

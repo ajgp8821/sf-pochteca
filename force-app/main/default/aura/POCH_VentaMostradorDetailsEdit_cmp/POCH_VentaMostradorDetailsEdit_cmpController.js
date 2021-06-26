@@ -1,6 +1,12 @@
 ({
 	doInit : function(component, event, helper) { 
 		var ventasMostrador = component.get("{!v.ventasMostrador}");
+		helper.getPicklistValuesOneLevel(component,'Venta_Mostrador_Detalle__c','UnidadMedida__c', null);
+		helper.getDependentPicklistValues(component, 'Venta_Mostrador_Detalle__c', 'Oficina_de_Venta__c', 'POCH_Centro__c', component.get("v.VentaInstance.Oficina_de_Venta__c"), true);
+		component.set("v.listControllingValuesUnidaM" ,component.get("v.VentaInstance.UnidadMedida__c"));
+		component.set("v.listCentro" ,component.get("v.VentaInstance.POCH_Centro__c"));
+		component.set("v.listAlmacen" ,component.get("v.VentaInstance.Almacen__c"));
+		//component.set("v.listCentro" ,component.get("v.VentaInstance.POCH_Centro__c"));
 		if (ventasMostrador !== null && ventasMostrador !== undefined) {
 			component.set("{!v.strIdSucursalAmp}", ventasMostrador.POCH_Sucursal__c);
 			if (ventasMostrador.Status__c == 'Cancelado'){
@@ -8,19 +14,6 @@
 			}
 			
 		}
-    var tem1 = component.get("{!v.strIdVentaMostrador}"); 
-		var tem2 = component.get("{!v.isStatusCancel}");
-		helper.getDescriptionString(component, 'Venta_Mostrador_Detalle__c', 'POCH_Centro__c', component.get("v.VentaInstance.POCH_Centro__c"));
-		helper.getDescriptionString(component, 'Venta_Mostrador_Detalle__c', 'Almacen__c', component.get("v.VentaInstance.Almacen__c"));
-		helper.getDependentPicklistValues(component, 'Venta_Mostrador_Detalle__c', 'Oficina_de_Venta__c', 'POCH_Centro__c', component.get("v.VentaInstance.Oficina_de_Venta__c"), true);
-		// helper.getDependentPicklistValues(component, 'Venta_Mostrador_Detalle__c', 'Oficina_de_Venta__c', 'POCH_Centro__c', component.get("v.VentaInstance.Oficina_de_Venta__c"), true);
-
-		helper.getPicklistValuesOneLevel(component,'Stock_of_matrials__c','UnidadMedida__c', null); 
-		helper.getPicklistValuesOneLevel(component,'Stock_of_matrials__c','CurrencyIsoCode', null);
-
-		component.set("v.listControllingValuesUnidaM" ,component.get("v.VentaInstance.POCH_UnidadMedida__c")); 
-		component.set("v.listMoneda" ,component.get("v.VentaInstance.CurrencyIsoCode"));
-		
 	},
 	
 	// removeRow : function(component, event, helper){
@@ -82,10 +75,65 @@
 	},
 
 	calcularTotales : function(component, event, helper) {
-        var calcularTotalesEvent = component.getEvent("calcularTotales");
-        var test = " test";
-        calcularTotalesEvent.setParams({testParam: test});
-        calcularTotalesEvent.fire();
+        var ventaDetalle = component.get("v.VentaInstance");
+        ventaDetalle.Product__c = component.get("v.VentaInstance.Product__c");
+        var temp = component.get("v.VentaInstance.POCH_Centro__c" );
+        ventaDetalle.Sucursal__c = component.get("v.VentaInstance.Sucursal__c");
+        ventaDetalle.Oficina_de_Venta__c = component.get("v.VentaInstance.Oficina_de_Venta__c");
+        var venta = component.get("v.ventasMostrador");
+        var action = component.get("c.getPrice");
+        var action2 = component.get("c.getIVA");
+		action.setParams({
+            //product: component.get("v.VentaInstance.POCH_Producto__c"),
+            product: ventaDetalle.Product__c,
+            sucursal: ventaDetalle.Sucursal__c,
+            //sucursal: 'a1K4P00000Ldvr8UAB',
+            cantidad: ventaDetalle.POCH_Cantidad__c,
+            account: component.get("{!v.ventasMostrador.Cliente__c}"),
+            //account: '0014P00002lB91DQAS',
+            unidadMedida: ventaDetalle.UnidadMedida__c,
+            notIsApiField: true,
+            objectType: 'Venta_Mostrador_Detalle__c',
+            selectedField: 'UnidadMedida__c'
+        });
+        action.setCallback(this, function (response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                let precio = response.getReturnValue();
+                ventaDetalle.Precio__c =  precio;
+                ventaDetalle.Descto__c = parseFloat(ventaDetalle.Descto__c);
+                ventaDetalle.Descuento_Monto__c = precio * ventaDetalle.Descto__c / 100;
+                //var montoPorcentaje = precio * ventaDetalle.Descto__c;
+                ventaDetalle.Valor_neto__c = (precio - ventaDetalle.Descuento_Monto__c ) * ventaDetalle.POCH_Cantidad__c;
+                component.set("v.VentaInstance", ventaDetalle); 
+                action2.setParams({
+                    product: ventaDetalle.Product__c,
+                    sucursal: ventaDetalle.Sucursal__c,
+                    //sucursal: 'a1K4P00000Ldvr8UAB',
+                    valorNeto: ventaDetalle.Valor_neto__c
+                });
+                action2.setCallback(this, function (response) {
+                    var state = response.getState();
+                    if (state === "SUCCESS") {
+                        let ivaMonto = response.getReturnValue();
+                        ventaDetalle.IVA__c;
+                        component.set("v.VentaInstance", ventaDetalle); 
+                        var calcularTotalesEvent = component.getEvent("calcularTotales");
+                        var test = " test";
+                        calcularTotalesEvent.setParams({testParam: test});
+                        calcularTotalesEvent.fire();
+                    }else {
+                        console.log("--- Algo salio mal ---");
+                    }
+                });
+                $A.enqueueAction(action2);
+                
+
+            }else {
+                console.log("--- Algo salio mal ---");
+            }
+        });
+        $A.enqueueAction(action);
     }
 
 })

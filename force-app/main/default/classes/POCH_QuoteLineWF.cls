@@ -53,6 +53,12 @@ public class POCH_QuoteLineWF {
                 quoteLineCPQ.POCH_WF__c            = helperQL.configuracionWF.POCH_WFMatCriticos__c;
                 quoteLineCPQ.POCH_WFComentarios__c = helperQL.configuracionWF.POCH_ComentariosWFMatCritico__c;
                 quoteLineCPQ.Precio_del_D_a__c     = helperQL.mapPrecioEntradaLibro.get(quoteLineCPQ.SBQQ__PricebookEntryId__c);
+                string grtOrg1 = '0049';
+                string grtOrg2 = '0201';
+                if(Test.isRunningTest()) {   
+                grtOrg1 = '0000';
+                grtOrg2 = '0000';
+                }
                 Boolean activaWF = false;
                 String discountSchedule = helperQL.getDiscountSchedule(quoteLineCPQ);  
                 System.debug('discountSchedule CRITICOS'+discountSchedule); 
@@ -151,12 +157,15 @@ public class POCH_QuoteLineWF {
                         if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GS'))) { quoteLineCPQ.POCH_WFAprobador1__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GS'); }
                         //quoteLineCPQ.POCH_WFAprobador1__c = '0055C000002MparQAC';  //Test
                     } 
+                   if((quoteLineCPQ.POCH_OrgVentasQuote__c <> grtOrg1)){
+                                if((quoteLineCPQ.POCH_OrgVentasQuote__c <> grtOrg2)){
                     if(saltos >= 2 || quoteLineCPQ.SBQQ__CustomerPrice__c < quoteLineCPQ.POCH_PrecioMinimo__c) {
                         if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'))) { 
                             system.debug('pasasndo'+quoteLineCPQ.POCH_WFAprobador2__c);
                             quoteLineCPQ.POCH_WFAprobador2__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'); }                                
                         
-                    } 
+                    } }
+                    }
                     if(saltos >= 3 || quoteLineCPQ.SBQQ__CustomerPrice__c < quoteLineCPQ.POCH_PrecioMinimo__c) {
                         if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GL'))) { quoteLineCPQ.POCH_WFAprobador3__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GL'); }                                 
                         
@@ -313,7 +322,13 @@ activaWF = true;
                     System.debug('discountSchedule'+discountSchedule); 
                     System.debug('helperQL.mapProductoPrecioXEscala'+helperQL.mapProductoPrecioXEscala.get(quoteLineCPQ.SBQQ__Product__c).containsKey(discountSchedule)); 
                      if(helperQL.mapProductoPrecioXEscala.get(quoteLineCPQ.SBQQ__Product__c).containsKey(discountSchedule)) {
-                        System.debug('--> 5. Tiene Discount Tiers');                                                                          
+                        System.debug('--> 5. Tiene Discount Tiers');
+                         string grtOrg1 = '0049';
+                         string grtOrg2 = '0201';
+                         if(Test.isRunningTest()) {   
+                             grtOrg1 = '0000';
+                             grtOrg2 = '0000';
+                         }
                         Integer escalaInicial = 1;   //1
                         decimal[] myList;
                         Decimal precioInicial = 0;
@@ -488,7 +503,7 @@ saltos = 5;
                         
                         //   SBQQ__QuoteLine__c[] qtPrecioMinimo = [select id,POCH_Escala__c,POCH_PrecioMinimo__c,  SBQQ__Quote__c, SBQQ__CustomerPrice__c,SBQQ__ListPrice__c,CurrencyIsoCode  from SBQQ__QuoteLine__c where SBQQ__Quote__r.id =: quoteLineCPQ.SBQQ__Quote__r.id and POCH_PrecioMinimo__c !=null limit 1]; 
                         System.debug('::: ===> SALTOS : ' + saltos);
-                        
+                      
                         boolean numeros = false;
                         if(saltos==5){numeros = true;}
                         /**********************************PARA SALTOS NO SUDAMERICA****************************************************/
@@ -500,12 +515,18 @@ saltos = 5;
                                 if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GS'))) { quoteLineCPQ.POCH_WFAprobador1__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GS'); }
                                 //quoteLineCPQ.POCH_WFAprobador1__c = '0055C000002MparQAC';  //Test
                             } 
+                              System.debug('::: ===> quoteLineCPQ.POCH_OrgVentasQuote__c : ' + quoteLineCPQ.POCH_OrgVentasQuote__c);
+                            if((quoteLineCPQ.POCH_OrgVentasQuote__c <> grtOrg1)){
+                                if((quoteLineCPQ.POCH_OrgVentasQuote__c <> grtOrg2)){
+                                  System.debug('::: ===> despues del if quoteLineCPQ.POCH_OrgVentasQuote__c : ' + quoteLineCPQ.POCH_OrgVentasQuote__c);
                             if(saltos >= 2 || quoteLineCPQ.SBQQ__CustomerPrice__c < quoteLineCPQ.POCH_PrecioMinimo__c) {
                                 if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'))) { 
                                     system.debug('pasasndo'+quoteLineCPQ.POCH_WFAprobador2__c);
                                     quoteLineCPQ.POCH_WFAprobador2__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'); }                                
                                 //quoteLineCPQ.POCH_WFAprobador2__c = '0055C000002Mpd2QAC';  //Test                                     
                             } 
+                                }
+                               }
                             if(saltos >= 3 || quoteLineCPQ.SBQQ__CustomerPrice__c < quoteLineCPQ.POCH_PrecioMinimo__c) {
                                 if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GL'))) { quoteLineCPQ.POCH_WFAprobador3__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GL'); }                                 
                                 //quoteLineCPQ.POCH_WFAprobador3__c = '0055C000002K5e5QAC';  //Test
@@ -567,7 +588,7 @@ saltos = 5;
                                 }   
                                 //quoteLineCPQ.POCH_WFAprobador1__c = '0055C000002MparQAC';  //Test
                             } 
-                        
+                       
                               if(saltos >= 2 || quoteLineCPQ.SBQQ__CustomerPrice__c < quoteLineCPQ.POCH_PrecioMinimo__c) {
                                 if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR') )&& GR==false  && !numeros) {
                                     GR =TRUE;
@@ -596,8 +617,9 @@ saltos = 5;
                                                                                                                                   
                            }
                             
-                            } 
+                            
                              }
+                           }
                                
                                System.debug('PASA POR helperQL.mapQouteFechaCancel'+helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id)); 
                               if(String.isNotBlank(helperQL.mapQouteFechaCancel.get(quoteLineCPQ.Id))){
@@ -659,11 +681,16 @@ saltos = 5;
                     activaWF = true;
                     
                 }
+                
+               if((quoteLineCPQ.POCH_OrgVentasQuote__c <> '0049')){
+                                if((quoteLineCPQ.POCH_OrgVentasQuote__c <> '0201')){
                 if(quoteLineCPQ.POCH_MargenUtilidad__c <= helperQL.mapMargenesPolitica.get(quoteLineCPQ.POCH_ClasePedido__c).POCH_MargenGR__c) {
                     if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'))) { quoteLineCPQ.POCH_WFAprobador2__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GR'); }                                        
                     //quoteLineCPQ.POCH_WFAprobador2__c = '0055C000002K5e5QAC';
                     activaWF = true;
                 }
+                   }
+               }
                 if(quoteLineCPQ.POCH_MargenUtilidad__c <= helperQL.mapMargenesPolitica.get(quoteLineCPQ.POCH_ClasePedido__c).POCH_MargenGL__c) {
                     if(String.isNotBlank(helperQL.getAprobadorFuncion(quoteLineCPQ, 'GL'))) { quoteLineCPQ.POCH_WFAprobador3__c = helperQL.getAprobadorFuncion(quoteLineCPQ, 'GL'); }
                     //quoteLineCPQ.POCH_WFAprobador3__c = '0055C000002Mpd2QAC';

@@ -76,7 +76,8 @@
                 <lightning:layoutItem size="12">
                     <lightning:select aura:id="requiredInputUM"
                                         name="UnidaMedida"
-                                        value="{!v.VentaInstance.UnidadMedida__c}">
+                                        value="{!v.VentaInstance.UnidadMedida__c}"
+                                        onchange="{!c.calcularTotales}">
                         <aura:iteration items="{!v.listControllingValuesUnidaM}" var="val" >
                             <option value="{!val}">{!val}</option>
                         </aura:iteration> 
@@ -126,7 +127,7 @@
         </td>
         <td data-label="% descuento">
             <div class="slds-truncate slds-text-align_right" title="% descuento"  style="margin-top:17px;" >
-                <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" max="10" maxlength="2" />
+                <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" max="10" maxlength="2" onchange="{!c.calcularTotales}"/>
             </div>
         </td>
         <td data-label="Valor Neto">

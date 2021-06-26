@@ -13,12 +13,15 @@ public class POCH_QuoteLineWFTest {
         acc.POCH_Region__c = reg.Id;
         acc.POCH_OrganizacionVentas__c ='0015';
         acc.POCH_CuentaClave__c = false;
+        acc.Gte_Com1__c = false;
+        acc.TV__c = true;
         insert acc;
         
       
         
          POCH_Sucursal__c suc = POCH_DataCreationTest.getSucursal();
          suc.POCH_Sociedad__c 		   = '412';
+         
          insert suc;
         
         
@@ -44,13 +47,7 @@ public class POCH_QuoteLineWFTest {
         POCH_ValoracionProducto__c vp = POCH_DataCreationTest.getVP();
         vp.POCH_Producto__c = prd.Id;
         insert vp;          
-        
-        /*POCH_OpportunityTriggerService.isInvokedByTrigger = true;
-Opportunity opp      = POCH_DataCreationTest.getOpportunity();
-opp.AccountId        = acc.Id;
-opp.POCH_Sucursal__c = suc.Id;
-opp.Pricebook2Id     = pb.Id;
-insert opp;*/
+    
         
         SBQQ__Quote__c qt        = POCH_DataCreationTest.getQuote();
         qt.SBQQ__Account__c      = acc.Id;
@@ -77,6 +74,8 @@ insert opp;*/
         POCH_WFAprobador__c ap3 = POCH_DataCreationTest.getAprobador();
         POCH_WFAprobador__c ap4 = POCH_DataCreationTest.getAprobador();
         POCH_WFAprobador__c ap5 = POCH_DataCreationTest.getAprobador();
+        ap1.TV__c = true;
+        ap1.Gte_Com1__c = false;
         ap1.RecordTypeId        = Schema.SObjectType.POCH_WFAprobador__c.getRecordTypeInfosByName().get('Aprobador Gerente Sucursal').getRecordTypeId(); 
         ap2.RecordTypeId        = Schema.SObjectType.POCH_WFAprobador__c.getRecordTypeInfosByName().get('Aprobador Gerente Regional').getRecordTypeId();
         ap3.RecordTypeId        = Schema.SObjectType.POCH_WFAprobador__c.getRecordTypeInfosByName().get('Aprobador Gerente Linea').getRecordTypeId();
@@ -280,17 +279,10 @@ public static testMethod void testHandleWFListadePreciosSudamerica() {
        
     
         //wfd.suc.Sociedad__c = '412';
-      
-        SBQQ__Quote__c qt        = POCH_DataCreationTest.getQuote();
-        qt.SBQQ__Account__c      =  wfd.acc.Id;
-        //qt.SBQQ__Opportunity2__c = opp.Id;
-        qt.SBQQ__PriceBook__c    = wfd.pb.Id;
-       // qt.POCH_Sucursal__c      = sucP.Id;
-        //insert qt;
     
         SBQQ__QuoteLine__c ql = POCH_DataCreationTest.getQuoteLine();
         ql.SBQQ__DiscountSchedule__c = ds.Id;
-        ql.SBQQ__Quote__c  = qt.id;
+        ql.SBQQ__Quote__c  = wfd.qt.id;
         ql.SBQQ__DiscountTier__c     = lDT[4].Id;
         ql.SBQQ__CustomerPrice__c    = 15;
         ql.SBQQ__ListPrice__c		 = 10;

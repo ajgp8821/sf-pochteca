@@ -38,11 +38,11 @@
             }
         }
         
-        if(equalsvalues.length > 1) {
-            component.set("v.blnShowProducts" , blnShowPopupProd);
-            helper.showToast(component, event, helper,'No se pueden agregar productos iguales');
-        }
-        else {
+        // if(equalsvalues.length > 1) {
+            // component.set("v.blnShowProducts" , blnShowPopupProd);
+            // helper.showToast(component, event, helper,'No se pueden agregar productos iguales');
+        // }
+        // else {
             
             if(selectedProductFromEvent.Product2.ProductCode != '' && selectedProductFromEvent.Product2.ProductCode != null && selectedProductFromEvent.Product2.ProductCode != undefined ) {
                 component.set("v.VentaInstance.Material__c" , selectedProductFromEvent.Product2.ProductCode.replace(/^0+/, ''));
@@ -58,7 +58,7 @@
                 component.set("v.VentaInstance.CurrencyIsoCode" , selectedProductFromEvent.CurrencyIsoCode);
             }
             component.set("v.blnShowProducts" , blnShowPopupProd);
-        }
+        // }
     },
     
     validateUM : function(component, event, helper) {
@@ -93,18 +93,20 @@
         var venta = component.get("v.ventasMostrador");
         var action = component.get("c.getPrice");
         var action2 = component.get("c.getIVA");
+        var action3 = component.get("c.getMargen");
         action.setParams({
             //product: component.get("v.VentaInstance.POCH_Producto__c"),
             product: ventaDetalle.Product__c,
-            //sucursal: component.get("v.strIdSucursalAmp"),
-            sucursal: 'a1K4P00000Ldvr8UAB',
+            sucursal: component.get("v.strIdSucursalAmp"),
+            //sucursal: 'a1K4P00000Ldvr8UAB',
             cantidad: ventaDetalle.POCH_Cantidad__c,
-            //account: venta.Cliente__c,
-            account: '0014P00002lB91DQAS',
+            account: venta.Cliente__c,
+            //account: '0014P00002lB91DQAS',
             unidadMedida: ventaDetalle.UnidadMedida__c,
             notIsApiField: true,
             objectType: 'Venta_Mostrador_Detalle__c',
-            selectedField: 'UnidadMedida__c'
+            selectedField: 'UnidadMedida__c',
+            organizacionVenta: component.get('v.organizacionVentas')
         });
         action.setCallback(this, function (response) {
             var state = response.getState();
@@ -118,8 +120,8 @@
                 component.set("v.VentaInstance", ventaDetalle); 
                 action2.setParams({
                     product: component.get("v.VentaInstance.Product__c"),
-                    //sucursal: component.get("v.strIdSucursalAmp"),
-                    sucursal: 'a1K4P00000Ldvr8UAB',
+                    sucursal: component.get("v.strIdSucursalAmp"),
+                    //sucursal: 'a1K4P00000Ldvr8UAB',
                     valorNeto: ventaDetalle.Valor_neto__c
                 });
                 action2.setCallback(this, function (response) {
@@ -127,11 +129,36 @@
                     if (state === "SUCCESS") {
                         let ivaMonto = response.getReturnValue();
                         ventaDetalle.IVA__c;
-                        component.set("v.VentaInstance", ventaDetalle); 
-                        var calcularTotalesEvent = component.getEvent("calcularTotales");
-                        var test = " test";
-                        calcularTotalesEvent.setParams({testParam: test});
-                        calcularTotalesEvent.fire();
+                        component.set("v.VentaInstance", ventaDetalle);
+                        action3.setParams({
+                            //product: component.get("v.VentaInstance.POCH_Producto__c"),
+                            product: ventaDetalle.Product__c,
+                            unidadMedida: ventaDetalle.UnidadMedida__c,
+                            notIsApiField: true,
+                            objectType: 'Venta_Mostrador_Detalle__c',
+                            selectedField: 'UnidadMedida__c',
+                            precio: ventaDetalle.Precio__c,
+                            porcentajeDescuento: ventaDetalle.Descto__c,
+                            centro: ventaDetalle.POCH_Centro__c,
+                            selectedField2: 'POCH_Centro__c',
+                            moneda: ventaDetalle.CurrencyIsoCode,
+                            selectedField3: 'Almacen__c'
+                        });
+                        action3.setCallback(this, function (response) {
+                            var state = response.getState();
+                            if (state === "SUCCESS") {
+                                let margen = response.getReturnValue();
+                                component.set("v.VentaInstance.Margen__c");
+                                var calcularTotalesEvent = component.getEvent("calcularTotales");
+                                var test = " test";
+                                calcularTotalesEvent.setParams({testParam: test});
+                                calcularTotalesEvent.fire();
+                            }else{
+                                console.log("--- Algo salio mal ---");
+                            }
+                        });
+                        $A.enqueueAction(action3);
+                        
                     }else {
                         console.log("--- Algo salio mal ---");
                     }
@@ -140,6 +167,7 @@
                 
 
             }else {
+                helper.showToast('Warning', 'Atención!', 'Unidad de medida no valida para este producto');
                 console.log("--- Algo salio mal ---");
             }
         });

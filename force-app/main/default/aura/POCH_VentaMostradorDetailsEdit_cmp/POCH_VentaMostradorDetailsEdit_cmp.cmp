@@ -12,6 +12,8 @@
       <aura:attribute name="listWhoBuy" type="list" default="[]" description="field values Who Buy"/>
       <aura:attribute name="strFreQuote" type="String" default="1"/>
       <aura:attribute name="isStatusCancel"  type="Boolean" default="false"/>
+      <aura:attribute name="listCentro" type="list" default="[]" description="field values Centro"/>
+      <aura:attribute name="listAlmacen" type="list" default="[]" description="field values Centro"/>
       
       <aura:attribute name="strIdSucursalAmp" type="String"  default="" /> 
       <aura:attribute name="strIdVentaMostrador"     type="String"  default="" />
@@ -25,7 +27,6 @@
       <aura:attribute name="oficinaVentas" type="String" default=""/>
 
       <aura:attribute name="organizacionVentas" type="String" default=""/>
-
       <aura:handler name="AddProductLookupDetail2" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.addNewProductSelected}"/>
       <!-- Register 2 Lightning Event for handle add or Delete rows on Parent Component  --> 
       <!-- <aura:registerEvent name="DeleteRowEvt" type="c:POCH_DeleteProductsSheet_evt"/>  -->
@@ -47,12 +48,7 @@
                                     <span class="slds-assistive-text">Delete Icon</span>
                               </a>
                         </div>
-                        <!-- <aura:if isTrue="{!v.rowIndex > 0}">
-                              <a onclick="{!c.removeRow}">
-                                    <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
-                                    <span class="slds-assistive-text">Delete Icon</span>
-                              </a>      
-                        </aura:if> -->
+
                   </div>
             </td>
             <td data-label="Codigo">
@@ -77,7 +73,8 @@
                               <lightning:select aura:id="requiredInputUM"  
                                           name="UnidaMedida"
                                           value="{!v.VentaInstance.UnidadMedida__c}"
-                                          disabled="{!v.isStatusCancel}">
+                                          disabled="{!v.isStatusCancel}"
+                                          onchange="{!c.calcularTotales}">
                               <aura:iteration items="{!v.listControllingValuesUnidaM}" var="val" >
                                     <option value="{!val}">{!val}</option>
                               </aura:iteration> 
@@ -92,35 +89,24 @@
             </td>
             <td data-label="Moneda">
                   <div class="slds-truncate" title="Moneda" style="width: 80px;">
-                      <!--<lightning:input    type="text" name="monedaCom" value="{!v.ProductInstance.POCH_MonedaCompetencia__c}"/>-->
-                        <!-- <lightning:layoutItem size="12">    
-                          <lightning:select aura:id="requiredInputMonedaComp"  
-                                            name="Moneda"
-                                            value="{!v.VentaInstance.CurrencyIsoCode}"
-                                            disabled="{!v.isStatusCancel}">
-                              <aura:iteration items="{!v.listMoneda}" var="val" >
-                                  <option value="{!val}" >{!val}</option>
-                              </aura:iteration>
-                          </lightning:select>
-                    </lightning:layoutItem>    -->
-                    <lightning:input type="text" name="UMP" value="{!v.VentaInstance.CurrencyIsoCode}" readonly="true" />
+                        <lightning:input type="text" name="UMP" value="{!v.VentaInstance.CurrencyIsoCode}" readonly="true" />
                   </div>
             </td>
             <td data-label="Centro">
                   <div class="slds-truncate" title="Centro" style="width: 40px;">
-                        <!-- <lightning:input type="text" name="UMP" value="{!v.VentaInstance.POCH_uma__c}" readonly="true" /> -->
+                      <!-- <lightning:input type="text" name="UMP" value="{!v.VentaInstance.POCH_uma__c}" readonly="true" /> -->
                         <lightning:layoutItem size="12">
                               <lightning:select aura:id="requiredCentro"
-                                                name="Centro"
-                                                value="{!v.VentaInstance.POCH_Centro__c}"
-                                                onchange="{!c.getAlmacen}">
-                                    <aura:iteration items="{!v.listCentro}" var="val" >
+                                    name="Centro"
+                                    value="{!v.VentaInstance.POCH_Centro__c}"
+                                    onchange="{!c.getAlmacen}">
+                              <aura:iteration items="{!v.listCentro}" var="val" >
                                     <option value="{!val}">{!val}</option>
-                                    </aura:iteration> 
-                              </lightning:select>
-                        </lightning:layoutItem>
+                              </aura:iteration> 
+                        </lightning:select>
+                      </lightning:layoutItem>
                   </div>
-            </td>	
+              </td>
             <td data-label="Almacen">
                   <div class="slds-truncate slds-text-align_right" title="Almacen"  style="margin-top:17px;" >
                         <!-- <ui:outputCurrency value="{!v.VentaInstance.POCH_EsPotencial__c}" format="$#,###.00" /> -->
@@ -138,13 +124,14 @@
             </td>
             <td data-label="% descuento">
                   <div class="slds-truncate slds-text-align_right" title="% descuento"  style="margin-top:17px;" >
-                      <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" disabled="{!v.isStatusCancel}" type="number" max="10" maxlength="2"  onblur="Malo" />   
+                      <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" max="10" maxlength="2" onchange="{!c.calcularTotales}"/>
                   </div>
             </td>              
             <td data-label="Valor Neto">
                   <div class="slds-truncate" title="Valor Neto" style="width: 90px;">
+                      <ui:outputCurrency value="{!v.VentaInstance.Valor_neto__c}" format="$#,###.00" />
                   </div>
-            </td>
+              </td>
             <td data-label="Stock">
                   <div class="slds-truncate" title="Stock" style="width: 85px;">
                         <lightning:input value="{!v.VentaInstance.Stock__c}" type="number" readonly="true" />
@@ -157,11 +144,8 @@
                   </div>
             </td>
       </tr>
-
 	<aura:if isTrue="{!v.blnShowProducts}">
-            <c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.strIdSucursalAmp}" idInvSheet="{!v.strIdHojaInv}" 
+            <c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.VentaInstance.Sucursal__c}" idInvSheet="{!v.strIdHojaInv}" 
                                     indVentaM="{!v.indVentaM}" organizacionVentas="{!v.organizacionVentas}"/>
 	</aura:if>
-	
-	
 </aura:component>

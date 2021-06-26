@@ -48,24 +48,33 @@
         else if(ventaMostrador.Uso_de_CFDI__c == '' || ventaMostrador.Uso_de_CFDI__c == null || ventaMostrador.Uso_de_CFDI__c == undefined || ventaMostrador.Uso_de_CFDI__c == '--'){
             helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Uso de CFDI');
         }
+        else if((ventaMostrador.Metodo_de_Pago3__c != '' || ventaMostrador.Metodo_de_Pago3__c != ' ') && (ventaMostrador.Importe_3__c == 0 || ventaMostrador.Importe_3__c == null)){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar el Importe 3');
+        }
         else if(ventaMostrador.Metodo_de_Pago__c == '' || ventaMostrador.Metodo_de_Pago__c == null || ventaMostrador.Metodo_de_Pago__c == undefined || ventaMostrador.Metodo_de_Pago__c == '--'){
             helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Métodos de Pago');
         }
         else if(ventaMostrador.Metodo_de_Pago2__c == '' || ventaMostrador.Metodo_de_Pago2__c == null || ventaMostrador.Metodo_de_Pago2__c == undefined || ventaMostrador.Metodo_de_Pago2__c == '--'){
             helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Métodos de Pago 2');
         }
-        else if(ventaMostrador.Metodo_de_Pago3__c == '' || ventaMostrador.Metodo_de_Pago3__c == null || ventaMostrador.Metodo_de_Pago3__c == undefined || ventaMostrador.Metodo_de_Pago3__c == '--'){
-            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Métodos de Pago 3');
+        else if(ventaMostrador.Digitos_tarjeta__c == '' || ventaMostrador.Digitos_tarjeta__c == null || ventaMostrador.Digitos_tarjeta__c == undefined){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe completar Ultimos 4 digitos de tarjeta');
         }
+        // else if(ventaMostrador.Importe__c)
         // TODO: Validar moneda
         else{
             var isNewRecord = component.get("v.blnRecordExisteShowDetail");
             var detalleVentaMostrador =  component.get("v.ventasMostradorList");
     
             console.log('ventaMostrador', JSON.stringify(ventaMostrador));
-            helper.saveVentasMostrador(component, event);
+            // helper.saveVentasMostrador(component, event);
         }
-
+        // Metodo_de_Pago__c
+        // Metodo_de_Pago2__c
+        // Metodo_de_Pago3__c
+        // Importe__c
+        // Importe_2__c
+        // Importe_3__c
     },
 
     save: function(component, event, helper) {

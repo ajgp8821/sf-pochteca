@@ -164,7 +164,9 @@
             IVA__c: 0.0,
             Product__c: '',
             Stock__c: 0,
-            Stock_Consignacion__c: 0
+            Stock_Consignacion__c: 0,
+            Status__c:'Creado',
+            Margen__c: 0.0
         });
         // set the updated list to attribute (contactList) again
         component.set("v.ventasMostradorList", RowItemList);
@@ -474,11 +476,21 @@
                                     }
                                 }
                             }
-                            ventaMostrador.Descuento__c = sumatoriaDescuento;
-                            ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
-                            ventaMostrador.Subtotal__c = sumatoriaValorNeto - sumatoriaDescuento;
-                            ventaMostrador.IVA__c = sumatoriaIVA;
-                            ventaMostrador.Precio_total__c = ventaMostrador.Subtotal__c + ventaMostrador.IVA__c;
+                            if(isNaN(sumatoriaDescuento) || isNaN(sumatoriaDescuento) || isNaN(sumatoriaIVA)) {
+                                ventaMostrador.Descuento__c = 0;
+                                ventaMostrador.Valor_Neto__c = 0;
+                                ventaMostrador.Subtotal__c = 0;
+                                ventaMostrador.IVA__c = 0;
+                                ventaMostrador.Precio_total__c = 0;
+                            }
+                            else {
+                                ventaMostrador.Descuento__c = sumatoriaDescuento;
+                                ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
+                                ventaMostrador.Subtotal__c = sumatoriaValorNeto - sumatoriaDescuento;
+                                ventaMostrador.IVA__c = sumatoriaIVA;
+                                ventaMostrador.Precio_total__c = ventaMostrador.Subtotal__c + ventaMostrador.IVA__c;
+                            }
+
                             component.set("v.ventasMostrador", ventaMostrador);
                         }
                     } else {
@@ -561,6 +573,7 @@
             if (response.getState() == "SUCCESS") {
                 if (response.getReturnValue() == true){
                     this.showToast('success', 'Guardado!', 'Se ha guardado con éxito!')
+                    //$A.get('e.force:refreshView').fire();
                 }
                 console.log(response);
                 console.log(response.getState);

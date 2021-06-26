@@ -76,6 +76,7 @@ public class POCH_CustomLookup_cls {
                 + ' FROM  ' + ObjectName 
                 + ' WHERE Poch_Sucursal__r.Name LIKE: searchKey AND POCH_Cliente__c =: parentId ORDER BY createdDate DESC LIMIT 3';
         }
+        System.debug('query --->> ' + sQuery);
         if(String.isNotBlank(sQuery)) {
             List<sObject> lstOfRecords = Database.query(sQuery); 
             for (sObject obj: lstOfRecords) {

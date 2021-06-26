@@ -26,9 +26,9 @@
                     listOneLevel.push(StoreResponse[i]);
                 }
                 //
-                if (listOneLevel != undefined && listOneLevel.length > 0) {
+                /*if (listOneLevel != undefined && listOneLevel.length > 0) {
                     ControllerFieldOneLevel.push('--');
-                }
+                }*/
                 
                 for (var i = 0; i < listOneLevel.length; i++) {
                     ControllerFieldOneLevel.push(listOneLevel[i]);
@@ -110,7 +110,10 @@
                             if (state === "SUCCESS") {
                                 let listValues2 = response.getReturnValue();
                                 if(listValues2 !== null && listValues2 !== undefined && listValues2.length > 0) {
-                                    instanceVenta.Almacen__c = listValues2[0];
+                                    if (listValues2[0] == 'ALPT'){
+                                        instanceVenta.Almacen__c = listValues2[0];    
+                                    }
+                                    //instanceVenta.Almacen__c = listValues2[0];
                                     component.set("v.listAlmacen", listValues2);
                                     component.set("v.VentaInstance", instanceVenta);
                                     component.set();

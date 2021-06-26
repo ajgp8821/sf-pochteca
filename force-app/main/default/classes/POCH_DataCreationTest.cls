@@ -8,7 +8,7 @@ public class POCH_DataCreationTest {
         acc.POCH_IDClienteSAP__c 	   	= '181114';
         acc.POCH_CorreoElectronico__c  	= 'test@mail.com';
         acc.POCH_TipoRegistro__c       	= 'Prospecto';
-        acc.POCH_OrganizacionVentas__c 	= '0049';
+        acc.POCH_OrganizacionVentas__c 	= '0013';
         acc.CurrencyIsoCode			   	= 'MXN';
         acc.BillingStreet			   	= 'Calle';
         acc.BillingPostalCode		   	= '02400';
@@ -33,7 +33,7 @@ public class POCH_DataCreationTest {
         acc.Phone						= '5536848772';
         acc.POCH_CorreoElectronico__c  	= 'test2@mail.com';
         acc.POCH_TipoRegistro__c       	= 'Prospecto';
-        acc.POCH_OrganizacionVentas__c 	= '0049';
+        acc.POCH_OrganizacionVentas__c 	= '0013';
         acc.CurrencyIsoCode			   	= 'MXN';
         acc.BillingStreet			   	= 'Calle';
         acc.BillingPostalCode		   	= '02400';
