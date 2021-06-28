@@ -75,65 +75,70 @@
 	},
 
 	calcularTotales : function(component, event, helper) {
-        var ventaDetalle = component.get("v.VentaInstance");
-        ventaDetalle.Product__c = component.get("v.VentaInstance.Product__c");
-        var temp = component.get("v.VentaInstance.POCH_Centro__c" );
-        ventaDetalle.Sucursal__c = component.get("v.VentaInstance.Sucursal__c");
-        ventaDetalle.Oficina_de_Venta__c = component.get("v.VentaInstance.Oficina_de_Venta__c");
-        var venta = component.get("v.ventasMostrador");
-        var action = component.get("c.getPrice");
-        var action2 = component.get("c.getIVA");
-		action.setParams({
-            //product: component.get("v.VentaInstance.POCH_Producto__c"),
-            product: ventaDetalle.Product__c,
-            sucursal: ventaDetalle.Sucursal__c,
-            //sucursal: 'a1K4P00000Ldvr8UAB',
-            cantidad: ventaDetalle.POCH_Cantidad__c,
-            account: component.get("{!v.ventasMostrador.Cliente__c}"),
-            //account: '0014P00002lB91DQAS',
-            unidadMedida: ventaDetalle.UnidadMedida__c,
-            notIsApiField: true,
-            objectType: 'Venta_Mostrador_Detalle__c',
-            selectedField: 'UnidadMedida__c'
-        });
-        action.setCallback(this, function (response) {
-            var state = response.getState();
-            if (state === "SUCCESS") {
-                let precio = response.getReturnValue();
-                ventaDetalle.Precio__c =  precio;
-                ventaDetalle.Descto__c = parseFloat(ventaDetalle.Descto__c);
-                ventaDetalle.Descuento_Monto__c = precio * ventaDetalle.Descto__c / 100;
-                //var montoPorcentaje = precio * ventaDetalle.Descto__c;
-                ventaDetalle.Valor_neto__c = (precio - ventaDetalle.Descuento_Monto__c ) * ventaDetalle.POCH_Cantidad__c;
-                component.set("v.VentaInstance", ventaDetalle); 
-                action2.setParams({
-                    product: ventaDetalle.Product__c,
-                    sucursal: ventaDetalle.Sucursal__c,
-                    //sucursal: 'a1K4P00000Ldvr8UAB',
-                    valorNeto: ventaDetalle.Valor_neto__c
-                });
-                action2.setCallback(this, function (response) {
-                    var state = response.getState();
-                    if (state === "SUCCESS") {
-                        let ivaMonto = response.getReturnValue();
-                        ventaDetalle.IVA__c;
-                        component.set("v.VentaInstance", ventaDetalle); 
-                        var calcularTotalesEvent = component.getEvent("calcularTotales");
-                        var test = " test";
-                        calcularTotalesEvent.setParams({testParam: test});
-                        calcularTotalesEvent.fire();
-                    }else {
-                        console.log("--- Algo salio mal ---");
-                    }
-                });
-                $A.enqueueAction(action2);
-                
-
-            }else {
-                console.log("--- Algo salio mal ---");
-            }
-        });
-        $A.enqueueAction(action);
-    }
+		var ventaDetalle = component.get("v.VentaInstance");
+		ventaDetalle.Product__c = component.get("v.VentaInstance.Product__c");
+		var temp = component.get("v.VentaInstance.POCH_Centro__c" );
+		ventaDetalle.Sucursal__c = component.get("v.VentaInstance.Sucursal__c");
+		ventaDetalle.Oficina_de_Venta__c = component.get("v.VentaInstance.Oficina_de_Venta__c");
+		var venta = component.get("v.ventasMostrador");
+		var action = component.get("c.getPrice");
+		var action2 = component.get("c.getIVA");
+		
+		if (ventaDetalle.Descto__c > 10 || ventaDetalle.Descto__c < 0){
+			helper.showToast('warning', '', 'Descuento Máximo 10%');
+		}
+		else {
+			action.setParams({
+				//product: component.get("v.VentaInstance.POCH_Producto__c"),
+				product: ventaDetalle.Product__c,
+				sucursal: ventaDetalle.Sucursal__c,
+				//sucursal: 'a1K4P00000Ldvr8UAB',
+				cantidad: ventaDetalle.POCH_Cantidad__c,
+				account: component.get("{!v.ventasMostrador.Cliente__c}"),
+				//account: '0014P00002lB91DQAS',
+				unidadMedida: ventaDetalle.UnidadMedida__c,
+				notIsApiField: true,
+				objectType: 'Venta_Mostrador_Detalle__c',
+				selectedField: 'UnidadMedida__c'
+			});
+			action.setCallback(this, function (response) {
+				var state = response.getState();
+				if (state === "SUCCESS") {
+						let precio = response.getReturnValue();
+						ventaDetalle.Precio__c =  precio;
+						ventaDetalle.Descto__c = parseFloat(ventaDetalle.Descto__c);
+						ventaDetalle.Descuento_Monto__c = precio * ventaDetalle.Descto__c / 100;
+						//var montoPorcentaje = precio * ventaDetalle.Descto__c;
+						ventaDetalle.Valor_neto__c = (precio - ventaDetalle.Descuento_Monto__c ) * ventaDetalle.POCH_Cantidad__c;
+						component.set("v.VentaInstance", ventaDetalle); 
+						action2.setParams({
+							product: ventaDetalle.Product__c,
+							sucursal: ventaDetalle.Sucursal__c,
+							//sucursal: 'a1K4P00000Ldvr8UAB',
+							valorNeto: ventaDetalle.Valor_neto__c
+						});
+						action2.setCallback(this, function (response) {
+							var state = response.getState();
+							if (state === "SUCCESS") {
+								let ivaMonto = response.getReturnValue();
+								ventaDetalle.IVA__c;
+								component.set("v.VentaInstance", ventaDetalle);
+								var calcularTotalesEvent = component.getEvent("calcularTotales");
+								var test = " test";
+								calcularTotalesEvent.setParams({testParam: test});
+								calcularTotalesEvent.fire();
+							}else {
+								console.log("--- Algo salio mal ---");
+							}
+						});
+						$A.enqueueAction(action2);
+				}
+				else {
+					console.log("--- Algo salio mal ---");
+				}
+			});
+			$A.enqueueAction(action);
+		}
+	}
 
 })

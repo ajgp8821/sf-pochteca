@@ -35,9 +35,10 @@
         component.set("v.ventasMostradorList", AllRowsList);
     },
 
-    update: function(component, event, helper) {
+    sendSap: function(component, event, helper) {
 
         var ventaMostrador =  component.get("v.ventasMostrador");
+        helper.validateCurrency(component, event);
 
         if(ventaMostrador.Via_de_pago__c == '' || ventaMostrador.Via_de_pago__c == null || ventaMostrador.Via_de_pago__c == undefined || ventaMostrador.Via_de_pago__c == '--'){
             helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Vía de Pago');
@@ -68,6 +69,7 @@
     
             console.log('ventaMostrador', JSON.stringify(ventaMostrador));
             // helper.saveVentasMostrador(component, event);
+            //helper.saveVentasMostrador(component, event);
         }
         // Metodo_de_Pago__c
         // Metodo_de_Pago2__c
@@ -80,6 +82,7 @@
     save: function(component, event, helper) {
         var errores = false;
         var ventaMostrador =  component.get("v.ventasMostrador");
+        ventaMostrador.OrganizacionVentas__c = component.get("v.organizacionVentas");
         var detalleVentaMostrador =  component.get("v.ventasMostradorList");
         for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
             if (detalleVentaMostrador[indexVar].Product__c == null || detalleVentaMostrador[indexVar].Product__c == '' ){
@@ -101,6 +104,46 @@
         if (errores == false){
             helper.saveVentasMostrador(component, event); 
         }
+        
+        //button.set('v.disabled',true);
+        
+    },
+
+    update: function(component, event, helper) {
+        var errores = false;
+        var ventaMostrador =  component.get("v.ventasMostrador");
+        ventaMostrador.OrganizacionVentas__c = component.get("v.organizacionVentas");
+        var detalleVentaMostrador =  component.get("v.ventasMostradorList");
+        for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
+            if (detalleVentaMostrador[indexVar].Product__c == null || detalleVentaMostrador[indexVar].Product__c == '' ){
+                helper.showToast('Warning', 'Atención!', 'No puede guardar sin seleccionar un producto');
+                errores = true;
+                break;
+            }
+            
+        }
+        var email = ventaMostrador.Email__c;
+        var emailRegex = /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
+        //Se muestra un texto a modo de ejemplo, luego va a ser un icono
+        if (emailRegex.test(email)) {
+            console.log('test');
+        } else {
+            helper.showToast('Warning', 'Atención!', 'formato de email no valido');
+            errores = true;
+        }
+        if (errores == false){
+            helper.showToast('Warning', 'Atención!', 'Se manda a actualizar');
+            helper.updateVentasMostrador(component, event); 
+        }
+        
+        //button.set('v.disabled',true);
+        
+    },
+
+    // TODO
+    cancel: function(component, event, helper) {
+        
+        helper.cancelVentasMostrador(component, event);
         
         //button.set('v.disabled',true);
         

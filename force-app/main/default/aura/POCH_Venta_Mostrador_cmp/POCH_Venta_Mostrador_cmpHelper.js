@@ -108,6 +108,75 @@
         $A.enqueueAction(action);
     },
 
+    validateCurrency: function(component, event) {
+        var listIdProduct = new Array();
+        var unidadMedidaCorrectaList = new Array();
+        var lst = '<ul> Falta :';
+        var msj = '';
+        var strValidateUnidadM = false;
+        var dataProducts =  component.get("v.ventasMostradorList");
+        // TODO: Validar dataProducts > 0
+        for (var i = 0; i < dataProducts.length; i++) {
+            listIdProduct.push(dataProducts[i].Product__c);
+        }
+
+        var action = component.get("c.getUnidadesMedidas");
+        action.setParams({
+            listIdProducto: listIdProduct
+        });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                let listResult = response.getReturnValue();
+                if(listResult !== null && listResult !== undefined && listResult.length > 0){
+                    for (var indexVar = 0; indexVar < dataProducts.length; indexVar++) {
+                        for (var i = 0; i < listResult.length; i++) {
+                            if (dataProducts[indexVar].UnidadMedida__c != null && dataProducts[indexVar].UnidadMedida__c !=''){
+                                var idProd = listResult[i].substr(0,18);
+                                var medida = listResult[i].substr(18);
+                                if (idProd == dataProducts[indexVar].Product__c && medida == dataProducts[indexVar].UnidadMedida__c.toUpperCase()){
+                                    unidadMedidaCorrectaList[indexVar] = 1; 
+                                    break;      
+                                }else{
+                                    unidadMedidaCorrectaList[indexVar] = 0; 
+                                }
+                            }     
+                        }
+                    }
+                    
+                    for (var indexVar = 0; indexVar < dataProducts.length; indexVar++) {
+                        //Unidad de medida
+                        if(dataProducts[indexVar].UnidadMedida__c != null && dataProducts[indexVar].UnidadMedida__c !=''){
+                            if (unidadMedidaCorrectaList[indexVar] == 0){
+                                msj += '<li type="disc"> Selecciona una unidad de medida válida Material: ' + dataProducts[indexVar].Material__c + ' <li/>' ;
+                                strValidateUnidadM = false;
+                                unidadMedidaCorrectaList[indexVar] = 0;
+                            }else{
+                                strValidateUnidadM = true;
+                            }
+                        }
+                    }
+                    //lst += '</ul>';
+                    if(msj == '' || msj == null || msj == undefined){
+                        // Llamar al metodo de insertar o actualizar
+                        //helper.validaAutorizacion(component, event, helper);
+                        //component.set("v.blnErrores", false);
+                        component.set("v.blnErrores", false);
+                    } else {
+                        var errores = lst + msj + '</ul>';
+                        component.set("v.blnErrores", true);  
+                        component.set("v.strErrores", errores);
+                    }
+                    button.set('v.disabled',false);
+                }
+            } else{
+                console.log('--- Algo salio mal ---');
+            }
+
+        });
+        $A.enqueueAction(action);
+    },
+
     createObjectDataCabecera: function(component, event) {
         var RowItemList = component.get("v.ventasMostradorListTemp");
         RowItemList.unshift({    //push
@@ -561,9 +630,78 @@
         $A.enqueueAction(action);
     },
 
-    saveVentasMostrador: function (component, event) {
+    closeFocusedTab : function(component, event) {
+        var workspaceAPI = component.find("workspace");
+        workspaceAPI.getFocusedTabInfo().then(function(response) {
+            var focusedTabId = response.tabId;
+            workspaceAPI.closeTab({tabId: focusedTabId});
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+    },
 
+    cancelVentasMostrador: function(component, event) {
+        component.set("v.showSpinner", true);
+        let action = component.get('c.calcelVentasMostrador');
+        action.setParams({
+            "ventasMostrador": component.get("v.ventasMostrador")
+        });
+        action.setCallback(this, function(response) {
+            
+            if (response.getState() == "SUCCESS") {
+                if (response.getReturnValue() == true){
+                    this.showToast('success', 'Cancelado!', 'Se ha cancelado con éxito!')
+                    $A.get('e.force:refreshView').fire();
+                }
+                else {
+                    this.showToast('Error', 'Error!', 'Ocurrio un error al intentar cancelar');
+                    console.log("--- Algo salio mal ---");
+                }
+            } else {
+                this.showToast('Error', 'Error!', 'Ocurrio un error al intentar cancelar');
+                console.log("--- Algo salio mal ---");
+            }
+            component.set("v.showSpinner", false);
+        });
+        $A.enqueueAction(action);
+    },
+
+    saveVentasMostrador: function (component, event) {
+        component.set("v.showSpinner", true);
         let action = component.get('c.saveVentasMostrador');
+        action.setParams({
+            "ventasMostrador": component.get("v.ventasMostrador"),
+            "ventasMostradorDetalle": component.get('v.ventasMostradorList')
+        });       
+        action.setCallback(this, function(response) {
+            component.set("v.showSpinner", true);
+            if (response.getState() == "SUCCESS") {
+                if (response.getReturnValue() == true){
+                    this.showToast('success', 'Guardado!', 'Se ha guardado con éxito!')
+                    //$A.get('e.force:refreshView').fire();
+                }
+                console.log(response);
+                console.log(response.getState);
+                component.set("v.showSpinner", false);
+                this.closeFocusedTab(component, event);
+                //$A.get('e.force:refreshView').fire();
+            
+            } else {
+                this.showToast('Error', 'Error!', 'Ocurrio un error al intentar guardar');
+                console.log("--- Algo salio mal ---");
+                component.set("v.showSpinner", false);
+            }
+        });
+        $A.enqueueAction(action);
+
+        var ventaMostrador =  component.get("v.ventasMostrador");
+        console.log('ventaMostrador', JSON.stringify(ventaMostrador));
+    },
+
+    updateVentasMostrador: function (component, event) {
+
+        let action = component.get('c.updateVentasMostrador');
         action.setParams({
             "ventasMostrador": component.get("v.ventasMostrador"),
             "ventasMostradorDetalle": component.get('v.ventasMostradorList')

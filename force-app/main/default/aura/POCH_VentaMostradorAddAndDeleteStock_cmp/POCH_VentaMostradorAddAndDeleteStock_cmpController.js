@@ -94,84 +94,90 @@
         var action = component.get("c.getPrice");
         var action2 = component.get("c.getIVA");
         var action3 = component.get("c.getMargen");
-        action.setParams({
-            //product: component.get("v.VentaInstance.POCH_Producto__c"),
-            product: ventaDetalle.Product__c,
-            sucursal: component.get("v.strIdSucursalAmp"),
-            //sucursal: 'a1K4P00000Ldvr8UAB',
-            cantidad: ventaDetalle.POCH_Cantidad__c,
-            account: venta.Cliente__c,
-            //account: '0014P00002lB91DQAS',
-            unidadMedida: ventaDetalle.UnidadMedida__c,
-            notIsApiField: true,
-            objectType: 'Venta_Mostrador_Detalle__c',
-            selectedField: 'UnidadMedida__c',
-            organizacionVenta: component.get('v.organizacionVentas')
-        });
-        action.setCallback(this, function (response) {
-            var state = response.getState();
-            if (state === "SUCCESS") {
-                let precio = response.getReturnValue();
-                ventaDetalle.Precio__c =  precio;
-                ventaDetalle.Descto__c = parseFloat(ventaDetalle.Descto__c);
-                ventaDetalle.Descuento_Monto__c = precio * ventaDetalle.Descto__c / 100;
-                //var montoPorcentaje = precio * ventaDetalle.Descto__c;
-                ventaDetalle.Valor_neto__c = (precio - ventaDetalle.Descuento_Monto__c ) * ventaDetalle.POCH_Cantidad__c;
-                component.set("v.VentaInstance", ventaDetalle); 
-                action2.setParams({
-                    product: component.get("v.VentaInstance.Product__c"),
-                    sucursal: component.get("v.strIdSucursalAmp"),
-                    //sucursal: 'a1K4P00000Ldvr8UAB',
-                    valorNeto: ventaDetalle.Valor_neto__c
-                });
-                action2.setCallback(this, function (response) {
-                    var state = response.getState();
-                    if (state === "SUCCESS") {
-                        let ivaMonto = response.getReturnValue();
-                        ventaDetalle.IVA__c;
-                        component.set("v.VentaInstance", ventaDetalle);
-                        action3.setParams({
-                            //product: component.get("v.VentaInstance.POCH_Producto__c"),
-                            product: ventaDetalle.Product__c,
-                            unidadMedida: ventaDetalle.UnidadMedida__c,
-                            notIsApiField: true,
-                            objectType: 'Venta_Mostrador_Detalle__c',
-                            selectedField: 'UnidadMedida__c',
-                            precio: ventaDetalle.Precio__c,
-                            porcentajeDescuento: ventaDetalle.Descto__c,
-                            centro: ventaDetalle.POCH_Centro__c,
-                            selectedField2: 'POCH_Centro__c',
-                            moneda: ventaDetalle.CurrencyIsoCode,
-                            selectedField3: 'Almacen__c'
-                        });
-                        action3.setCallback(this, function (response) {
-                            var state = response.getState();
-                            if (state === "SUCCESS") {
-                                let margen = response.getReturnValue();
-                                component.set("v.VentaInstance.Margen__c");
-                                var calcularTotalesEvent = component.getEvent("calcularTotales");
-                                var test = " test";
-                                calcularTotalesEvent.setParams({testParam: test});
-                                calcularTotalesEvent.fire();
-                            }else{
-                                console.log("--- Algo salio mal ---");
-                            }
-                        });
-                        $A.enqueueAction(action3);
-                        
-                    }else {
-                        console.log("--- Algo salio mal ---");
-                    }
-                });
-                $A.enqueueAction(action2);
-                
 
-            }else {
-                helper.showToast('Warning', 'Atención!', 'Unidad de medida no valida para este producto');
-                console.log("--- Algo salio mal ---");
-            }
-        });
-        $A.enqueueAction(action);
+        if (ventaDetalle.Descto__c > 10 || ventaDetalle.Descto__c < 0){
+			helper.showToast2('warning', '', 'Descuento Máximo 10%');
+		}
+		else {
+            action.setParams({
+                //product: component.get("v.VentaInstance.POCH_Producto__c"),
+                product: ventaDetalle.Product__c,
+                sucursal: component.get("v.strIdSucursalAmp"),
+                //sucursal: 'a1K4P00000Ldvr8UAB',
+                cantidad: ventaDetalle.POCH_Cantidad__c,
+                account: venta.Cliente__c,
+                //account: '0014P00002lB91DQAS',
+                unidadMedida: ventaDetalle.UnidadMedida__c,
+                notIsApiField: true,
+                objectType: 'Venta_Mostrador_Detalle__c',
+                selectedField: 'UnidadMedida__c',
+                organizacionVenta: component.get('v.organizacionVentas')
+            });
+            action.setCallback(this, function (response) {
+                var state = response.getState();
+                if (state === "SUCCESS") {
+                    let precio = response.getReturnValue();
+                    ventaDetalle.Precio__c =  precio;
+                    ventaDetalle.Descto__c = parseFloat(ventaDetalle.Descto__c);
+                    ventaDetalle.Descuento_Monto__c = precio * ventaDetalle.Descto__c / 100;
+                    //var montoPorcentaje = precio * ventaDetalle.Descto__c;
+                    ventaDetalle.Valor_neto__c = (precio - ventaDetalle.Descuento_Monto__c ) * ventaDetalle.POCH_Cantidad__c;
+                    component.set("v.VentaInstance", ventaDetalle); 
+                    action2.setParams({
+                        product: component.get("v.VentaInstance.Product__c"),
+                        sucursal: component.get("v.strIdSucursalAmp"),
+                        //sucursal: 'a1K4P00000Ldvr8UAB',
+                        valorNeto: ventaDetalle.Valor_neto__c
+                    });
+                    action2.setCallback(this, function (response) {
+                        var state = response.getState();
+                        if (state === "SUCCESS") {
+                            let ivaMonto = response.getReturnValue();
+                            ventaDetalle.IVA__c;
+                            component.set("v.VentaInstance", ventaDetalle);
+                            action3.setParams({
+                                //product: component.get("v.VentaInstance.POCH_Producto__c"),
+                                product: ventaDetalle.Product__c,
+                                unidadMedida: ventaDetalle.UnidadMedida__c,
+                                notIsApiField: true,
+                                objectType: 'Venta_Mostrador_Detalle__c',
+                                selectedField: 'UnidadMedida__c',
+                                precio: ventaDetalle.Precio__c,
+                                porcentajeDescuento: ventaDetalle.Descto__c,
+                                centro: ventaDetalle.POCH_Centro__c,
+                                selectedField2: 'POCH_Centro__c',
+                                moneda: ventaDetalle.CurrencyIsoCode,
+                                selectedField3: 'Almacen__c'
+                            });
+                            action3.setCallback(this, function (response) {
+                                var state = response.getState();
+                                if (state === "SUCCESS") {
+                                    let margen = response.getReturnValue();
+                                    component.set("v.VentaInstance.Margen__c");
+                                    var calcularTotalesEvent = component.getEvent("calcularTotales");
+                                    var test = " test";
+                                    calcularTotalesEvent.setParams({testParam: test});
+                                    calcularTotalesEvent.fire();
+                                }else{
+                                    console.log("--- Algo salio mal ---");
+                                }
+                            });
+                            $A.enqueueAction(action3);
+                            
+                        }else {
+                            console.log("--- Algo salio mal ---");
+                        }
+                    });
+                    $A.enqueueAction(action2);
+                    
+
+                }else {
+                    helper.showToast('Warning', 'Atención!', 'Unidad de medida no valida para este producto');
+                    console.log("--- Algo salio mal ---");
+                }
+            });
+            $A.enqueueAction(action);
+        }
         
     },
 

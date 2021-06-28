@@ -8,6 +8,16 @@
         });
         toastEvent.fire();
     },
+
+    showToast2: function(tipomsj, titlemsj, Mensaje) {
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+            "type": tipomsj,
+            "title": titlemsj,
+            "message": Mensaje
+        });
+        toastEvent.fire();        
+    },
     
     getPicklistValuesOneLevel: function(component,StrObject,StrnNameField) {
         var action = component.get("c.PickListValuesIntoList");

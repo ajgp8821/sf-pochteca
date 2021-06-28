@@ -427,9 +427,9 @@ public class POCH_VentaMostrador_cls {
     }
 
     @AuraEnabled
-    public static Boolean editVentasMostrador(Ventas_Mostrador__c ventasMostrador, Venta_Mostrador_Detalle__c[] ventasMostradorDetalle) {
+    public static Boolean updateVentasMostrador(Ventas_Mostrador__c ventasMostrador, Venta_Mostrador_Detalle__c[] ventasMostradorDetalle) {
 
-        Boolean editDetails = true;
+        Boolean updateDetails = true;
         if (!string.isBlank(ventasMostrador.Metodo_de_Pago__c)){
             ventasMostrador.Metodo_de_Pago__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago__c', ventasMostrador.Metodo_de_Pago__c);
         }
@@ -458,15 +458,15 @@ public class POCH_VentaMostrador_cls {
                 detalle.Cte_Consigna__c = 0;
                 System.debug('print centro salida --> : ' + detalle.POCH_Centro__c);
             }
-            editDetails = editVentasMostradorDetalle(ventasM.getId(), ventasMostradorDetalle);
-            
-            if (editDetails == false) {
+            updateDetails = updateVentasMostradorDetalle(ventasM.getId(), ventasMostradorDetalle);
+            System.debug('updateDetails ----> ' + updateDetails);
+            if (updateDetails == false) {
                 Database.rollback(spVentasM);
             }
         }
 
-        // editVentasMostradorDetalle(ventasMostrador.Id, ventasMostradorDetalle);
-        if (ventasM.isSuccess() && editDetails == true) {
+        // updateVentasMostradorDetalle(ventasMostrador.Id, ventasMostradorDetalle);
+        if (ventasM.isSuccess() && updateDetails == true) {
             return true;
         }
         else {
@@ -475,18 +475,55 @@ public class POCH_VentaMostrador_cls {
     }
 
     @AuraEnabled
-    public static Boolean editVentasMostradorDetalle(Id idVentasMostrador, List<Venta_Mostrador_Detalle__c> ventasMostradorDetalle) {
+    public static Boolean calcelVentasMostrador(Ventas_Mostrador__c ventasMostrador) {
+
+        Boolean updateDetails = true;
+        if (!string.isBlank(ventasMostrador.Metodo_de_Pago__c)){
+            ventasMostrador.Metodo_de_Pago__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago__c', ventasMostrador.Metodo_de_Pago__c);
+        }
+        if (!string.isBlank(ventasMostrador.Metodo_de_Pago2__c)){
+            ventasMostrador.Metodo_de_Pago2__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago2__c', ventasMostrador.Metodo_de_Pago2__c);
+        }
+        if (!string.isBlank(ventasMostrador.Metodo_de_Pago3__c)){
+            ventasMostrador.Metodo_de_Pago3__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago3__c', ventasMostrador.Metodo_de_Pago3__c);
+        }
+        ventasMostrador.CurrencyIsoCode = getApiName('Ventas_Mostrador__c', 'CurrencyIsoCode', ventasMostrador.CurrencyIsoCode);
+        ventasMostrador.Via_de_pago__c = getApiName('Ventas_Mostrador__c', 'Via_de_pago__c', ventasMostrador.Via_de_pago__c);
+        ventasMostrador.Uso_de_CFDI__c = getApiName('Ventas_Mostrador__c', 'Uso_de_CFDI__c', ventasMostrador.Uso_de_CFDI__c);
+        ventasMostrador.Digitos_tarjeta__c = String.valueOf(ventasMostrador.Digitos_tarjeta__c);
+        ventasMostrador.Status__c = 'Cancelado';
+
+        // Create a savepoint before update 
+        Savepoint spVentasM = Database.setSavepoint();
+
+        System.debug('ventasMostrador ' + JSON.serializePretty(ventasMostrador));
+        Database.SaveResult ventasM = Database.update(ventasMostrador, false);
+        System.debug('ventasM.isSuccess() ' + ventasM.isSuccess());
+        
+        if (ventasM.isSuccess()) {
+            return true;
+        }
+        else {
+            Database.rollback(spVentasM);
+            return false;
+        }
+    }
+
+    @AuraEnabled
+    public static Boolean updateVentasMostradorDetalle(Id idVentasMostrador, List<Venta_Mostrador_Detalle__c> ventasMostradorDetalle) {
         
         // Create a savepoint before delete 
         Savepoint spVentasMD = Database.setSavepoint();
         // System.debug('idVentasMostrador = ' + idVentasMostrador);
-        Database.DeleteResult[] deleteVentasM = Database.delete(ventasMostradorDetalle, false);
+        List<Venta_Mostrador_Detalle__c> vmDetailToDelete = [Select id from Venta_Mostrador_Detalle__c where Ventas_Mostrador__c  =: idVentasMostrador];
+        Database.DeleteResult[] deleteVentasM = Database.delete(vmDetailToDelete);
         // delete
         // delete [SELECT Id FROM Venta_Mostrador_Detalle__c where Ventas_Mostrador__c.Id =: idVentasMostrador];
 
         for (Venta_Mostrador_Detalle__c detail: ventasMostradorDetalle) {
             System.debug('print2 ' + JSON.serializePretty(detail));
             detail.Ventas_Mostrador__c = idVentasMostrador;
+            detail.Id = null;
         }
         // insert(ventasMostradorDetalle);
         System.debug(JSON.serializePretty(ventasMostradorDetalle));
@@ -499,8 +536,8 @@ public class POCH_VentaMostrador_cls {
         // saveVentasMostradorDetalle(idVentasMostrador, deploymentDetails);
 
         if (deleteVentasM[0].isSuccess()) {
-            Database.SaveResult[] srList = Database.insert(ventasMostradorDetalle, false);
-            System.debug('print result' + srList[0].isSuccess());
+            Database.SaveResult[] srList = Database.insert(ventasMostradorDetalle);
+            System.debug('print result ' + srList[0].isSuccess());
             // Boolean saveVMD = saveVentasMostradorDetalle(idVentasMostrador, deploymentDetails);
             if (srList[0].isSuccess() == true){
                 return true;
@@ -511,6 +548,48 @@ public class POCH_VentaMostrador_cls {
             }
         }
         return false;
+    }
+
+    /**
+    Metodo para obtener el description de un picklist dado el api name 
+    */
+    @AuraEnabled        
+    public static List<String> getUnidadesMedidas(List<String> listIdProducto ) {
+        List<String> listUnidadesMedidas = new List<String>();
+        List<POCH_UnidadMedidaProducto__c> listUnidadMedidaProducto = new List<POCH_UnidadMedidaProducto__c>();
+        for (String idProduct : listIdProducto) {
+            String idProductoAux = idProduct;
+            
+            for(POCH_UnidadMedidaProducto__c objIterateMedida :[SELECT 
+                                                                Id,
+                                                                POCH_UMA__c,
+                                                                POCH_Producto__c
+                                                            FROM POCH_UnidadMedidaProducto__c 
+                                                            WHERE POCH_Producto__c =: idProductoAux]){
+                listUnidadesMedidas.add(objIterateMedida.POCH_Producto__c + objIterateMedida.POCH_UMA__c);
+            }
+            for(Product2  objIterateProduct:[SELECT 
+                                                Id,
+                                                POCH_UnidadesMedida__c, 
+                                                QuantityUnitOfMeasure 
+                                            FROM Product2 
+                                            WHERE Id =: idProductoAux]){
+                if (objIterateProduct.POCH_UnidadesMedida__c != null){
+                    String medidas = objIterateProduct.POCH_UnidadesMedida__c;
+                    List<String> lstMedidas = medidas.split(',');
+                    for (String currentMedida : lstMedidas) {
+                        listUnidadesMedidas.add(objIterateProduct.Id + currentMedida);
+                    }
+                }    
+                if (objIterateProduct.QuantityUnitOfMeasure != null){
+                    listUnidadesMedidas.add(objIterateProduct.Id + objIterateProduct.QuantityUnitOfMeasure);
+                }                        
+            } 
+            //mapUnidadesMedidas.put (idProductoAux, listUnidadesMedidas);
+            //listUnidadesMedidas.clear(); //add values into the map
+        }
+        
+        return listUnidadesMedidas;
     }
 
     /**

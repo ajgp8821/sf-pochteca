@@ -43,22 +43,24 @@
                               </a>
                         </div>
                         <div class="slds-size_1-of-2 slds-align_absolute-center" >
-                              <a onclick="{!c.removeRow}">
-                                    <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
-                                    <span class="slds-assistive-text">Delete Icon</span>
-                              </a>
+                              <aura:if isTrue="{!!v.isStatusCancel}">
+                                    <a onclick="{!c.removeRow}">
+                                          <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                          <span class="slds-assistive-text">Delete Icon</span>
+                                    </a>
+                              </aura:if>
                         </div>
 
                   </div>
             </td>
             <td data-label="Codigo">
                   <div class="slds-truncate" title="Codigo" style="width: 100px;">
-                        <lightning:input  class="CustomClassAlignCenter"  type="text" name="input001"  readonly="true"  value="{!v.VentaInstance.Material__c}" />
+                        <lightning:input  class="CustomClassAlignCenter" type="text" name="input001" readonly="true" value="{!v.VentaInstance.Material__c}" />
                   </div>
             </td>
             <td data-label="Descripcion">
                   <div class="slds-truncate" title="Descripcion" style="width: 180px;">
-                        <lightning:textarea    name="inputDescripcion"  readonly="true"  value="{!v.VentaInstance.Descripcion__c }" />
+                        <lightning:textarea name="inputDescripcion" readonly="true" value="{!v.VentaInstance.Descripcion__c }" />
                   </div>
             </td>
             <td data-label="Cantidad"  >
@@ -99,6 +101,7 @@
                               <lightning:select aura:id="requiredCentro"
                                     name="Centro"
                                     value="{!v.VentaInstance.POCH_Centro__c}"
+                                    disabled="{!v.isStatusCancel}"
                                     onchange="{!c.getAlmacen}">
                               <aura:iteration items="{!v.listCentro}" var="val" >
                                     <option value="{!val}">{!val}</option>
@@ -114,6 +117,7 @@
                               <lightning:select aura:id="requiredAlmacen"
                                                 name="Almacen"
                                                 value="{!v.VentaInstance.Almacen__c}"
+                                                disabled="{!v.isStatusCancel}"
                                                 onchange="{!c.buscarStock}">
                                     <aura:iteration items="{!v.listAlmacen}" var="val">
                                     <option value="{!val}">{!val}</option>
@@ -124,7 +128,7 @@
             </td>
             <td data-label="% descuento">
                   <div class="slds-truncate slds-text-align_right" title="% descuento"  style="margin-top:17px;" >
-                      <lightning:input value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" max="10" maxlength="2" onchange="{!c.calcularTotales}"/>
+                      <lightning:input aura:id="descuento" value="{!v.VentaInstance.Descto__c}" format="$##.00" type="number" maxlength="2" onchange="{!c.calcularTotales}" disabled="{!v.isStatusCancel}" />
                   </div>
             </td>              
             <td data-label="Valor Neto">
@@ -145,7 +149,9 @@
             </td>
       </tr>
 	<aura:if isTrue="{!v.blnShowProducts}">
-            <c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.VentaInstance.Sucursal__c}" idInvSheet="{!v.strIdHojaInv}" 
-                                    indVentaM="{!v.indVentaM}" organizacionVentas="{!v.organizacionVentas}"/>
+            <aura:if isTrue="{!!v.isStatusCancel}">
+                  <c:POCH_SearchProducts_cmp isOpen="{!v.blnShowProducts}" strIdSucAmp="{!v.VentaInstance.Sucursal__c}" idInvSheet="{!v.strIdHojaInv}" 
+                                          indVentaM="{!v.indVentaM}" organizacionVentas="{!v.organizacionVentas}"/>
+            </aura:if>
 	</aura:if>
 </aura:component>

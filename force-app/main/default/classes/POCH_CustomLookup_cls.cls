@@ -82,14 +82,16 @@ public class POCH_CustomLookup_cls {
             for (sObject obj: lstOfRecords) {
                 returnList.add(obj);
             }
-            
+            System.debug('ANTES DEL IF --->> ');
             if(ObjectName == 'Pricebookentry' && returnList.isEmpty()) {
+                System.debug('DENTRO DEL IF --->> ');
                 for(PricebookEntry pbe : [SELECT id,Name,UnitPrice,CurrencyIsoCode,Product2.Id,Product2.Name,Product2.ProductCode,PriceBook2Id,Pricebook2.Poch_Sucursal__c,Product2.onlyInSalesforce__c,POCH_UnidadMedida__c,Product2.QuantityUnitOfMeasure 
                                           FROM PricebookEntry WHERE Name LIKE: searchKey OR Product2.ProductCode LIKE: searchKey ORDER BY CreatedDate ASC LIMIT 1]) 
                 {
                     pbe.UnitPrice = 0;  
                     returnList.add(pbe);
                 }
+                System.debug('DENTRO DEL IF returnList --->> ' + returnList);
             }
             
         }        
