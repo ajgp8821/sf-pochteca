@@ -5,7 +5,7 @@
     
     <aura:attribute name="strIdSucAmp" type="String" default="" />
     <aura:attribute name="idInvSheet"  type="String" default="" />
-    <aura:attribute name="indVentaM" type="boolean"/>
+    <aura:attribute name="indVentaM" type="boolean" default="false"/>
 
     <aura:attribute name="organizacionVentas" type="String" default=""/>
 
@@ -32,9 +32,11 @@
                                 {!v.body}
                         </div>
                     </div>
-                    <div class="slds-modal__footer slds-modal__footer_directional">
-                        <lightning:button class="slds-button slds-button_brand" onclick="{!c.createProductComponent}" label="Agregar Producto"/> 
-                    </div>
+                    <aura:if isTrue="{!!v.indVentaM}">
+                        <div class="slds-modal__footer slds-modal__footer_directional">
+                            <lightning:button class="slds-button slds-button_brand" onclick="{!c.createProductComponent}" label="Agregar Producto"/> 
+                        </div>
+                    </aura:if>
                 </div>
             </div>
             <div class="slds-backdrop slds-backdrop_open"></div>

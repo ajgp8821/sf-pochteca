@@ -60,6 +60,8 @@ insert opp;*/
         qt.SBQQ__PriceBook__c    = pb.Id;
         qt.POCH_Sucursal__c      = suc.Id;
         qt.Tiempo_cancelacion__c = '24';
+        qt.Moneda_documento__c     ='MXN';
+       // qt.WF_Moneda__c            = true;
         insert qt;
         
         POCH_WFSettings__c wfs = POCH_DataCreationTest.getSettings();

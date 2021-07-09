@@ -1,8 +1,8 @@
 /***************************************************************************************************************
 Name:        POCH_QuoteTriggerService.cls
 Author:      Victor Hugo Jiménez Hernández (vjimenez@freewayconsulting.com)
-Created:     02-10-2019
-Project:     Pochteca
+Created:	 02-10-2019
+Project:	 Pochteca
 
 Description: Quote Trigger Service Class
 ***************************************************************************************************************/
@@ -10,7 +10,7 @@ Description: Quote Trigger Service Class
 public class POCH_QuoteTriggerService {    
     
     public static void setSucursalAndPricebook(List<SBQQ__Quote__c> lQuotes) {
-        System.debug('::: IN POCH_QuoteTriggerService.setSucursalAndPricebook : lQuotes --> LINEA 13' + lQuotes); 
+        System.debug('::: IN POCH_QuoteTriggerService.setSucursalAndPricebook : lQuotes --> ' + lQuotes); 
         
         Map<Id,SBQQ__Quote__c> mapOldQuote = (Map<Id,SBQQ__Quote__c>) Trigger.oldMap;
         
@@ -23,7 +23,7 @@ public class POCH_QuoteTriggerService {
                 quote.CurrencyIsoCode = quote.POCH_AccountDivisa__c;
             }
             if(String.isNotBlank(quote.SBQQ__Account__c))
-                setIdAcc.add(quote.SBQQ__Account__c);
+            	setIdAcc.add(quote.SBQQ__Account__c);
             setOwner.add(quote.OwnerId);            
         }
         
@@ -49,7 +49,7 @@ public class POCH_QuoteTriggerService {
                         lOrgVtas.add(orgVtas);                    
                 }
                 mapUserOrgVentas.put(us.Id, lOrgVtas);
-                setSucursales.addAll(lOrgVtas); 
+            	setSucursales.addAll(lOrgVtas); 
             }        
         }
         //Se obtienen los pricebook
@@ -78,14 +78,10 @@ public class POCH_QuoteTriggerService {
                                 String idPricebook = '';
                                 System.debug('--> quote.POCH_SucursalId__c ' + quote.POCH_SucursalId__c);
                                 for(String orgVtas : mapUserOrgVentas.get(quote.OwnerId)) {
-                                  //  if(!Test.isRunningTest()) {
-                                         if(orgVtas == quote.POCH_SucursalId__c) {
+                                    if(orgVtas == quote.POCH_SucursalId__c) {
                                         idPricebook = mapSucursalPricebook.get(orgVtas).Id;
                                         break;
-                                  //  }
-                   
-                                   }
-                                   
+                                    }
                                 }
                                 if(String.isNotBlank(idPricebook))
                                     quote.SBQQ__PriceBook__c = idPricebook;
@@ -113,37 +109,27 @@ public class POCH_QuoteTriggerService {
     }
     
     public static void actualizaEstatusAprobado(List<SBQQ__Quote__c> lQuotes) {
-        System.debug('::: IN POCH_QuoteTriggerService.actualizaEstatusAprobado : lQuotes --LINEA 112> ' + lQuotes); 
+        System.debug('::: IN POCH_QuoteTriggerService.actualizaEstatusAprobado : lQuotes --> ' + lQuotes); 
         
         Map<Id,SBQQ__Quote__c> mapOldQuote = (Map<Id,SBQQ__Quote__c>) Trigger.oldMap;
         Set<Id> setAprbQuote = new Set<Id>();
         for(SBQQ__Quote__c qt : lQuotes) {
-            if(qt.POCH_ValidaAutorizaciones__c) {                             
+            if(qt.POCH_ValidaAutorizaciones__c) {				              
                 setAprbQuote.add(qt.Id);         
             }
         }
         
         if(!setAprbQuote.isEmpty() || Test.isRunningTest()) {
             Map<Id,Set<String>> mapLineasAprobadas = new Map<Id,Set<String>>();
-            system.debug(mapLineasAprobadas);
             for(SBQQ__QuoteLine__c ql : [SELECT Id,SBQQ__Quote__c,POCH_EstatusPartida__c FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c IN : setAprbQuote]) {
                 if(mapLineasAprobadas.containsKey(ql.SBQQ__Quote__c)) { mapLineasAprobadas.get(ql.SBQQ__Quote__c).add(ql.POCH_EstatusPartida__c); } 
                 else mapLineasAprobadas.put(ql.SBQQ__Quote__c, new Set<String>{ql.POCH_EstatusPartida__c});
-                system.debug(mapLineasAprobadas);
-                system.debug(ql);
             }
-            system.debug(mapLineasAprobadas);
             
             for(SBQQ__Quote__c ql : lQuotes) {
-                system.debug(ql);
                 if(mapLineasAprobadas.containsKey(ql.Id)) {
-                    if(!mapLineasAprobadas.get(ql.Id).contains('Abierta') && !mapLineasAprobadas.get(ql.Id).contains('Por Autorizar') 
-                    && !mapLineasAprobadas.get(ql.Id).contains('No Autorizado') 
-                    && !mapLineasAprobadas.get(ql.Id).contains('Cancelado por Variación de Precio') 
-                    && !mapLineasAprobadas.get(ql.Id).contains('Por Autorizar') 
-                    && ql.POCH_EstatusCotizacion__c == 'Por Autorizar')
+                    if(!mapLineasAprobadas.get(ql.Id).contains('Abierta') && !mapLineasAprobadas.get(ql.Id).contains('Por Autorizar') && !mapLineasAprobadas.get(ql.Id).contains('No Autorizado') && !mapLineasAprobadas.get(ql.Id).contains('Cancelado por Variación de Precio') && !mapLineasAprobadas.get(ql.Id).contains('Port Autorizar') && ql.POCH_EstatusCotizacion__c == 'Por Autorizar')
                     {
-                          System.debug('::: PASA POR LIBERAR ====================LINEA 137'); 
                         ql.POCH_EstatusCotizacion__c = 'Por Liberar';
                     } else ql.POCH_ValidaAutorizaciones__c = false;
                 }            
@@ -152,10 +138,10 @@ public class POCH_QuoteTriggerService {
         
         System.debug('::: OUT POCH_QuoteTriggerService.actualizaEstatusAprobado'); 
     }
-    
+	
     //Gestiona la actualización de las Quotes
     public static void handleQuoteLinesWF(List<SBQQ__Quote__c> lQuotes) {
-        System.debug('::: IN POCH_QuoteTriggerService.handleQuoteLinesWF : lQuotes -->LNEA 149 ' + lQuotes); 
+        System.debug('::: IN POCH_QuoteTriggerService.handleQuoteLinesWF : lQuotes --> ' + lQuotes); 
         
         //Valida si el estatus de la Quote cambió a "Por Autorizar"
         Map<Id,SBQQ__Quote__c> mapOldQuote = (Map<Id,SBQQ__Quote__c>) Trigger.oldMap;
@@ -168,18 +154,14 @@ public class POCH_QuoteTriggerService {
         if(!setIdQuotes.isEmpty() || Test.isRunningTest()) {
             //Consulta las Quotes Lines dependientes de las Quotes actualizadas   
             List<SBQQ__QuoteLine__c> lQuoteLines = new List<SBQQ__QuoteLine__c>();
-            for(SBQQ__QuoteLine__c quoteLine : [SELECT Id,POCH_EnviarAprobacion__c ,POCH_EstatusPartida__c  FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c IN : setIdQuotes AND POCH_EstatusPartida__c = 'Abierta']) {
+            for(SBQQ__QuoteLine__c quoteLine : [SELECT Id,POCH_EnviarAprobacion__c FROM SBQQ__QuoteLine__c WHERE SBQQ__Quote__c IN : setIdQuotes AND POCH_EstatusPartida__c = 'Abierta']) {
                 quoteLine.POCH_EnviarAprobacion__c = true;
-             //   System.debug('--> LINEA 164 VALIDA QUERY ' + lQuoteLines);
-               // quoteLine.POCH_aPedido__c = TRUE;
-                //quoteLine.POCH_EstatusPartida__c = 'Por Autorizar';
                 lQuoteLines.add(quoteLine);
             }
             System.debug('--> lQuoteLines ' + lQuoteLines);
             
             if(!lQuoteLines.isEmpty()) {
                 try {
-                    System.debug('came for update' + lQuoteLines[0].POCH_EstatusPartida__c);
                     update lQuoteLines;
                 } catch(Exception ex) {
                     System.debug('--> ERROR: ' + ex.getMessage() + ' --> ' + ex.getStackTraceString());

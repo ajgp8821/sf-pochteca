@@ -106,7 +106,7 @@
                         component.set("v.VentaInstance.POCH_Centro__c",listValues[0]);
                         var instanceVenta = component.get("v.VentaInstance");
                         instanceVenta.POCH_Centro__c = listValues[0];
-                        component.set("v.listCentro", listValues)
+                        component.set("v.listCentro", listValues);
                         var action2 = component.get("c.getDependentPicklistValues");
                         action2.setParams({
                             objectType: objectType,
@@ -123,7 +123,6 @@
                                     instanceVenta.Almacen__c = listValues2[0];
                                     component.set("v.listAlmacen", listValues2);
                                     component.set("v.VentaInstance", instanceVenta);
-                                    component.set();
                                 }
                             }
                         });
@@ -152,4 +151,40 @@
         toastEvent.fire();        
     },
 
+    showToast2: function(tipomsj, titlemsj, Mensaje) {
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+            "type": tipomsj,
+            "title": titlemsj,
+            "message": Mensaje
+        });
+        toastEvent.fire();        
+    },
+
+    getStock: function (component, almacen, centro, producto, stockConsigna) {
+        var action = component.get("c.getStock");
+        action.setParams({
+            product: producto,
+            centro: centro,
+            almacen: almacen,
+            stockConsigna: stockConsigna
+        });
+        action.setCallback(this, function (response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                let stock = response.getReturnValue();
+                if(stock !== null && stock !== undefined) {
+                    if (stockConsigna != ''){
+                        component.set("v.VentaInstance.Stock_Consignacion__c",stock);
+                    }else{
+                        component.set("v.VentaInstance.Stock__c",stock);
+                    }
+                    
+                }
+            } else {
+                console.log("--- Algo salio mal ---");
+            }
+        });
+        $A.enqueueAction(action);
+    },
 })

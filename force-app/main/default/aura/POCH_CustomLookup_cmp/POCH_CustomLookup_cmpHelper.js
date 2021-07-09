@@ -1,15 +1,17 @@
 ({
   searchHelper : function(component,event,getInputkeyWord) {
+    var foo = [];
+    component.set("v.listOfSearchRecords", foo);
     if (component.get("v.indVentaM") == true ){
-      var action = component.get("c.fetchLookUpValuesFromVentasMostrador");
+      var action2 = component.get("c.fetchLookUpValuesFromVentasMostrador");
       
-      action.setParams({
+      action2.setParams({
         'searchKeyWord': getInputkeyWord,
         'ObjectName' : component.get("v.objectAPIName"),
         'parentId' : component.get("v.parentId"),
         'organizacionVenta': component.get("v.organizacionVentas")
       });
-      action.setCallback(this, function(response) {
+      action2.setCallback(this, function(response) {
         $A.util.removeClass(component.find("mySpinner"), "slds-show");
         var state = response.getState();
         if (state === "SUCCESS") {
@@ -26,7 +28,7 @@
         }
       });
       // enqueue the Action
-      $A.enqueueAction(action);
+      $A.enqueueAction(action2);
     }
     else {
       var action = component.get("c.fetchLookUpValues");
@@ -37,7 +39,7 @@
         'parentId' : component.get("v.parentId")
       });
       action.setCallback(this, function(response) {
-        A.util.removeClass(component.find("mySpinner"), "slds-show");
+        //A.util.removeClass(component.find("mySpinner"), "slds-show"); //ocasiona error
         var state = response.getState();
         if (state === "SUCCESS") {
           var storeResponse = response.getReturnValue();

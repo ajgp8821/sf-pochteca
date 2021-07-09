@@ -54,6 +54,8 @@ public class POCH_QuoteLineWFTest {
         //qt.SBQQ__Opportunity2__c = opp.Id;
         qt.SBQQ__PriceBook__c    = pb.Id;
         qt.Tiempo_cancelacion__c   = '24';
+        qt.Moneda_documento__c     ='MXN';
+       // qt.WF_Moneda__c            = true;
         qt.POCH_Sucursal__c      = suc.Id;
         insert qt;
         

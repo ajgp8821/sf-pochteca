@@ -126,7 +126,6 @@
                                     //instanceVenta.Almacen__c = listValues2[0];
                                     component.set("v.listAlmacen", listValues2);
                                     component.set("v.VentaInstance", instanceVenta);
-                                    component.set();
                                 }
                             }
                         });

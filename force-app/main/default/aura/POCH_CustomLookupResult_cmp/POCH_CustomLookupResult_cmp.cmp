@@ -2,7 +2,7 @@
     
     <aura:attribute name="oRecord" type="sObject" />
     <aura:attribute name="IconName" type="string"/> 
-    <aura:attribute name="indVentaM" type="boolean"/>
+    <aura:attribute name="indVentaM" type="boolean" default="false"/>
     <aura:handler name="init" value="this" action="{!c.doInit}"/> 
 
     <aura:registerEvent name="oSelectedRecordEvent" type="c:POCH_SelectedObjectRecordEvent_evt"/>

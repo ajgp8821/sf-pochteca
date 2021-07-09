@@ -1,3 +1,55 @@
 .THIS .slds-table {
   padding-bottom: 30px;
 }
+
+.THIS .myDiv {
+  padding-left: .75rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  /* height: 30px; */
+}
+
+.THIS .myArrow {
+  height: 60px;
+}
+.THIS .myArrow2 {
+  height: 43px;
+}
+.THIS .myArrow3 {
+  height: 60px;
+}
+.THIS .myArrow4 {
+  height: 64px;
+}
+
+.THIS .selectwithoutlabel {
+  height: 60px;
+  /* margin-top: -14px; */
+}
+
+.THIS .mySelect1 {
+  /* height: 60px; */
+  margin-top: -18px;
+}
+
+.THIS .mySelect {
+  /* height: 60px; */
+  margin-top: -14px;
+}
+
+.THIS .myInputNumber1 {
+  /* height: 60px; */
+  margin-top: -2px;
+}
+
+.THIS .myFontSize {
+  font-size: 18px;
+}
+
+.THIS .myFontSizeLC {
+  font-size: 15px !important;
+}
+
+.THIS .uiOutputNumber {
+  font-size: 18px;
+}

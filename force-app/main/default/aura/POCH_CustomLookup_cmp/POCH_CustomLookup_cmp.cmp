@@ -9,7 +9,7 @@
     <aura:attribute name="label" type="string" default=""/>
     <aura:attribute name="Message" type="String" default=""/>
     <aura:attribute name="parentId" type="String" default=""/>
-    <aura:attribute name="indVentaM" type="boolean"/>
+    <aura:attribute name="indVentaM" type="boolean" default="false"/>
 
     <aura:attribute name="organizacionVentas" type="String" default=""/>
     

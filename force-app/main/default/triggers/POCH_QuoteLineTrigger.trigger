@@ -21,6 +21,7 @@ trigger POCH_QuoteLineTrigger on SBQQ__QuoteLine__c (before insert, before updat
         
         if(Trigger.isAfter && Trigger.isUpdate) {
             POCH_QuoteLineTriggerHandler.afterUpdate(Trigger.new);
+       
         }       
     }
     

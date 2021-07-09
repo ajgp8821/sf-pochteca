@@ -114,9 +114,9 @@
                                     />
                     <lightning:button
                                     variant="brand"
-                                    title="Save"
+                                    title="Procesar"
                                     onclick="{!c.sendSap}"
-                                    label="Enviar a SAP"
+                                    label="Procesar"
                                     disabled="{!v.blnShowButtons}"
                                     />
                 </aura:if>
@@ -147,8 +147,8 @@
                                         <!-- disabled="{!v.blnShowButtons}" -->
                         <lightning:button
                                         variant="brand"
-                                        title="Enviar a SAP"
-                                        label="Enviar a SAP"
+                                        title="Procesar"
+                                        label="Procesar"
                                         onclick="{!c.sendSap}"
                                         />
                                         <!-- disabled="{!v.blnShowButtons}" -->
@@ -160,10 +160,11 @@
         <br />
     
         <div class="c-container">
-            <lightning:layout multipleRows="true">
+            <div class="myDiv">Datos del Cliente</div>
+            <lightning:layout multipleRows="true" class="myArrow">
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element"> 
-                        <label class="slds-form-element__label" for="Subtotal">Cliente</label> 
+                        <label class="slds-form-element__label" for="Subtotal"><Strong>Cliente</Strong></label> 
                         <div class="slds-form-element__control">
                             <input type="text" readonly="true" id="Name_Cliente__c" class="slds-input" value="{!v.ventasMostrador.Name_Cliente__c}" />
                         </div>
@@ -171,16 +172,18 @@
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element"> 
-                        <label class="slds-form-element__label" for="Subtotal">línea de crédito del cliente</label> 
+                        <label class="slds-form-element__label" for="Subtotal"><Strong>Línea de crédito del cliente</Strong></label> 
                         <div class="slds-form-element__control">
-                            <input type="number" id="Credito_disponible__c" readonly="true" class="slds-input" value="{!v.ventasMostrador.Credito_disponible__c}" />
+                            <!-- <input type="number" id="Credito_disponible__c" readonly="true" class="slds-input" value="{!v.ventasMostrador.Credito_disponible__c}" /> -->
+                            <ui:outputNumber value="{!v.ventasMostrador.Credito_disponible__c}" format="#,###.00" class="myFontSizeLC" />
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <lightning:select label="Moneda del pedido" aura:id="requiredInputMonedaComp" name="Moneda" 
-                                    value="{!v.ventasMostrador.CurrencyIsoCode}"
-                                    disabled="{!v.isStatusCancel}" onchange="{!c.validarMoneda}">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <label class="slds-form-element__label" for="Subtotal"><strong>Moneda del pedido</strong></label>
+                    <lightning:select aura:id="requiredInputMonedaComp" name="Moneda" 
+                                    value="{!v.ventasMostrador.CurrencyIsoCode}" class="mySelect1"
+                                    disabled="{!v.isStatusCancel}" onchange="{!c.validarMoneda}" >
                         <aura:iteration items="{!v.listMoneda}" var="val" >
                             <option value="{!val}" >{!val}</option>
                         </aura:iteration>
@@ -188,16 +191,17 @@
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label" for="idSap">
-                            <abbr class="slds-required" title="required"></abbr>Id registro SAP de Ventas mostrador</label>
+                        <label class="slds-form-element__label" for="idSap"><strong>Número de pedido SAP</strong></label>
                         <div class="slds-form-element__control">
-                            <input type="text" readonly="true" id="idSap" class="slds-input" value="{!v.ventasMostrador.Id_Registro_SAP__c}" />
+                            <input type="text" readonly="true" id="idSap" class="slds-input myFontSize" value="{!v.ventasMostrador.Id_Registro_SAP__c}" />
                         </div>
                     </div>
                 </lightning:layoutItem>
+            </lightning:layout>
+            <lightning:layout multipleRows="true" class="myArrow">
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label" for="Id_cliente_SAP__c">Id de cliente SAP</label>
+                        <label class="slds-form-element__label" for="Id_cliente_SAP__c"><strong>Id de cliente SAP</strong></label>
                         <div class="slds-form-element__control">
                             <input type="text" id="Id_cliente_SAP__c" readonly="true" class="slds-input" value="{!v.ventasMostrador.Id_cliente_SAP__c}"/>
                         </div>
@@ -205,15 +209,17 @@
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label" for="Condicion_de_Pago__c">Condición de pago</label>
+                        <label class="slds-form-element__label" for="Condicion_de_Pago__c"><strong>Condición de pago</strong></label>
                         <div class="slds-form-element__control">
                             <input type="text" id="Condicion_de_Pago__c" readonly="true" class="slds-input" value="{!v.ventasMostrador.Condicion_de_Pago__c}" />
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <lightning:select label="Via de pago" aura:id="requiredInputMonedaComp" name="viaPago" 
-                                    value="{!v.ventasMostrador.Via_de_pago__c}"
+                <!-- Select -->
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <label class="slds-form-element__label" for="Subtotal"><strong>Vía de pago</strong></label>
+                    <lightning:select aura:id="requiredInputMonedaComp" name="viaPago" 
+                                    value="{!v.ventasMostrador.Via_de_pago__c}" class="mySelect1"
                                     disabled="{!v.isStatusCancel}" >
                         <aura:iteration items="{!v.listViaPago}" var="val" >
                             <option value="{!val}" >{!val}</option>
@@ -221,72 +227,87 @@
                     </lightning:select>
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <div class="slds-form-element">
-                        <label class="slds-form-element__label" for="Valor_Neto__c">Valor Neto</label>
+                    <div class="slds-form-element myFontSize">
+                        <label class="slds-form-element__label" for="Valor_Neto__c"><strong>Valor Neto</strong></label>
                         <div class="slds-form-element__control">
-                            <ui:outputNumber value="{!v.ventasMostrador.Valor_Neto__c}" format="#,###.00" />
+                            <ui:outputNumber value="{!v.ventasMostrador.Valor_Neto__c}" format="#,###.00" class="myFontSize" />
                             <!--<input type="number" id="Valor_Neto__c" readonly="true" class="slds-input" value="{!v.ventasMostrador.Valor_Neto__c}" />-->
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+            </lightning:layout>
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
                     <!--<div class="slds-form-element">-->
-                        <!--<label class="slds-form-element__label" for="email">Correo electronico</label>-->
+                        <label class="slds-form-element__label" for="email"><strong>Correo electrónico</strong></label>
                         <!--<div class="slds-form-element__control">-->
-                            <ui:inputEmail aura:id="email" class="field" value="{!v.ventasMostrador.Email__c}" disabled="{!v.isStatusCancel}"
-                                label="Correo electronico" />
+                            <ui:inputEmail aura:id="email" class="field" value="{!v.ventasMostrador.Email__c}" disabled="{!v.isStatusCancel}" />
+                                <!-- label="Correo electronico" /> -->
                             <!--<input type="email" id="email" class="slds-input" value="{!v.ventasMostrador.Email__c}" disabled="{!v.isStatusCancel}"
                                     onchange="{c.validarEmail}"/>-->
                         <!--</div>-->
                     <!--</div>-->
                 </lightning:layoutItem>
-                
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <lightning:select label="Uso de CFDI" aura:id="cfdi" name="cfdi" 
-                                    value="{!v.ventasMostrador.Uso_de_CFDI__c}"
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <label class="slds-form-element__label" for="Subtotal"><strong>Uso de CFDI</strong></label>
+                    <lightning:select aura:id="cfdi" name="cfdi" 
+                                    value="{!v.ventasMostrador.Uso_de_CFDI__c}" class="mySelect1"
                                     disabled="{!v.isStatusCancel}" >
                         <aura:iteration items="{!v.listCFDI}" var="val" >
                             <option value="{!val}" >{!val}</option>
                         </aura:iteration>
                     </lightning:select>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <lightning:input type="number" value="{!v.ventasMostrador.Digitos_tarjeta__c}" label="Ultimos 4 digitos de tarjeta" max="9999" maxlength="4" disabled="{!v.isStatusCancel}" />
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <label class="slds-form-element__label" for="Descuento"><strong>Ultimos 4 digitos de tarjeta</strong></label>
+                    <lightning:input type="number" value="{!v.ventasMostrador.Digitos_tarjeta__c}"
+                                     class="mySelect1"
+                                     max="9999" maxlength="4" disabled="{!v.isStatusCancel}" />
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element"> 
-                        <label class="slds-form-element__label" for="Descuento">Descuento</label> 
+                        <label class="slds-form-element__label" for="Descuento"><strong>Descuento</strong></label> 
                         <div class="slds-form-element__control">
                             <ui:outputNumber value="{!v.ventasMostrador.Descuento__c}" format="#,###.00" />
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <lightning:select label="Métodos de Pago" aura:id="requiredInputMonedaComp" name="metPago" 
-                                    value="{!v.ventasMostrador.Metodo_de_Pago__c}"
-                                    disabled="{!v.isStatusCancel}" >
+            </lightning:layout>
+            <br />
+            <!-- <div class="myDiv">Métodos de Pago</div> -->
+            <lightning:layout multipleRows="true" class="myArrow4">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <label class="slds-form-element__label" for="Subtotal"><strong>Métodos de Pago</strong></label>    
+                    <lightning:select aura:id="requiredInputMonedaComp" name="metPago" 
+                                        value="{!v.ventasMostrador.Metodo_de_Pago__c}" class="mySelect1"
+                                        disabled="{!v.isStatusCancel}" >
                         <aura:iteration items="{!v.listMetPago}" var="val" >
                             <option value="{!val}" >{!val}</option>
                         </aura:iteration>
                     </lightning:select>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <ui:inputNumber value="{!v.ventasMostrador.Importe__c}" format="#,###.00" label="Importe" disabled="{!v.isStatusCancel}" />
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <label class="slds-form-element__label" for="Subtotal"><strong>Importe</strong></label> 
+                    <ui:inputNumber value="{!v.ventasMostrador.Importe__c}" format="#,###.00" disabled="{!v.isStatusCancel}" class="myInputNumber1" />
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago__c}" disabled="{!v.isStatusCancel}" label="Obs. Pago" />
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <label class="slds-form-element__label" for="Subtotal"><strong>Obs. Pago</strong></label>
+                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago__c}" disabled="{!v.isStatusCancel}" />
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element"> 
-                        <label class="slds-form-element__label" for="Subtotal">Subtotal</label> 
+                        <label class="slds-form-element__label" for="Subtotal"><strong>Subtotal</strong></label> 
                         <div class="slds-form-element__control">
                             <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Subtotal__c}" format="#,###.00" />
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <lightning:select label="Métodos de Pago 2" aura:id="requiredInputMonedaComp" name="metPago2" 
-                                    value="{!v.ventasMostrador.Metodo_de_Pago2__c}"
+            </lightning:layout>
+
+            <lightning:layout multipleRows="true" class="myArrow2">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <lightning:select aura:id="requiredInputMonedaComp" name="metPago2" 
+                                    value="{!v.ventasMostrador.Metodo_de_Pago2__c}" class="mySelect"
                                     disabled="{!v.isStatusCancel}" >
                         <aura:iteration items="{!v.listMetPago}" var="val" >
                             <option value="{!val}" >{!val}</option>
@@ -294,21 +315,24 @@
                     </lightning:select>
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <ui:inputNumber value="{!v.ventasMostrador.Importe_2__c}" format="#,###.00" label="Importe 2" disabled="{!v.isStatusCancel}" />
+                    <ui:inputNumber value="{!v.ventasMostrador.Importe_2__c}" format="#,###.00" disabled="{!v.isStatusCancel}" />
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago_2__c}" disabled="{!v.isStatusCancel}" label="Obs. Pago 2" />
+                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago_2__c}" disabled="{!v.isStatusCancel}" />
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element"> 
-                        <label class="slds-form-element__label" for="Subtotal">Importe Impuesto</label> 
+                        <label class="slds-form-element__label" for="Subtotal"><strong>Importe Impuesto</strong></label> 
                         <div class="slds-form-element__control">
                             <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.IVA__c}" format="#,###.00" />
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <lightning:select label="Métodos de Pago 3" aura:id="requiredInputMonedaComp" name="metPago3" 
+            </lightning:layout>
+
+            <lightning:layout multipleRows="true" class="myArrow3">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
+                    <lightning:select aura:id="requiredInputMonedaComp" name="metPago3" class="mySelect"
                                     value="{!v.ventasMostrador.Metodo_de_Pago3__c}"
                                     disabled="{!v.isStatusCancel}" >
                         <aura:iteration items="{!v.listMetPago}" var="val" >
@@ -317,26 +341,21 @@
                     </lightning:select>
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <ui:inputNumber value="{!v.ventasMostrador.Importe_3__c}" format="#,###.00" label="Importe 3" disabled="{!v.isStatusCancel}" />
+                    <ui:inputNumber value="{!v.ventasMostrador.Importe_3__c}" format="#,###.00" disabled="{!v.isStatusCancel}" />
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago_3__c}" disabled="{!v.isStatusCancel}" label="Obs. Pago 3" />
+                    <ui:inputText class="field" value="{!v.ventasMostrador.Obs_Pago_3__c}" disabled="{!v.isStatusCancel}" />
                 </lightning:layoutItem>            
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
                     <div class="slds-form-element"> 
-                        <label class="slds-form-element__label" for="Subtotal">Total</label> 
+                        <label class="slds-form-element__label" for="Subtotal"><strong>Total</strong></label> 
                         <div class="slds-form-element__control">
                             <ui:outputNumber  class="CustomClassAlign" value="{!v.ventasMostrador.Precio_total__c}" format="#,###.00" />
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <!-- <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
-                    <div class="custom-box">Id registro SAP de Ventas mostrador</div>
-                    <div class="slds-text-heading_medium" title="{!v.simpleRecord}">
-                        <lightning:input type="text" readonly="true" value="{!v.ventasMostrador.Id_Registro_SAP__c}" />
-                    </div>
-                </lightning:layoutItem>      -->
             </lightning:layout>
+
         </div>
         <br/>
         <table class="slds-table slds-table_cell-buffer slds-table_bordered">
@@ -345,44 +364,46 @@
                     
                     <th class="" scope="col">
                         <div class="slds-truncate" title="Agregar">
-                            <a onclick="{!c.addNewRow}">
-                                <lightning:icon iconName="utility:add" class="slds-icon slds-icon_small" size="small" alternativeText="add"/>
-                                <span class="slds-assistive-text">Add Icon</span> 
-                            </a>
+                            <aura:if isTrue="{!!v.isStatusCancel}">
+                                <a onclick="{!c.addNewRow}">
+                                    <lightning:icon iconName="utility:add" class="slds-icon slds-icon_small" size="small" alternativeText="add"/>
+                                    <span class="slds-assistive-text">Add Icon</span> 
+                                </a>
+                            </aura:if>
                         </div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="Material">Material</div>
+                        <div class="slds-truncate slds-align_absolute-left" title="Material">Material</div>
                     </th>
                     <th scope="col" >
-                        <div  class="{!v.blnBorderColorDesc == true ? 'slds-form-element slds-truncate slds-align_absolute-center' : 'slds-has-error slds-truncate slds-align_absolute-center'}"  title="Descripcion">Descripción</div>
+                        <div  class="{!v.blnBorderColorDesc == true ? 'slds-form-element slds-truncate slds-align_absolute-left' : 'slds-has-error slds-truncate slds-align_absolute-left'}"  title="Descripcion">Descripción</div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="Cantidad ">Cantidad</div>
+                        <div class="slds-truncate slds-align_absolute-left" title="Cantidad ">Cantidad</div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="UM Venta">UM Venta</div>
+                        <div class="slds-truncate slds-align_absolute-left" title="UM Venta">UM Venta</div>
                     </th>
                     <th class="" scope="col">
                         <div class="slds-truncate slds-align_absolute-center" title="Precio">Precio</div>
                     </th> 
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="Moneda ">Moneda </div>
+                        <div class="slds-truncate slds-align_absolute-left" title="Moneda ">Moneda </div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="Centro ">Centro </div>
+                        <div class="slds-truncate slds-align_absolute-left" title="Centro ">Centro </div>
                     </th>   
                     <th class="" scope="col">
                         <div class="slds-truncate slds-align_absolute-center" title="Almacen">Almacen</div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="Porcentaje de descuento">% descuento</div>
+                        <div class="slds-truncate slds-align_absolute-left" title="Porcentaje de descuento">% descuento</div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="Valor Neto">Valor Neto</div>
+                        <div class="slds-truncate slds-align_absolute-left" title="Valor Neto">Valor Neto</div>
                     </th>  
                     <th class="" scope="col">
-                        <div class="slds-truncate slds-align_absolute-center" title="Stock">Stock</div>
+                        <div class="slds-truncate slds-align_absolute-left" title="Stock">Stock</div>
                     </th>
                     <th class="" scope="col">
                         <div class="slds-truncate slds-align_absolute-center" title="Stock consignacion">Stock consignacion</div>
@@ -408,7 +429,8 @@
                     <aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
                         <c:POCH_VentaMostradorDetailsEdit_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}"
                                                             ListaVentaSelected="{!v.ventasMostradorList}" ventasMostrador="{!v.ventasMostrador}"
-                                                            organizacionVentas="{!v.organizacionVentas}" oficinaVentas="{!v.ventasMostrador.OrganizacionVentas__c}" />
+                                                            organizacionVentas="{!v.organizacionVentas}" oficinaVentas="{!v.oficinaVentas}" 
+                                                            strIdSucursalAmp="{!v.strIdSucursal}"/>
                                                             <!-- organizacionVentas="{!v.organizacionVentas}" oficinaVentas="{!v.oficinaVentas}" /> -->
                     </aura:iteration>
                 </aura:if>  

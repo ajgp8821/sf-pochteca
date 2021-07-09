@@ -13,6 +13,7 @@
         if (idVentasMostrador != null && idVentasMostrador != "") {
             component.set("v.blnRecordExisteShowDetail", true);
             helper.showCabeceraVentaMostrador(component, event, helper);
+            helper.getSucursal(component, event);
             helper.showDetailVentaMostrador(component, event, helper);
             helper.requiereActualizacion(component, event, helper);
         }
@@ -38,50 +39,93 @@
     sendSap: function(component, event, helper) {
 
         var ventaMostrador =  component.get("v.ventasMostrador");
-        helper.validateCurrency(component, event);
-
-        if(ventaMostrador.Via_de_pago__c == '' || ventaMostrador.Via_de_pago__c == null || ventaMostrador.Via_de_pago__c == undefined || ventaMostrador.Via_de_pago__c == '--'){
-            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Vía de Pago');
+        if (component.get("v.oficinaVentas") != '' || component.get("v.oficinaVentas") != null || component.get("v.oficinaVentas") != undefined){
+            component.set("v.ventasMostrador.Oficina_de_Venta__c", component.get("v.oficinaVentas"));
         }
-        else if(ventaMostrador.CurrencyIsoCode == '' || ventaMostrador.CurrencyIsoCode == null || ventaMostrador.CurrencyIsoCode == undefined || ventaMostrador.CurrencyIsoCode == '--'){
-            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Moneda del pedido');
+        if (component.get("v.strIdSucursal") != '' || component.get("v.strIdSucursal") != null || component.get("v.strIdSucursal") != undefined){
+            component.set("v.ventasMostrador.POCH_Sucursal__c",component.get("v.strIdSucursal"));
+        }
+        if (component.get("v.organizacionVentas") != '' || component.get("v.organizacionVentas") != null || component.get("v.organizacionVentas") != undefined){
+            component.set("v.ventasMostrador.OrganizacionVentas__c", component.get("v.organizacionVentas"));
+        }
+        var email = ventaMostrador.Email__c;
+        var emailRegex = /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
+        if(ventaMostrador.Importe__c == null){
+            ventaMostrador.Importe__c = 0;
+        }
+        if(ventaMostrador.Importe_2__c == null){
+            ventaMostrador.Importe_2__c = 0;
+        }
+        if(ventaMostrador.Importe_3__c == null){
+            ventaMostrador.Importe_3__c = 0;
+        }
+        if(ventaMostrador.Metodo_de_Pago3__c != '' && ventaMostrador.Importe_3__c <= 0){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar el Importe 3');
+        }
+        else if(ventaMostrador.Metodo_de_Pago3__c == '' && ventaMostrador.Importe_3__c > 0){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar metodo de pago 3');
+        }
+        else if(ventaMostrador.Metodo_de_Pago2__c != '' && ventaMostrador.Importe_2__c <= 0){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar el Importe 2');
+        }
+        else if(ventaMostrador.Metodo_de_Pago2__c == '' && ventaMostrador.Importe_2__c > 0){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar metodo de pago 2');
+        }
+        else if(ventaMostrador.Metodo_de_Pago__c != '' && ventaMostrador.Importe__c <= 0){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar el Importe');
+        }
+        else if(ventaMostrador.Metodo_de_Pago__c == '' && ventaMostrador.Importe__c > 0){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar metodo de pago');
+        }
+        else if( (ventaMostrador.Importe__c + ventaMostrador.Importe_2__c + ventaMostrador.Importe_3__c == 0 )){
+                helper.showToast('Warning', 'Atención!', 'Antes de guardar, los importes deben sumar el total');
+        }
+        else if( (ventaMostrador.Importe__c + ventaMostrador.Importe_2__c + ventaMostrador.Importe_3__c != ventaMostrador.Precio_total__c )){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, los importes deben sumar el total');
+        }
+        else if( (ventaMostrador.Importe__c > 0 && ventaMostrador.Importe_2__c > 0 && ventaMostrador.Importe_3__c > 0) &&
+                 (ventaMostrador.Importe__c + ventaMostrador.Importe_2__c + ventaMostrador.Importe_3__c != ventaMostrador.Precio_total__c )){
+                helper.showToast('Warning', 'Atención!', 'Antes de guardar, los importes deben sumar el total');
+        }
+        else if( (ventaMostrador.Importe_2__c > 0 && ventaMostrador.Importe_3__c > 0 && ventaMostrador.Importe__c == 0) &&
+            (ventaMostrador.Importe_2__c + ventaMostrador.Importe_3__c != ventaMostrador.Precio_total__c )){
+                helper.showToast('Warning', 'Atención!', 'Antes de guardar, los importes deben sumar el total');
+        }
+        else if( (ventaMostrador.Importe__c > 0 && ventaMostrador.Importe_3__c > 0 && ventaMostrador.Importe_2__c == 0) &&
+            (ventaMostrador.Importe__c + ventaMostrador.Importe_3__c != ventaMostrador.Precio_total__c )){
+                helper.showToast('Warning', 'Atención!', 'Antes de guardar, los importes deben sumar el total');
+        }
+        else if( (ventaMostrador.Importe__c > 0 && ventaMostrador.Importe_2__c > 0 && ventaMostrador.Importe_3__c == 0) &&
+            (ventaMostrador.Importe__c + ventaMostrador.Importe_2__c != ventaMostrador.Precio_total__c )){
+                helper.showToast('Warning', 'Atención!', 'Antes de guardar, los importes deben sumar el total');
+        }
+        else if(ventaMostrador.Via_de_pago__c == '' || ventaMostrador.Via_de_pago__c == null || ventaMostrador.Via_de_pago__c == undefined || ventaMostrador.Via_de_pago__c == '--'){
+            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Vía de Pago');
         }
         else if(ventaMostrador.Uso_de_CFDI__c == '' || ventaMostrador.Uso_de_CFDI__c == null || ventaMostrador.Uso_de_CFDI__c == undefined || ventaMostrador.Uso_de_CFDI__c == '--'){
             helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Uso de CFDI');
         }
-        else if((ventaMostrador.Metodo_de_Pago3__c != '' || ventaMostrador.Metodo_de_Pago3__c != ' ') && (ventaMostrador.Importe_3__c == 0 || ventaMostrador.Importe_3__c == null)){
-            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe indicar el Importe 3');
+        //else if(ventaMostrador.Digitos_tarjeta__c.length != 4){
+        //    helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe completar Ultimos 4 digitos de tarjeta');
+        //}
+        //Se muestra un texto a modo de ejemplo, luego va a ser un icono
+        else if (!emailRegex.test(email)) {
+            helper.showToast('Warning', 'Atención!', 'formato de email no valido');
+            // errores = true;
         }
-        else if(ventaMostrador.Metodo_de_Pago__c == '' || ventaMostrador.Metodo_de_Pago__c == null || ventaMostrador.Metodo_de_Pago__c == undefined || ventaMostrador.Metodo_de_Pago__c == '--'){
-            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Métodos de Pago');
+
+        // Validar Moneda del detalle
+        else {
+            helper.validateCurrency(component, event);
         }
-        else if(ventaMostrador.Metodo_de_Pago2__c == '' || ventaMostrador.Metodo_de_Pago2__c == null || ventaMostrador.Metodo_de_Pago2__c == undefined || ventaMostrador.Metodo_de_Pago2__c == '--'){
-            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe seleccionar Métodos de Pago 2');
-        }
-        else if(ventaMostrador.Digitos_tarjeta__c == '' || ventaMostrador.Digitos_tarjeta__c == null || ventaMostrador.Digitos_tarjeta__c == undefined){
-            helper.showToast('Warning', 'Atención!', 'Antes de guardar, debe completar Ultimos 4 digitos de tarjeta');
-        }
-        // else if(ventaMostrador.Importe__c)
-        // TODO: Validar moneda
-        else{
-            var isNewRecord = component.get("v.blnRecordExisteShowDetail");
-            var detalleVentaMostrador =  component.get("v.ventasMostradorList");
-    
-            console.log('ventaMostrador', JSON.stringify(ventaMostrador));
-            // helper.saveVentasMostrador(component, event);
-            //helper.saveVentasMostrador(component, event);
-        }
-        // Metodo_de_Pago__c
-        // Metodo_de_Pago2__c
-        // Metodo_de_Pago3__c
-        // Importe__c
-        // Importe_2__c
-        // Importe_3__c
     },
 
     save: function(component, event, helper) {
         var errores = false;
         var ventaMostrador =  component.get("v.ventasMostrador");
+        component.set("v.ventasMostrador.Oficina_de_Venta__c", component.get("v.oficinaVentas"));
+        component.set("v.ventasMostrador.POCH_Sucursal__c",component.get("v.strIdSucursal"));
+        component.set("v.ventasMostrador.OrganizacionVentas__c", component.get("v.organizacionVentas"));
         ventaMostrador.OrganizacionVentas__c = component.get("v.organizacionVentas");
         var detalleVentaMostrador =  component.get("v.ventasMostradorList");
         for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
@@ -102,7 +146,7 @@
             errores = true;
         }
         if (errores == false){
-            helper.saveVentasMostrador(component, event); 
+            helper.saveVentasMostrador(component, event, false); 
         }
         
         //button.set('v.disabled',true);
@@ -132,8 +176,8 @@
             errores = true;
         }
         if (errores == false){
-            helper.showToast('Warning', 'Atención!', 'Se manda a actualizar');
-            helper.updateVentasMostrador(component, event); 
+            //helper.showToast('Warning', 'Atención!', 'Se manda a actualizar');
+            helper.updateVentasMostrador(component, event, false); 
         }
         
         //button.set('v.disabled',true);
@@ -155,10 +199,10 @@
 
     validarMoneda: function(component, event, helper) { 
         var StrnNameField = component.get("v.ventasMostrador.CurrencyIsoCode");
-        if (StrnNameField != "Dólar de EE.UU.") {
+        if (StrnNameField != "Dólar de EE.UU." && StrnNameField != "U.S. Dollar") {
             helper.validarCurrency(component, StrnNameField, true, 'Ventas_Mostrador__c', 'CurrencyIsoCode');
             //helper.getApiName(component,'Ventas_Mostrador__c','CurrencyIsoCode', label);            
-        }            
+        }          
     },
 
     calcularTotales: function(component, event, helper) {

@@ -22,12 +22,14 @@ public class POCH_QuoteLineWFHelper {
     
     public POCH_WFSettings__c                          configuracionWF          {get;set;}
     public Map<String,Id>                              mapGerenteSucursal       {get;set;}
+    public Map<String,Id>                              mapAprobadordeMoneda     {get;set;}
     public Map<String,Map<String,Id>>                  mapGerenteRegional       {get;set;}
     public Map<String,Map<String,Id>>                  mapGerenteLinea          {get;set;}
     public Map<String,Map<String,Id>>                  mapDirectorDivision      {get;set;}
     public Map<String,Id>                              mapDirectorEjecutivo     {get;set;}
     public Map<String,Id>                              mapDirectorEjecutivoDe   {get;set;}
     public Map<id,String>                              mapQouteFechaCancel      {get;set;}
+    public Map<id,SBQQ__QuoteLine__c>                  mapQouteDivisaMoneda     {get;set;}
     public Map<String,Id>                              mapDirectorEjecutivoGS   {get;set;}
     public Map<String,POCH_MargenProductoSinPrecio__mdt>mapMargenesPolitica     {get;set;}
     public Map<Id,Map<String,POCH_ProductoSucursal__c>> mapGrupoMateriales      {get;set;}
@@ -61,6 +63,7 @@ public class POCH_QuoteLineWFHelper {
         //Obtiene los Aprobadores definidos en Tipos de Metadatos Personalizados getFechaCancelado
         getAprobadoresWF();
         getFechaCancelado();
+        getmapQouteDivisaMoneda();
         
     } 
     
@@ -99,6 +102,19 @@ public class POCH_QuoteLineWFHelper {
                 } else this.mapMargenPapel.put(excepcion.POCH_GrupoMateriales__c, new Map<String,Decimal>{excepcion.POCH_GrupoMateriales__c => excepcion.POCH_Margen__c});                    
             }           
         }
+    }
+    private void getmapQouteDivisaMoneda() {
+        set<Id> setIdQoute = new set<Id>();
+        this.mapQouteDivisaMoneda = new   Map<Id,SBQQ__QuoteLine__c>();     
+        for(SBQQ__QuoteLine__c ql : this.lQuoteLinesCPQ) {
+            if(String.isNotBlank(ql.id))
+                setIdQoute.add(ql.id);
+        } 
+        
+        for(SBQQ__QuoteLine__c  quoteLineCPQ : [select id,SBQQ__Quote__r.Moneda_documento__c,SBQQ__Quote__r.WF_Moneda__c,CurrencyIsoCode,SBQQ__EndDate__c, SBQQ__StartDate__c, POCH_WF__c from SBQQ__QuoteLine__c where 
+                                                SBQQ__Quote__r.Tiempo_cancelacion__c <> null and id =: setIdQoute ]){
+                                                    this.mapQouteDivisaMoneda.put(quoteLineCPQ.Id, quoteLineCPQ);  
+                                                }
     }
     private void getFechaCancelado() {
         set<Id> setIdQoute = new set<Id>();
@@ -266,7 +282,7 @@ public class POCH_QuoteLineWFHelper {
         Set<Boolean> setIdGteCom1 = new Set<Boolean>();
         string orvent = ''; 
         string qt;
-      
+        
         for(SBQQ__QuoteLine__c ql : this.lQuoteLinesCPQ) {
             qt = ql.SBQQ__Quote__c;
             setIdOrVenta.add(ql.POCH_OrgVentasQuote__c);
@@ -280,13 +296,13 @@ public class POCH_QuoteLineWFHelper {
         this.mapDirectorEjecutivoGS  = new Map<String,Id>();        
         List<POCH_WFAprobador__c> allWfaProb = new List<POCH_WFAprobador__c>();
         if(setIdCuentaClaveTV.contains(true) && setIdGteCom1.contains(false)){
-           
+            
             allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c,TV__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and TV__c =: true LIMIT 50000];
             if(allWfaProb.size()==0){
                 allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c,TV__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and TV__c =: false and Gte_Com1__c =:false LIMIT 50000];   
             }
         }else if(setIdCuentaClaveTV.contains(false) && setIdGteCom1.contains(true)){
-         
+            
             allWfaProb = [SELECT id, RecordType.Name, Gte_Com1__c,POCH_OrganizacionVentas__c,TV__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and Gte_Com1__c =: true LIMIT 50000];
             if(allWfaProb.size()==0){
                 allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c,TV__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta and TV__c =: false and Gte_Com1__c =:false LIMIT 50000];   
@@ -294,7 +310,7 @@ public class POCH_QuoteLineWFHelper {
             
         }else{
             allWfaProb = [SELECT id, RecordType.Name, POCH_OrganizacionVentas__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c where POCH_OrganizacionVentas__c IN : setIdOrVenta  LIMIT 50000];
-         
+            
         }
         for(POCH_WFAprobador__c aprobadorWF : allWfaProb) {
             
@@ -302,13 +318,13 @@ public class POCH_QuoteLineWFHelper {
                 this.mapDirectorEjecutivoGS.put(aprobadorWF.POCH_OrganizacionVentas__c, aprobadorWF.POCH_Aprobador__c);
             }
         }            
-     
+        
     }
     
     
     //Obtiene las listas de aprobadores
     private void getAprobadoresWF() {
-        //  this.mapGerenteSucursal    = new Map<String,Id>();
+        this.mapAprobadordeMoneda  = new Map<String,Id>();        
         this.mapGerenteRegional    = new Map<String,Map<String,Id>>();
         this.mapGerenteLinea       = new Map<String,Map<String,Id>>();
         this.mapDirectorDivision   = new Map<String,Map<String,Id>>();
@@ -316,7 +332,7 @@ public class POCH_QuoteLineWFHelper {
         
         for(POCH_WFAprobador__c aprobadorWF : [SELECT RecordType.Name, POCH_OrganizacionVentas__c, POCH_Aprobador__c, POCH_Sociedad__c, POCH_GrupoMateriales__c FROM POCH_WFAprobador__c LIMIT 50000]) {
             /* if(aprobadorWF.RecordType.Name == 'Aprobador Gerente Sucursal') {
-this.mapGerenteSucursal.put(aprobadorWF.POCH_OrganizacionVentas__c, aprobadorWF.POCH_Aprobador__c);            
+this.mapGerenteSucursal.put(aprobadorWF.POCH_OrganizacionVentas__c, aprobadorWF.POCH_Aprobador__c);   mapAprobadordeMoneda         
 }*/
             if(aprobadorWF.RecordType.Name == 'Aprobador Gerente Regional') {
                 if(this.mapGerenteRegional.containsKey(aprobadorWF.POCH_Sociedad__c))
@@ -333,9 +349,10 @@ this.mapGerenteSucursal.put(aprobadorWF.POCH_OrganizacionVentas__c, aprobadorWF.
                     this.mapDirectorDivision.get(aprobadorWF.POCH_Sociedad__c).put(aprobadorWF.POCH_GrupoMateriales__c,aprobadorWF.POCH_Aprobador__c);
                 else this.mapDirectorDivision.put(aprobadorWF.POCH_Sociedad__c, new Map<String,Id>{aprobadorWF.POCH_GrupoMateriales__c => aprobadorWF.POCH_Aprobador__c});
             }
-            /* if(aprobadorWF.RecordType.Name == 'Aprobador Director Ejecutivo') {
-this.mapDirectorEjecutivoDE.put(aprobadorWF.POCH_Sociedad__c, aprobadorWF.POCH_Aprobador__c);
-}*/
+           
+            if(aprobadorWF.RecordType.Name == 'Aprobador Moneda') {
+                this.mapAprobadordeMoneda.put(aprobadorWF.POCH_Sociedad__c, aprobadorWF.POCH_Aprobador__c);
+            }
         }                              
     }
     
@@ -386,9 +403,11 @@ this.mapDirectorEjecutivoDE.put(aprobadorWF.POCH_Sociedad__c, aprobadorWF.POCH_A
         
         if(funcion == 'GS') {
             if(this.mapDirectorEjecutivoGS.containsKey(quoteLineCPQ.POCH_OrgVentasQuote__c)) { 
-             aprobadorWF = this.mapDirectorEjecutivoGS.get(quoteLineCPQ.POCH_OrgVentasQuote__c);
+                aprobadorWF = this.mapDirectorEjecutivoGS.get(quoteLineCPQ.POCH_OrgVentasQuote__c);
             }                                                              
-         } else if(funcion == 'DE') {
+        } else if(funcion == 'MO') {
+            if(this.mapAprobadordeMoneda.containsKey(quoteLineCPQ.POCH_QuoteSociedad__c)) { aprobadorWF = this.mapAprobadordeMoneda.get(quoteLineCPQ.POCH_QuoteSociedad__c); }
+        }else if(funcion == 'DE') {
             if(this.mapDirectorEjecutivoDE.containsKey(quoteLineCPQ.POCH_QuoteSociedad__c)) { aprobadorWF = this.mapDirectorEjecutivoDE.get(quoteLineCPQ.POCH_QuoteSociedad__c); }
         } else if(this.mapGrupoMateriales.containsKey(quoteLineCPQ.SBQQ__Product__c)) {
             if(this.mapGrupoMateriales.get(quoteLineCPQ.SBQQ__Product__c).containsKey(quoteLineCPQ.POCH_CanalDistribucion__c)) {
