@@ -16,26 +16,7 @@
             this.getSucursal(component, event);
             this.getInfoAccount(component, event, helper);
             this.getCreditLine(component, event, helper);
-            this.getConditionPago(component, event, helper);
-            // action.setParams({
-            //     idAccount: component.get("v.strIdAccount")
-            // });
-            // action.setCallback(this, function (response) {
-            //     component.set("v.showSpinner", true);
-            //     var state = response.getState();
-            //     if (state === "SUCCESS") {
-            //         let sucursal = response.getReturnValue();
-            //         if(sucursal !== null && sucursal !== undefined) {
-            //             component.set("v.strIdSucursal",sucursal.Id);
-            //             component.set('v.blnShowButtons', false);
-            //             component.set("v.organizacionVentas",sucursal.POCH_OrganizacionVentas__c);
-            //         }
-            //     } else {
-            //         console.log("--- Algo salio mal ---");
-            //     }
-            //     component.set("v.showSpinner", false);
-            // });
-            // $A.enqueueAction(action);  
+            this.getConditionPago(component, event, helper); 
         }
     },
 
@@ -50,7 +31,6 @@
             idAccount: account
         });
         action.setCallback(this, function (response) {
-            // component.set("v.showSpinner", false);
             var state = response.getState();
             if (state === "SUCCESS") {
                 let sucursal = response.getReturnValue();
@@ -63,7 +43,6 @@
             } else {
                 console.log("--- Algo salio mal ---");
             }
-            // component.set("v.showSpinner", false);
         });
         $A.enqueueAction(action);
     },
@@ -74,7 +53,7 @@
             idCabeceraVentaMostrador: component.get("v.recordId")
         });
         action.setCallback(this, function (response) {
-            console.log("showCabeceraVentaMostrador");
+            // console.log("showCabeceraVentaMostrador");
             var state = response.getState();
             if (state === "SUCCESS") {
                 let cabeceraVentas = response.getReturnValue();
@@ -169,7 +148,6 @@
                             msj += '<li type="disc"> No puede guardar sin seleccionar un producto:  <li/>' ;
                         }
                     }
-                    //lst += '</ul>';
                     if(msj == '' || msj == null || msj == undefined){
 
                         var StrnNameField = component.get("v.ventasMostrador.CurrencyIsoCode");
@@ -190,15 +168,10 @@
                                     if(StoreResponse == false){
                                         msj +=' Moneda no permitida'
                                         var errores =  msj;
-                                        //component.set("v.blnErrores", true);  
-                                        // component.set("v.strErrores", errores); //
-                                        //component.set('v.blnShowButtons',true);
                                         this.showToast('Error', 'Error!', msj);
                                         component.set("v.strErrores", null);
                                     }
                                     else {
-                                        // this.sa
-                                        //this.validationsSap(component, event);
                                         component.set("v.blnErrores", false);
                                         component.set("v.strErrores", null);
                                         if (idVentasMostrador != null && idVentasMostrador != "") {
@@ -215,9 +188,6 @@
                         else {
                             this.validationsSap(component, event);
                         }
-                        // Llamar al metodo de insertar o actualizar
-                        //component.set("v.blnErrores", false);
-                        
                     } else {
                         var errores = lst + msj + '</ul>';
                         component.set("v.blnErrores", true);  
@@ -300,68 +270,6 @@
         component.set("v.ventasMostradorList", RowItemList);
     },
 
-    requiereActualizacion : function(component, event, helper) {        
-    	let action = component.get('c.getDataInv');
-            console.log(action); 
-        action.setParams({
-            'idInv': component.get('v.recordId')
-        });
-        action.setCallback(this,function(response){
-                        console.log(response);
-            if(response.getState() === 'SUCCESS') {
-                //component.set('v.blnUpdatePrices', response.getReturnValue().RequiereActualizacion__c);     
-                component.set('v.strIdAccount',    response.getReturnValue().POCH_Cuenta__c);
-                component.set('v.strIdBranch',     response.getReturnValue().POCH_Sucursal__r.Name);
-                console.log(action);
-                
-                helper.validaAutorizacion(component, event, helper);
-            }
-        });
-        $A.enqueueAction(action);
-    },
-
-    validaAutorizacion : function(component, event, helper) {
-        let action = component.get('c.getAutorizacion');
-        var action3 = component.get("c.getAccesDetalle");
-        var listIdDetalleInventario = new Array();
-        action.setParams({
-            'idSuc': component.get('v.strIdBranch')
-        });
-        action.setCallback(this,function(response) {
-            if(response.getState() === 'SUCCESS') {
-                component.set('v.blnShowButtons', response.getReturnValue()); 
-                if(component.get('v.blnRecordExisteShowDetail') === false) {
-                    if(response.getReturnValue() === true){
-                        this.showToast('Warning', 'Advertencia!', "No cuenta con los permisos para agregar una venta en esta sucursal"); 
-                    } else if(response.getReturnValue() === false) {
-                        helper.UpdateRecords(component, event, helper);
-                    }
-                }
-                let listProduct = component.get('v.productList');
-                for(var i = 0; i < listProduct.length; i++){
-                    listIdDetalleInventario.push(listProduct[i].Id);
-                }
-                action3.setParams({
-                    listIdDetalleInventario : listIdDetalleInventario                    
-                });
-                action3.setCallback(this, function(response) {
-                    var state = response.getState();
-                    var state2;
-                    if (state === "SUCCESS") {
-                        state2 = response.getReturnValue();
-                        if (state2){
-                            component.set('v.blnShowButtons', true);
-                        }
-                    }else{
-                        console.log('--- Algo salio mal ---');
-                    }
-                });
-                $A.enqueueAction(action3);                                  
-            }
-        });
-        $A.enqueueAction(action);
-    },
-
     getInfoAccount: function (component, event, helper) {
         var action = component.get("c.getAccount");
         action.setParams({
@@ -377,10 +285,6 @@
                     ventaMostrador.Id_cliente_SAP__c = cliente.POCH_IDClienteSAP__c;
                     ventaMostrador.Email__c = cliente.POCH_CorreoElectronico__c;
                     ventaMostrador.CurrencyIsoCode = cliente.CurrencyIsoCode;
-                    // component.set("v.accountName", cliente.Name);
-                    // component.set("v.idSap", cliente.POCH_IDClienteSAP__c);
-                    // component.set("v.email", cliente.POCH_CorreoElectronico__c);
-                    // component.set("v.currency", cliente.CurrencyIsoCode);
                     component.set("v.ventasMostrador", ventaMostrador);
                     if (cliente.POCH_ClasificacionFiscal__c == 0){
                         component.set("v.isExento", true);
@@ -407,14 +311,10 @@
                     var ventaMostrador = component.get("v.ventasMostrador");
                     ventaMostrador.Credito_disponible__c = creditLine.POCH_SaldoDisponible__c;
                     component.set("v.ventasMostrador", ventaMostrador);
-
-                    // component.set("v.creditLine", creditLine.POCH_SaldoDisponible__c);
-
                 }else{
                     var ventaMostrador = component.get("v.ventasMostrador");
                     ventaMostrador.Credito_disponible__c = 0;
                     component.set("v.ventasMostrador", ventaMostrador);
-                    // component.set("v.creditLine", "0");
                 }
             } else {
                 console.log("--- Algo salio mal ---");
@@ -436,8 +336,6 @@
                     var ventasMostrador = component.get("v.ventasMostrador");
                     ventasMostrador.Condicion_de_Pago__c = conditionP;
                     component.set("v.ventasMostrador", ventaMostrador);
-
-                    // component.set("v.conditionPago", conditionP);
                 }
             } else {
                 console.log("--- Algo salio mal ---");
@@ -494,9 +392,7 @@
                 }
                 if(StrnNameField == 'Uso_de_CFDI__c'){
                     component.set("v.listCFDI", ControllerFieldOneLevel);
-                    
                 }
-                
             }
             component.set("v.showSpinner", false);
         });
@@ -509,11 +405,8 @@
         var regCabecera = component.get("v.ventasMostrador");
         var action = component.get("c.getDescription");
         var listApiField = new Array();
-        // if (isNewRecord){
-            listApiField.push(regCabecera.CurrencyIsoCode);     
-        // } else {
-        //     listApiField.push(component.get("v.currency"));    
-        // }
+        listApiField.push(regCabecera.CurrencyIsoCode);     
+        
         listApiField.push(component.get("v.currency"));
         action.setParams({
             objectType: 'Ventas_Mostrador__c',
@@ -526,17 +419,8 @@
                 let labelPicklist = response.getReturnValue();
                 if(labelPicklist !== null && labelPicklist !== undefined && labelPicklist.length > 0) {
                     for (let index = 0; index < labelPicklist.length; index++) {
-                        // if (isNewRecord){
-                            regCabecera.CurrencyIsoCode = labelPicklist[index];
-                            component.set("v.ventasMostrador", regCabecera);       
-                        // } else {
-                        //     // var ventaMostrador = component.get("v.ventasMostrador");
-                        //     regCabecera.CurrencyIsoCode = labelPicklist[index];
-                        //     component.set("v.ventasMostrador", regCabecera);
-
-                        //     // component.set("v.currency", labelPicklist[index]);  
-                        // }
-                        
+                        regCabecera.CurrencyIsoCode = labelPicklist[index];
+                        component.set("v.ventasMostrador", regCabecera);       
                     }
                 }
             } else {
@@ -564,104 +448,13 @@
                 sumatoriaIVA = sumatoriaIVA + parseFloat(detalleVentaMostrador[indexVar].IVA__c);              
             }
         }
-        /*if(isNaN(sumatoriaDescuento) || isNaN(sumatoriaDescuento) || isNaN(sumatoriaIVA)) {
-            ventaMostrador.Descuento__c = 0;
-            ventaMostrador.Valor_Neto__c = 0;
-            ventaMostrador.Subtotal__c = 0;
-            ventaMostrador.IVA__c = 0;
-            ventaMostrador.Precio_total__c = 0;
-        }
-        else {*/
-            ventaMostrador.Descuento__c = sumatoriaDescuento;
-            ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
-            ventaMostrador.Subtotal__c = sumatoriaValorNeto - sumatoriaDescuento;
-            ventaMostrador.IVA__c = sumatoriaIVA;
-            ventaMostrador.Precio_total__c = ventaMostrador.Subtotal__c + ventaMostrador.IVA__c;
-            ventaMostrador.Precio_total__c = Math.round(ventaMostrador.Precio_total__c * 100) / 100;
-            component.set("v.ventasMostrador", ventaMostrador);
-        //}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        /*var currencyAux = "";
-        action2.setParams({
-            objectType: 'Ventas_Mostrador__c',
-            selectedField: 'CurrencyIsoCode',
-            apiLabel: ventaMostrador.CurrencyIsoCode
-        });
-        action2.setCallback(this, function(response) {
-            if (response.getState() == "SUCCESS") {
-                currencyAux =  response.getReturnValue();
-                action.setParams({
-                });
-                action.setCallback(this, function (response) {
-                    var state = response.getState();
-                    if (state === "SUCCESS") {
-                        let listRates = response.getReturnValue();
-                        if(listRates !== null && listRates !== undefined && listRates.length > 0) {
-                            
-                            for (var indexVar = 0; indexVar < detalleVentaMostrador.length; indexVar++) {
-                                sumatoriaDescuento = sumatoriaDescuento + detalleVentaMostrador[indexVar].Descuento_Monto__c;
-                                if (detalleVentaMostrador[indexVar].CurrencyIsoCode == currencyAux){
-                                    sumatoriaValorNeto = sumatoriaValorNeto + detalleVentaMostrador[indexVar].Valor_neto__c;
-                                    if (exento == false){
-                                        sumatoriaIVA = sumatoriaIVA + detalleVentaMostrador[indexVar].IVA__c;              
-                                    }
-                                    
-                                }else{
-                                    for (var i = 0; i < listRates.length; i++) {
-                                        var temp = listRates[i].substr(0,3);
-                                        var temp2 = listRates[i].substr(3);
-                                        var temp3 = detalleVentaMostrador[indexVar].CurrencyIsoCode;
-                                        //if (listRates[i].substr(0,3) == detalleVentaMostrador[indexVar].CurrencyIsoCode){
-                                        if (listRates[i].substr(0,3) == currencyAux){
-                                            sumatoriaValorNeto = sumatoriaValorNeto + (detalleVentaMostrador[indexVar].Valor_neto__c * listRates[i].substr(3));
-                                            if (exento == false){
-                                                sumatoriaIVA = sumatoriaIVA + (detalleVentaMostrador[indexVar].IVA__c / listRates[i].substr(3));              
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if(isNaN(sumatoriaDescuento) || isNaN(sumatoriaDescuento) || isNaN(sumatoriaIVA)) {
-                                ventaMostrador.Descuento__c = 0;
-                                ventaMostrador.Valor_Neto__c = 0;
-                                ventaMostrador.Subtotal__c = 0;
-                                ventaMostrador.IVA__c = 0;
-                                ventaMostrador.Precio_total__c = 0;
-                            }
-                            else {
-                                ventaMostrador.Descuento__c = sumatoriaDescuento;
-                                ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
-                                ventaMostrador.Subtotal__c = sumatoriaValorNeto - sumatoriaDescuento;
-                                ventaMostrador.IVA__c = sumatoriaIVA;
-                                ventaMostrador.Precio_total__c = ventaMostrador.Subtotal__c + ventaMostrador.IVA__c;
-                            }
-
-                            component.set("v.ventasMostrador", ventaMostrador);
-                        }
-                    } else {
-                        console.log("--- Algo salio mal ---");
-                    }
-                });
-                $A.enqueueAction(action);
-            }
-        });
-        $A.enqueueAction(action2);*/
-        
+        ventaMostrador.Descuento__c = sumatoriaDescuento;
+        ventaMostrador.Valor_Neto__c = sumatoriaValorNeto;
+        ventaMostrador.Subtotal__c = sumatoriaValorNeto - sumatoriaDescuento;
+        ventaMostrador.IVA__c = sumatoriaIVA;
+        ventaMostrador.Precio_total__c = ventaMostrador.Subtotal__c + ventaMostrador.IVA__c;
+        ventaMostrador.Precio_total__c = Math.round(ventaMostrador.Precio_total__c * 100) / 100;
+        component.set("v.ventasMostrador", ventaMostrador);
     },
 
     getApiName: function(component,StrObject,StrnNameField, label) {
@@ -691,12 +484,8 @@
         var msj = '';
         var lst = '<ul> Error :';
         var noNewRecord = component.get("v.blnRecordExisteShowDetail");
-        //if (noNewRecord){
-            var idAccount = component.get("v.ventasMostrador.Cliente__c")
-            //var idAccount = aux.Cliente__c;
-        //}else {
-        //    var idAccount = component.get("v.strIdAccount");
-        //}
+        var idAccount = component.get("v.ventasMostrador.Cliente__c")
+        
         action.setParams({
             idAccount: idAccount,
             moneda: StrnNameField,
@@ -710,12 +499,8 @@
                 if(StoreResponse == false){
                     msj +=' Moneda no permitida'
                     var errores =  msj;
-                    //component.set("v.blnErrores", true);  
-                    //component.set("v.strErrores", errores);
-                    //component.set('v.blnShowButtons',true);
                     this.showToast('Error', 'Error!', msj);
                 }
-                
             }
         });
         $A.enqueueAction(action);
@@ -770,14 +555,12 @@
             component.set("v.showSpinner", true);
             if (response.getState() == "SUCCESS") {
                 if (response.getReturnValue() == true){
-                    this.showToast('success', 'Guardado!', 'Se ha guardado con éxito!')
-                    //$A.get('e.force:refreshView').fire();
+                    this.showToast('success', 'Guardado!', 'Se ha guardado con éxito!');
                 }
-                console.log(response);
-                console.log(response.getState);
+                // console.log(response);
+                // console.log(response.getState);
                 component.set("v.showSpinner", false);
                 this.closeFocusedTab(component, event);
-                //$A.get('e.force:refreshView').fire();
             
             } else {
                 this.showToast('Error', 'Error!', 'Ocurrio un error al intentar guardar');
@@ -788,7 +571,7 @@
         $A.enqueueAction(action);
 
         var ventaMostrador =  component.get("v.ventasMostrador");
-        console.log('ventaMostrador', JSON.stringify(ventaMostrador));
+        // console.log('ventaMostrador', JSON.stringify(ventaMostrador));
     },
 
     updateVentasMostrador: function (component, event, isSendSap) {
@@ -806,8 +589,8 @@
                     this.showToast('success', 'Guardado!', 'Se ha guardado con éxito!')
                     $A.get('e.force:refreshView').fire();
                 }
-                console.log(response);
-                console.log(response.getState);
+                // console.log(response);
+                // console.log(response.getState);
             
             } else {
                 this.showToast('Error', 'Error!', 'Ocurrio un error al intentar guardar');
@@ -818,7 +601,7 @@
         $A.enqueueAction(action);
 
         var ventaMostrador =  component.get("v.ventasMostrador");
-        console.log('ventaMostrador', JSON.stringify(ventaMostrador));
+        // console.log('ventaMostrador', JSON.stringify(ventaMostrador));
     },
 
     showToast : function(tipomsj,titlemsj,Mensaje) {

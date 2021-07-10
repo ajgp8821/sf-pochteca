@@ -42,13 +42,11 @@ public class POCH_VentaMostrador_cls {
                         OrganizacionVentas__c
                     FROM Ventas_Mostrador__c 
                     WHERE id =: idCabeceraVentaMostrador];
-        system.debug(cabecera);
         cabecera.Uso_de_CFDI__c = getDescriptionString('Ventas_Mostrador__c', 'Uso_de_CFDI__c', cabecera.Uso_de_CFDI__c);
         cabecera.Metodo_de_Pago__c = getDescriptionString('Ventas_Mostrador__c', 'Metodo_de_Pago__c', cabecera.Metodo_de_Pago__c);
         cabecera.Metodo_de_Pago2__c = getDescriptionString('Ventas_Mostrador__c', 'Metodo_de_Pago2__c', cabecera.Metodo_de_Pago2__c);
         cabecera.Metodo_de_Pago3__c = getDescriptionString('Ventas_Mostrador__c', 'Metodo_de_Pago3__c', cabecera.Metodo_de_Pago3__c);
         cabecera.Via_de_pago__c = getDescriptionString('Ventas_Mostrador__c', 'Via_de_pago__c', cabecera.Via_de_pago__c);
-        system.debug(cabecera);
         return cabecera; 
     }
     
@@ -91,29 +89,7 @@ public class POCH_VentaMostrador_cls {
     @AuraEnabled
     public static Ventas_Mostrador__c getDataInv(String idInv) {
         return [SELECT Cliente__c,POCH_Sucursal__c,POCH_Sucursal__r.Name FROM Ventas_Mostrador__c WHERE Id =: idInv];
-    }   
-
-    /*
-    @Description:Obtiene permisos de usuario actual
-    */
-    @AuraEnabled
-    public static Boolean getAutorizacion(String idSuc) {
-        if(String.isNotBlank(idSuc)) {
-            String orgVts = [SELECT POCH_OrganizacionVentas__c FROM POCH_Sucursal__c WHERE Id =: idSuc OR Name =: idSuc LIMIT 1].POCH_OrganizacionVentas__c;            
-            //User usuario  = [SELECT Profile.Name,POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId() LIMIT 1];
-            User usuario  = [SELECT Profile.Name,POCH_OrganizacionesVentas__c FROM User WHERE Id = '0052i000003KL7YAAW' LIMIT 1];
-            
-            List<String> lSuc = usuario.POCH_OrganizacionesVentas__c.split(';');
-            Set<String>  setSuc = new Set<String>();
-            for(String suc : lSuc)
-                setSuc.add(suc);
-            
-            
-            if(!setSuc.contains(orgVts) && !usuario.Profile.Name.containsIgnoreCase('admin'))            
-                return true;
-        }        
-        return false;
-    } 
+    }
     
     // Metodo para Obtener los stocks y mostarlos en el componente
     @AuraEnabled
@@ -150,7 +126,6 @@ public class POCH_VentaMostrador_cls {
     @AuraEnabled
     public static Poch_Sucursal__c getSucursal(String idAccount) {
         User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId()];
-        //User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id = '0052i000003KL7YAAW'];
         POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
                                                     Id, 
                                                     Poch_Sucursal__c,
@@ -158,7 +133,6 @@ public class POCH_VentaMostrador_cls {
                                                     Poch_Sucursal__r.POCH_OrganizacionVentas__c
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                //AND POCH_IdOrgVenta__c = '0029'];
                                                 AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
         Poch_Sucursal__c organizacionVentas = [SELECT id, POCH_OrganizacionVentas__c, POCH_OficinaVentas__c FROM Poch_Sucursal__c WHERE id =: sucursalAmp.Poch_Sucursal__c];
         return organizacionVentas;
@@ -187,14 +161,12 @@ public class POCH_VentaMostrador_cls {
     @AuraEnabled
     public static POCH_InformacionCredito__c getCreditLine(String idAccount) {
         User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId()];
-        //User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id = '0052i000003KL7YAAW'];
         POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
                                                     Id, 
                                                     Poch_Sucursal__c,
                                                     POCH_AreaControlCreditos__c 
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                //AND POCH_IdOrgVenta__c = '0029'];
                                                 AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
 
         POCH_InformacionCredito__c creditLine = [SELECT 
@@ -213,13 +185,11 @@ public class POCH_VentaMostrador_cls {
     public static String getConditionPago(String idAccount) {
         String conditionPago = '';
         User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId()];
-        //User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id = '0052i000003KL7YAAW'];
         POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
                                                     Id, 
                                                     Condici_n_de_Pago__c
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
-                                                //AND POCH_IdOrgVenta__c = '0029'];
                                                 AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
 
         List<String> listDescription = new List<String>();
@@ -227,12 +197,11 @@ public class POCH_VentaMostrador_cls {
         Schema.DescribeSObjectResult res = convertToObj.getDescribe();
         Schema.DescribeFieldResult fieldResult = res.fields.getMap().get('Condici_n_de_Pago__c').getDescribe();
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
-            for(Schema.PicklistEntry pickListVal : ple) {
-                if (sucursalAmp.Condici_n_de_Pago__c == pickListVal.getValue()){
-                    conditionPago = pickListVal.getLabel();
-                }
-                //pickListValuesList.add(pickListVal.getLabel());
-            }   
+        for(Schema.PicklistEntry pickListVal : ple) {
+            if (sucursalAmp.Condici_n_de_Pago__c == pickListVal.getValue()){
+                conditionPago = pickListVal.getLabel();
+            }
+        }   
         return conditionPago;
     }
 
@@ -251,7 +220,7 @@ public class POCH_VentaMostrador_cls {
                 description = pickListVal.getValue();
             } 
         }
-            
+        
         return description;
     }
     
@@ -270,10 +239,8 @@ public class POCH_VentaMostrador_cls {
                 if (apiField == pickListVal.getValue()){
                     listDescription.add(pickListVal.getLabel());
                 }
-                //pickListValuesList.add(pickListVal.getLabel());
             }   
         }
-            
         return listDescription;
     }
 
@@ -283,20 +250,15 @@ public class POCH_VentaMostrador_cls {
     @AuraEnabled        
     public static String getDescriptionString(String objectType, String selectedField, String apiField) {
         String description = '';
-        //List<String> listDescription = new List<String>();
         Schema.SObjectType convertToObj = Schema.getGlobalDescribe().get(objectType);
         Schema.DescribeSObjectResult res = convertToObj.getDescribe();
         Schema.DescribeFieldResult fieldResult = res.fields.getMap().get(selectedField).getDescribe();
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
-        //for (String apiField : listApiField) {
-            for(Schema.PicklistEntry pickListVal : ple) {
-                if (apiField == pickListVal.getValue()){
-                    description = pickListVal.getLabel();
-                }
-                //pickListValuesList.add(pickListVal.getLabel());
-            }   
-        //}
-            
+        for(Schema.PicklistEntry pickListVal : ple) {
+            if (apiField == pickListVal.getValue()){
+                description = pickListVal.getLabel();
+            }
+        }
         return description;
     }
 
@@ -310,14 +272,12 @@ public class POCH_VentaMostrador_cls {
         }
         Boolean currencyCorrect = false;
         User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id =: UserInfo.getUserId()];
-        //User usuario  = [SELECT POCH_OrganizacionesVentas__c FROM User WHERE Id = '0052i000003KL7YAAW'];
         POCH_SucursalAmpliada__c sucursalAmp = [SELECT 
                                                     Id, 
                                                     Poch_Sucursal__c 
                                                 FROM POCH_SucursalAmpliada__c 
                                                 WHERE POCH_Cliente__c =: idAccount
                                                 AND POCH_IdOrgVenta__c =: usuario.POCH_OrganizacionesVentas__c];
-                                                //AND POCH_IdOrgVenta__c = '0029'];
         POCH_Sucursal__c sucursal = [SELECT Id, CurrencyIsoCode FROM POCH_Sucursal__c WHERE Id =: sucursalAmp.Poch_Sucursal__c];
         if (moneda == sucursal.CurrencyIsoCode){
             currencyCorrect = true;
@@ -340,8 +300,7 @@ public class POCH_VentaMostrador_cls {
     @AuraEnabled
     public static Boolean saveVentasMostrador(Ventas_Mostrador__c ventasMostrador, Venta_Mostrador_Detalle__c[] ventasMostradorDetalle, Boolean isSendSap) {
         Boolean saveDetails = true;
-        // ventasMostrador.Status = 'On Hold';
-        // insert(ventasMostrador);
+        
         ventasMostrador.Status__c = 'Alta';
         if (!string.isBlank(ventasMostrador.Metodo_de_Pago__c)){
             ventasMostrador.Metodo_de_Pago__c = getApiName('Ventas_Mostrador__c', 'Metodo_de_Pago__c', ventasMostrador.Metodo_de_Pago__c);
@@ -360,19 +319,14 @@ public class POCH_VentaMostrador_cls {
             ventasMostrador.Enviado_SAP__c = true;
             ventasMostrador.Status__c = 'Liberado a SAP';
         }
-        //System.debug(JSON.serializePretty(ventasMostrador));
-        //System.debug(JSON.serializePretty(ventasMostradorDetalle));
         Database.SaveResult ventasM = Database.insert(ventasMostrador, false);
-        System.debug('print respuesta insert Cabecera : ' + ventasM);
 
         if (ventasMostradorDetalle.size() > 0){
             for (Venta_Mostrador_Detalle__c detalle : ventasMostradorDetalle) {
-                System.debug('print centro--> : ' + detalle.POCH_Centro__c);
                 detalle.Almacen__c = getApiName('Venta_Mostrador_Detalle__c', 'Almacen__c', detalle.Almacen__c);
                 detalle.POCH_Centro__c = getApiName('Venta_Mostrador_Detalle__c', 'POCH_Centro__c', detalle.POCH_Centro__c);
                 detalle.UnidadMedida__c = getApiName('Venta_Mostrador_Detalle__c', 'UnidadMedida__c', detalle.UnidadMedida__c);
                 detalle.Cte_Consigna__c = 0;
-                System.debug('print centro salida --> : ' + detalle.POCH_Centro__c);
             }
             saveDetails = saveVentasMostradorDetalle(ventasM.getId(), ventasMostradorDetalle);
             
@@ -380,8 +334,6 @@ public class POCH_VentaMostrador_cls {
                 delete(ventasMostrador);
             }
         }
-        // System.debug('print respuesta insert detalle : ' + saveDetails);
-        // System.debug('print ventasM.isSuccess() : ' + ventasM.isSuccess() + ' saveDetails -> '+ saveDetails);
         if (ventasM.isSuccess() && saveDetails == true) {
             return true;
         }
@@ -394,33 +346,9 @@ public class POCH_VentaMostrador_cls {
     public static Boolean saveVentasMostradorDetalle(Id idVentasMostrador, List<Venta_Mostrador_Detalle__c> ventasMostradorDetalle) {
         
         for (Venta_Mostrador_Detalle__c detail: ventasMostradorDetalle) {
-            System.debug('print2 Material__c: ' + detail.Material__c);
-            System.debug('print2 POCH_Cantidad__c: ' + detail.POCH_Cantidad__c);
-            System.debug('print2 UnidadMedida__c: ' + detail.UnidadMedida__c);
-            System.debug('print2 Precio__c: ' + detail.Precio__c);
-            System.debug('print2 CurrencyIsoCode: ' + detail.CurrencyIsoCode);
-            System.debug('print2 POCH_Centro__c: ' + detail.POCH_Centro__c);
-            System.debug('print2 Almacen__c: ' + detail.Almacen__c);
-            System.debug('print2 Descto__c: ' + detail.Descto__c);
-            System.debug('print2 Valor_neto__c: ' + detail.Valor_neto__c);
-            System.debug('print2 Stock__c: ' + detail.Stock__c);
-            System.debug('print2 Stock_Consignacion__c: ' + detail.Stock_Consignacion__c);
-            System.debug('print2 Cte_Consigna__c: ' + detail.Stock_Consignacion__c);
-            System.debug('print2 Descuento_Monto__c: ' + detail.Descuento_Monto__c);
-            System.debug('print2 IVA__c: ' + detail.IVA__c);
-            System.debug('print2 Oficina_de_Venta__c: ' + detail.Oficina_de_Venta__c);
-            System.debug('print2 Product__c: ' + detail.Product__c);
-            System.debug('print2 Sucursal__c: ' + detail.Sucursal__c);
             detail.Ventas_Mostrador__c = idVentasMostrador;
         }
-        // insert(ventasMostradorDetalle);
-        System.debug(JSON.serializePretty(ventasMostradorDetalle));
-        
-        System.debug('print  idPadre andtes -> : ' +idVentasMostrador);
-        
-        System.debug('print  idPadre -> : ' + ventasMostradorDetalle[0].Ventas_Mostrador__c);
         Database.SaveResult[] srList = Database.insert(ventasMostradorDetalle, false);
-        System.debug('print result' + srList[0].isSuccess());
 
         if (srList[0].isSuccess()) {
             return true;
@@ -451,29 +379,22 @@ public class POCH_VentaMostrador_cls {
             ventasMostrador.Enviado_SAP__c = true;
             ventasMostrador.Status__c = 'Liberado a SAP';
         }
-
-
         // Create a savepoint before update 
         Savepoint spVentasM = Database.setSavepoint();
         Database.SaveResult ventasM = Database.update(ventasMostrador, false);
 
         if (ventasMostradorDetalle.size() > 0){
             for (Venta_Mostrador_Detalle__c detalle : ventasMostradorDetalle) {
-                System.debug('print centro--> : ' + detalle.POCH_Centro__c);
                 detalle.Almacen__c = getApiName('Venta_Mostrador_Detalle__c', 'Almacen__c', detalle.Almacen__c);
                 detalle.POCH_Centro__c = getApiName('Venta_Mostrador_Detalle__c', 'POCH_Centro__c', detalle.POCH_Centro__c);
                 detalle.UnidadMedida__c = getApiName('Venta_Mostrador_Detalle__c', 'UnidadMedida__c', detalle.UnidadMedida__c);
                 detalle.Cte_Consigna__c = 0;
-                System.debug('print centro salida --> : ' + detalle.POCH_Centro__c);
             }
             updateDetails = updateVentasMostradorDetalle(ventasM.getId(), ventasMostradorDetalle);
-            System.debug('updateDetails ----> ' + updateDetails);
             if (updateDetails == false) {
                 Database.rollback(spVentasM);
             }
         }
-
-        // updateVentasMostradorDetalle(ventasMostrador.Id, ventasMostradorDetalle);
         if (ventasM.isSuccess() && updateDetails == true) {
             return true;
         }
@@ -495,9 +416,7 @@ public class POCH_VentaMostrador_cls {
         // Create a savepoint before update 
         Savepoint spVentasM = Database.setSavepoint();
 
-        System.debug('ventasMostrador ' + JSON.serializePretty(ventasMostrador));
         Database.SaveResult ventasM = Database.update(ventasMostradorNew, false);
-        System.debug('ventasM.isSuccess() ' + ventasM.isSuccess());
         
         if (ventasM.isSuccess()) {
             return true;
@@ -513,31 +432,16 @@ public class POCH_VentaMostrador_cls {
         
         // Create a savepoint before delete 
         Savepoint spVentasMD = Database.setSavepoint();
-        // System.debug('idVentasMostrador = ' + idVentasMostrador);
         List<Venta_Mostrador_Detalle__c> vmDetailToDelete = [Select id from Venta_Mostrador_Detalle__c where Ventas_Mostrador__c  =: idVentasMostrador];
         Database.DeleteResult[] deleteVentasM = Database.delete(vmDetailToDelete);
-        // delete
-        // delete [SELECT Id FROM Venta_Mostrador_Detalle__c where Ventas_Mostrador__c.Id =: idVentasMostrador];
 
         for (Venta_Mostrador_Detalle__c detail: ventasMostradorDetalle) {
-            System.debug('print2 ' + JSON.serializePretty(detail));
             detail.Ventas_Mostrador__c = idVentasMostrador;
             detail.Id = null;
         }
-        // insert(ventasMostradorDetalle);
-        System.debug(JSON.serializePretty(ventasMostradorDetalle));
         
-        System.debug('print  idPadre andtes -> : ' +idVentasMostrador);
-        
-        System.debug('print  idPadre -> : ' + ventasMostradorDetalle[0].Ventas_Mostrador__c);
-        
-        
-        // saveVentasMostradorDetalle(idVentasMostrador, deploymentDetails);
-
         if (deleteVentasM[0].isSuccess()) {
             Database.SaveResult[] srList = Database.insert(ventasMostradorDetalle);
-            System.debug('print result ' + srList[0].isSuccess());
-            // Boolean saveVMD = saveVentasMostradorDetalle(idVentasMostrador, deploymentDetails);
             if (srList[0].isSuccess() == true){
                 return true;
             }
@@ -565,7 +469,6 @@ public class POCH_VentaMostrador_cls {
                                                                 POCH_Producto__c
                                                             FROM POCH_UnidadMedidaProducto__c 
                                                             WHERE POCH_Producto__c =: idProductoAux]){
-                System.debug(JSON.serializePretty(objIterateMedida));
                 listUnidadesMedidas.add(objIterateMedida.POCH_Producto__c + objIterateMedida.POCH_UMA__c);
             }
             for(Product2  objIterateProduct:[SELECT 
@@ -584,11 +487,8 @@ public class POCH_VentaMostrador_cls {
                 if (objIterateProduct.QuantityUnitOfMeasure != null){
                     listUnidadesMedidas.add(objIterateProduct.Id + objIterateProduct.QuantityUnitOfMeasure);
                 }                        
-            } 
-            //mapUnidadesMedidas.put (idProductoAux, listUnidadesMedidas);
-            //listUnidadesMedidas.clear(); //add values into the map
+            }
         }
-        
         return listUnidadesMedidas;
     }
 
@@ -619,7 +519,6 @@ public class POCH_VentaMostrador_cls {
     @AuraEnabled        
     public static Double getIVA(Id product, Id sucursal, Double valorNeto) {
         Double iva = 0.0;
-        System.debug('print  IVA product: ' + product + ' sucursal -> '+ sucursal + ' valorNeto -> ' + valorNeto);
         for(POCH_ProductoSucursal__c sucursalProducto :[SELECT 
                                                             Id,
                                                             IMPUESTO_PRODUCTO__c,
@@ -690,7 +589,6 @@ public class POCH_VentaMostrador_cls {
     @AuraEnabled        
     public static String getPrice(Id product, Id sucursal, Double cantidad, Id account, String unidadMedida, Boolean notIsApiField, 
                                     String objectType, String selectedField, String organizacionVenta) {
-        System.debug('print cantidad: ' + cantidad);
         Double precio = 0.0;
         Double precioContractPrice = 0.0;
         String unidadMedidaEscala = '';
@@ -800,7 +698,6 @@ public class POCH_VentaMostrador_cls {
                     Double auxFactores = factorConversionACantidad / factorConversionB;
                     cantidadConvertida = cantidad / auxFactores;
                 }
-                
             }
             for (SBQQ__DiscountSchedule__c ds : [SELECT
                                                     Id, 
@@ -865,7 +762,6 @@ public class POCH_VentaMostrador_cls {
                 }
         }
         respuesta = moneda + errorCantidadMinima + String.valueOf(precio);
-        //return precio;
         return respuesta;
     }
 
@@ -886,10 +782,7 @@ public class POCH_VentaMostrador_cls {
         if (notIsApiField){
             unidadMedida = getApiName(objectType, selectedField, unidadMedida);
             centro = getApiName(objectType, selectedField2, centro);
-            //moneda = getApiName(objectType, selectedField3, moneda);
         }
-        System.debug('print centro: ' + centro);
-        System.debug('print moneda: ' + moneda);
         
         for (Product2 pr : [SELECT Id, QuantityUnitOfMeasure FROM Product2 WHERE Id =: product]){
             for (POCH_UnidadMedidaProducto__c umP : [SELECT 
@@ -898,18 +791,14 @@ public class POCH_VentaMostrador_cls {
                                                 FROM POCH_UnidadMedidaProducto__c 
                                                 WHERE POCH_Producto__c =: product
                                                 AND POCH_UMA__c =: unidadMedida]){
-                System.debug('print POCH_UnidadMedidaProducto__c: ' + umP.POCH_FactorConversion__c );
                 factorConversionA = umP.POCH_FactorConversion__c;
             }
-            System.debug('print porcentajeDescuento: ' + porcentajeDescuento );
-            System.debug('print precio: ' + precio );
             
             if (porcentajeDescuento > 0){// Verificar que no llegue null
                 descuentoAux = (precio * porcentajeDescuento) / 100;
             }
             precio = precio - descuentoAux;
             precioAuxiliar = precio / factorConversionA;
-            System.debug('print precioAuxiliar: ' + precioAuxiliar + ' => precio ' + precio + ' * factorConversionA -> ' +factorConversionA);
             // buscamos valoracionProducto
             for (POCH_ValoracionProducto__c vp : [SELECT 
                                                     Id,
@@ -918,27 +807,20 @@ public class POCH_VentaMostrador_cls {
                                                 FROM POCH_ValoracionProducto__c 
                                                 WHERE POCH_Producto__c =: product 
                                                 AND POCH_AreaValoracion__c =: centro]){
-                System.debug('print (moneda ' + moneda + ' = ' + vp.CurrencyIsoCode + ' vp.POCH_CostoFactInterna__c -> ' + vp.POCH_CostoFactInterna__c);
                 if (moneda == vp.CurrencyIsoCode){
                     margen = ((precioAuxiliar - vp.POCH_CostoFactInterna__c) / precioAuxiliar) * 100;
                 }else{
                     List<String> listRates = getRates();
                     for (String rate : listRates) {
-                        //listRates[i].substr(0,3) ISOCODE
-                        //listRates[i].substr(3) RATE
-                        System.debug('print rate ' + rate.substring(0,3));
                         if (moneda == rate.substring(0,3)){
                             tipoCambio = decimal.valueOf(rate.substring(3));     
                         } 
                         if (vp.CurrencyIsoCode == rate.substring(0,3)){
-                            tipoCambio2 = decimal.valueOf(rate.substring(3));
-                            //precioAuxiliar = (precioAuxiliar / rate.substr(3) / );   
+                            tipoCambio2 = decimal.valueOf(rate.substring(3)); 
                         }           
                     }
-                    System.debug('print precioAuxiliar ' + precioAuxiliar); 
                     precioAuxiliar = (precioAuxiliar / tipoCambio) / tipoCambio2 ; 
                     margen = ((precioAuxiliar - vp.POCH_CostoFactInterna__c) / precioAuxiliar) * 100;
-                    System.debug('print margen : ' + margen );
                 }                                        
             }
         }

@@ -27,7 +27,6 @@
           // set searchResult list with return value from server.
         }
       });
-      // enqueue the Action
       $A.enqueueAction(action2);
     }
     else {
@@ -55,7 +54,6 @@
           // set searchResult list with return value from server.     
         }
       });
-      // enqueue the Action
       $A.enqueueAction(action);
     }
 	},

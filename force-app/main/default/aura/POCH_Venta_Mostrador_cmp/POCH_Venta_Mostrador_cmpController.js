@@ -15,9 +15,7 @@
             helper.showCabeceraVentaMostrador(component, event, helper);
             helper.getSucursal(component, event);
             helper.showDetailVentaMostrador(component, event, helper);
-            helper.requiereActualizacion(component, event, helper);
         }
-        // helper.createObjectData(component, event);
         
     },
 
@@ -140,7 +138,7 @@
         var emailRegex = /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
         //Se muestra un texto a modo de ejemplo, luego va a ser un icono
         if (emailRegex.test(email)) {
-            console.log('test');
+            // console.log('test');
         } else {
             helper.showToast('Warning', 'Atención!', 'formato de email no valido');
             errores = true;
@@ -148,9 +146,6 @@
         if (errores == false){
             helper.saveVentasMostrador(component, event, false); 
         }
-        
-        //button.set('v.disabled',true);
-        
     },
 
     update: function(component, event, helper) {
@@ -170,27 +165,20 @@
         var emailRegex = /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
         //Se muestra un texto a modo de ejemplo, luego va a ser un icono
         if (emailRegex.test(email)) {
-            console.log('test');
+            // console.log('test');
         } else {
             helper.showToast('Warning', 'Atención!', 'formato de email no valido');
             errores = true;
         }
         if (errores == false){
-            //helper.showToast('Warning', 'Atención!', 'Se manda a actualizar');
             helper.updateVentasMostrador(component, event, false); 
         }
-        
-        //button.set('v.disabled',true);
-        
     },
 
     // TODO
     cancel: function(component, event, helper) {
         
         helper.cancelVentasMostrador(component, event);
-        
-        //button.set('v.disabled',true);
-        
     },
 
     refresh: function(component, event, helper) {
@@ -200,16 +188,13 @@
     validarMoneda: function(component, event, helper) { 
         var StrnNameField = component.get("v.ventasMostrador.CurrencyIsoCode");
         if (StrnNameField != "Dólar de EE.UU." && StrnNameField != "U.S. Dollar") {
-            helper.validarCurrency(component, StrnNameField, true, 'Ventas_Mostrador__c', 'CurrencyIsoCode');
-            //helper.getApiName(component,'Ventas_Mostrador__c','CurrencyIsoCode', label);            
+            helper.validarCurrency(component, StrnNameField, true, 'Ventas_Mostrador__c', 'CurrencyIsoCode');       
         }          
     },
 
     calcularTotales: function(component, event, helper) {
         var blnShowPopupProd = event.getParam("testParam");
-        //var selectedProductFromEvent = event.getParam("recordByEvent");
         helper.calcularTotales(component, event, helper); 
     }
-
     
 })

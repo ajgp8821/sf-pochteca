@@ -86,7 +86,7 @@
         $A.enqueueAction(action);
     },*/
 
-    calcularTotales : function(component, event, helper) {
+    calcularTotales: function(component, event, helper) {
         var ventaDetalle = component.get("v.VentaInstance");
         ventaDetalle.Product__c = component.get("v.VentaInstance.Product__c");
         var temp = component.get("v.VentaInstance.POCH_Centro__c" );
@@ -106,6 +106,7 @@
             ventaDetalle.POCH_Cantidad__c = 0; 
         }
         if (ventaDetalle.Descto__c > 10 || ventaDetalle.Descto__c < 0){
+            component.set("v.VentaInstance.Descto__c", 0);
 			helper.showToast2('warning', '', 'Descuento Máximo 10%');
 		}
 		else {

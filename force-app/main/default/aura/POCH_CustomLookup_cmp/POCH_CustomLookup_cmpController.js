@@ -13,7 +13,6 @@
         }        
         var addressableContext = JSON.parse(window.atob(base64Context));
         alert('Click' + addressableContext.attributes.recordId);
-        // component.set("v.recordId", addressableContext.attributes.recordId);
     },
     onfocus : function(component,event,helper){
         $A.util.addClass(component.find("mySpinner"), "slds-show");

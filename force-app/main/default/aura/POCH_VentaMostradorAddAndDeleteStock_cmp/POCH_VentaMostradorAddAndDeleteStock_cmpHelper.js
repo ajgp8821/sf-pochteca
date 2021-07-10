@@ -35,10 +35,6 @@
                 for (var i = 0; i < StoreResponse.length; i++) {
                     listOneLevel.push(StoreResponse[i]);
                 }
-                //
-                /*if (listOneLevel != undefined && listOneLevel.length > 0) {
-                    ControllerFieldOneLevel.push('--');
-                }*/
                 
                 for (var i = 0; i < listOneLevel.length; i++) {
                     ControllerFieldOneLevel.push(listOneLevel[i]);
@@ -52,10 +48,6 @@
                 if(StrnNameField == 'Almacen__c'){
                     component.set("v.listAlmacen", ControllerFieldOneLevel);
                 }
-                // if(StrnNameField == 'CurrencyIsoCode'){
-                //     component.set("v.listMoneda", ControllerFieldOneLevel);
-                // }
-            
             }
         });
         $A.enqueueAction(action);
@@ -79,7 +71,6 @@
                     }else{
                         component.set("v.VentaInstance.Stock__c",stock);
                     }
-                    
                 }
             } else {
                 console.log("--- Algo salio mal ---");
@@ -135,7 +126,6 @@
                     if (selectedField == 'Almacen__c'){
                         component.set("v.listAlmacen", listValues);
                     }
-                    
                 }
             } else {
                 console.log("--- Algo salio mal ---");

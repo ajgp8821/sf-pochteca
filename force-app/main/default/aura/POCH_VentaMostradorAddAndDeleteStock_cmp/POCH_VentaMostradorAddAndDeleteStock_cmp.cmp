@@ -30,8 +30,6 @@
     <aura:handler name="init" value="this" action="{!c.doInit}"/>
     <aura:handler name="AddProductLookupDetail2" event="c:POCH_AddProductVentaMostrador_evt" action="{!c.addNewProductSelected}"/>
 
-    <!-- Register 2 Lightning Event for handle add or Delete rows on Parent Component  --> 
-    <!-- <aura:registerEvent name="DeleteRowEvt" type="c:POCH_DeleteProductsSheet_evt"/>  -->
     <aura:registerEvent name="DeleteRowEvt" type="c:POCH_DeleteProductVentaMostrador_evt"/> 
     <aura:registerEvent name="calcularTotales" type="c:POCH_Venta_Mostrador_evt"/>
     <aura:registerEvent name="recalcularTotales" type="c:POCH_DeleteProductVentaMostrador_evt"/>
@@ -97,7 +95,6 @@
         </td>
         <td data-label="Centro">
             <div class="slds-truncate slds-text-align_center" title="Centro" style="width: 120px;">
-                <!-- <lightning:input type="text" name="UMP" value="{!v.VentaInstance.POCH_uma__c}" readonly="true" /> -->
                 <lightning:layoutItem size="12">
                     <lightning:select aura:id="requiredCentro"
                                         name="Centro"
@@ -112,7 +109,6 @@
         </td>
         <td data-label="Almacen">
             <div class="slds-truncate" title="Almacen" >
-                <!-- <ui:outputCurrency value="{!v.VentaInstance.POCH_EsPotencial__c}" format="$#,###.00" /> -->
                 <lightning:layoutItem size="12">
                     <lightning:select aura:id="requiredAlmacen"
                                         name="Almacen"

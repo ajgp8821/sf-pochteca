@@ -11,34 +11,20 @@
 		if (component.get("v.VentaInstance.Oficina_de_Venta__c") != undefined){
 			component.set("v.oficinaVentas", component.get("v.VentaInstance.Oficina_de_Venta__c"));
 		}
-		/*
-		
-		if (component.get("v.ventasMostrador.POCH_Sucursal__c") != undefined && component.get("v.ventasMostrador.POCH_Sucursal__c") != ""){
-			component.set("v.strIdSucursalAmp", component.get("v.ventasMostrador.POCH_Sucursal__c"));			
-		}
-		if (component.get("v.ventasMostrador.OrganizacionVentas__c") != undefined && component.get("v.ventasMostrador.OrganizacionVentas__c") != ""){
-			component.set("v.organizacionVentas", component.get("v.ventasMostrador.OrganizacionVentas__c"));			
-		}*/
 		helper.getPicklistValuesOneLevel(component,'Venta_Mostrador_Detalle__c','UnidadMedida__c', null);
 		helper.getDependentPicklistValues(component, 'Venta_Mostrador_Detalle__c', 'Oficina_de_Venta__c', 'POCH_Centro__c', component.get("v.oficinaVentas"), true);
 		component.set("v.listControllingValuesUnidaM" ,component.get("v.VentaInstance.UnidadMedida__c"));
 		component.set("v.listCentro" ,component.get("v.centroTemp"));
 		component.set("v.listAlmacen" ,component.get("v.almacenTemp"));
-		//component.set("v.listCentro" ,component.get("v.VentaInstance.POCH_Centro__c"));
 		if (ventasMostrador !== null && ventasMostrador !== undefined) {
 			component.set("{!v.strIdSucursalAmp}", ventasMostrador.POCH_Sucursal__c);
 			if (ventasMostrador.Status__c == 'Cancelado' || ventasMostrador.Enviado_SAP__c == true){
 				component.set("{!v.isStatusCancel}", true);
 			}
-			
-		}
+        }
 	},
-	
-	// removeRow : function(component, event, helper){
-	// 	helper.RemoveRecordToDetail(component, event, helper); 
-	// },
-
-	removeRow : function(component, event, helper) {
+    
+    removeRow : function(component, event, helper) {
 		component.getEvent("DeleteRowEvt").setParams(
 				{"indexVar" : component.get("v.rowIndex") }
 		).fire();
@@ -47,7 +33,7 @@
 		var test = " test";
 		recalcularTotalesEvent.setParams({testParam: test});
 		recalcularTotalesEvent.fire();
-},
+    },
 	
 	LookupProduct : function(component, event, helper){
 		component.set("v.blnShowProducts", true);	 
@@ -68,34 +54,21 @@
 			if(productsSelected[i].Product__c ==  strlastId){			
 				equalsvalues.push(i);		
 			}	
-		}  
-
-		/*if(equalsvalues.length > 1) {
-			component.set("v.blnShowProducts" , blnShowPopupProd);
-			helper.showToast(component, event, helper,'No se pueden agregar productos iguales');			
 		}
-		else {*/
-			
-			if(selectedProductFromEvent.Product2.ProductCode != '' && selectedProductFromEvent.Product2.ProductCode != null && selectedProductFromEvent.Product2.ProductCode != undefined ) {
-				component.set("v.VentaInstance.Material__c" , selectedProductFromEvent.Product2.ProductCode.replace(/^0+/, ''));    
-			}
-			if(selectedProductFromEvent.Product2.Name != '' && selectedProductFromEvent.Product2.Name != null && selectedProductFromEvent.Product2.Name != undefined) {
-				component.set("v.VentaInstance.Descripcion__c", selectedProductFromEvent.Product2.Name.replace(/^0+/, ''));
-			}
-			if(selectedProductFromEvent.POCH_UnidadMedida__c != '' && selectedProductFromEvent.POCH_UnidadMedida__c != null && selectedProductFromEvent.POCH_UnidadMedida__c != undefined) {
-				component.set("v.VentaInstance.UnidadMedida__c" , selectedProductFromEvent.POCH_UnidadMedida__c);
-			}
-			// selectedProductFromEvent.CurrencyIsoCode
-			/*if(selectedProductFromEvent.CurrencyIsoCode != '' && selectedProductFromEvent.CurrencyIsoCode != null && selectedProductFromEvent.CurrencyIsoCode != undefined) {
-				component.set("v.VentaInstance.CurrencyIsoCode" , selectedProductFromEvent.CurrencyIsoCode);
-			}*/
-			
-			component.set("v.blnShowProducts" , blnShowPopupProd);
-		
-		//}
+        
+        if(selectedProductFromEvent.Product2.ProductCode != '' && selectedProductFromEvent.Product2.ProductCode != null && selectedProductFromEvent.Product2.ProductCode != undefined ) {
+            component.set("v.VentaInstance.Material__c" , selectedProductFromEvent.Product2.ProductCode.replace(/^0+/, ''));    
+        }
+        if(selectedProductFromEvent.Product2.Name != '' && selectedProductFromEvent.Product2.Name != null && selectedProductFromEvent.Product2.Name != undefined) {
+            component.set("v.VentaInstance.Descripcion__c", selectedProductFromEvent.Product2.Name.replace(/^0+/, ''));
+        }
+        if(selectedProductFromEvent.POCH_UnidadMedida__c != '' && selectedProductFromEvent.POCH_UnidadMedida__c != null && selectedProductFromEvent.POCH_UnidadMedida__c != undefined) {
+            component.set("v.VentaInstance.UnidadMedida__c" , selectedProductFromEvent.POCH_UnidadMedida__c);
+        }
+        component.set("v.blnShowProducts" , blnShowPopupProd);
 	},
 
-	calcularTotales : function(component, event, helper) {
+	calcularTotales: function(component, event, helper) {
 		var ventaDetalle = component.get("v.VentaInstance");
         ventaDetalle.Product__c = component.get("v.VentaInstance.Product__c");
         var temp = component.get("v.VentaInstance.POCH_Centro__c" );
@@ -115,16 +88,14 @@
             ventaDetalle.POCH_Cantidad__c = 0; 
         }
 		if (ventaDetalle.Descto__c > 10 || ventaDetalle.Descto__c < 0){
+            component.set("v.VentaInstance.Descto__c", 0);
 			helper.showToast2('warning', '', 'Descuento Máximo 10%');
 		}else{
 			action.setParams({
-                //product: component.get("v.VentaInstance.POCH_Producto__c"),
                 product: ventaDetalle.Product__c,
                 sucursal: component.get("v.ventasMostrador.POCH_Sucursal__c"),
-                //sucursal: 'a1K4P00000Ldvr8UAB',
                 cantidad: parseFloat(ventaDetalle.POCH_Cantidad__c),
                 account: venta.Cliente__c,
-                //account: '0014P00002lB91DQAS',
                 unidadMedida: ventaDetalle.UnidadMedida__c,
                 notIsApiField: true,
                 objectType: 'Venta_Mostrador_Detalle__c',
@@ -172,8 +143,6 @@
                                             for (var i = 0; i < listRates.length; i++) {
                                                 var temp = listRates[i].substr(0,3);
                                                 var temp2 = listRates[i].substr(3);
-                                                //var temp3 = detalleVentaMostrador[indexVar].CurrencyIsoCode;
-                                                //if (listRates[i].substr(0,3) == detalleVentaMostrador[indexVar].CurrencyIsoCode){
                                                 if (listRates[i].substr(0,3) == component.get("v.VentaInstance.CurrencyIsoCode")){
                                                     ventaDetalle.Valor_neto__c = precio  / listRates[i].substr(3);
                                                     ventaDetalle.Valor_neto__c = ventaDetalle.Valor_neto__c * parseFloat(ventaDetalle.POCH_Cantidad__c);
@@ -192,7 +161,6 @@
 									action2.setParams({
                                         product: component.get("v.VentaInstance.Product__c"),
                                         sucursal: component.get("v.ventasMostrador.POCH_Sucursal__c"),
-                                        //sucursal: 'a1K4P00000Ldvr8UAB',
                                         valorNeto: ventaDetalle.Valor_neto__c - ventaDetalle.Descuento_Monto__c
                                     });
 									action2.setCallback(this, function (response) {
@@ -202,7 +170,6 @@
                                             ventaDetalle.IVA__c = ivaMonto;
                                             component.set("v.VentaInstance", ventaDetalle);
                                             action3.setParams({
-                                                //product: component.get("v.VentaInstance.POCH_Producto__c"),
                                                 product: ventaDetalle.Product__c,
                                                 unidadMedida: ventaDetalle.UnidadMedida__c,
                                                 notIsApiField: true,
@@ -220,7 +187,6 @@
                                                 if (state === "SUCCESS") {
                                                     let margen = response.getReturnValue();
                                                     ventaDetalle.Margen__c = margen;
-                                                    //component.set("v.VentaInstance.Margen__c");
                                                     component.set("v.VentaInstance", ventaDetalle);
                                                     var calcularTotalesEvent = component.getEvent("calcularTotales");
                                                     var test = " test";
@@ -250,7 +216,6 @@
 	},
 
 	buscarStock : function(component, event, helper) {
-        //alert(event.getParam('v.value'));
         var almacen = component.get("v.VentaInstance.Almacen__c");
         var centro = component.get("v.VentaInstance.POCH_Centro__c");
         var producto = component.get("v.VentaInstance.Product__c");

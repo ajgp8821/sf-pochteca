@@ -17,6 +17,5 @@
         window.addEventListener("DOMMouseScroll", function(e) {
             e.preventDefault();
         }, false);
-        
     }
 })

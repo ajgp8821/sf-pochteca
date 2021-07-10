@@ -20,11 +20,9 @@
     
     <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
         <label class="slds-form-element__label" for="lookup-348">{!v.label}</label>
-        <!--This part is for display search bar for lookup-->  
         <div class="slds-form-element__control">
             
             <div class="slds-input-has-icon slds-input-has-icon--right">
-                <!-- This markup is for when an record is selected -->
                 <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
                     <lightning:pill class="pillSize" label="{!v.selectedRecord.Name}" name="{!v.selectedRecord.Name}" onremove="{! c.clear }">
                         <aura:set attribute="media">

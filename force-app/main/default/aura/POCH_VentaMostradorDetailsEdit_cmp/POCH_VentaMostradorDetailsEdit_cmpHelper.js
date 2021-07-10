@@ -51,10 +51,6 @@
                 if(StrnNameField == 'POCH_Centro__c'){
                     component.set("v.listCentro", ControllerFieldOneLevel);
                 }
-                // if(StrnNameField == 'CurrencyIsoCode'){
-                //     component.set("v.listMoneda", ControllerFieldOneLevel);
-                // }
-            
             }
         });
         $A.enqueueAction(action);
@@ -72,17 +68,12 @@
             if (response.getState() == "SUCCESS") {
                 var StoreResponse =  response.getReturnValue();
                 var ventaMostrador =  component.get("v.ventasMostrador");
-                // if(StrnNameField == 'CurrencyIsoCode'){
-                //     this.validarCurrency(component, StoreResponse);
-                //     ventaMostrador.CurrencyIsoCode = StoreResponse
-                // }
                 if(StrnNameField == 'POCH_Centro__c'){
                     component.set("v.VentaInstance.POCH_Centro__c", StoreResponse);
                 }
                 if(StrnNameField == 'Almacen__c'){
                     component.set("v.VentaInstance.Almacen__c", StoreResponse);
                 }
-                // component.set("v.ventasMostrador", ventaMostrador)
             }
         });
         $A.enqueueAction(action);
@@ -132,7 +123,6 @@
                     if (selectedField == 'Almacen__c'){
                         component.set("v.listAlmacen", listValues);
                     }
-                    
                 }
             } else {
                 console.log("--- Algo salio mal ---");

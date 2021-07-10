@@ -1,10 +1,8 @@
 <aura:component controller="POCH_VentaMostrador_cls" implements="lightning:actionOverride,force:hasRecordId,lightning:isUrlAddressable,force:lightningQuickActionWithoutHeader" access="global" >    
     <aura:handler name="init" value="this" action="{!c.doInit}"/>
     <lightning:workspaceAPI aura:id="workspace"/>
-    <!--Events Handler-->    
-    <!-- <aura:handler name="DeleteRowEvt" event="c:POCH_DeleteProductsSheet_evt" action="{!c.removeDeletedRow}"/> -->
+    <!--Events Handler-->
     <aura:handler name="DeleteRowEvt" event="c:POCH_DeleteProductVentaMostrador_evt" action="{!c.removeDeletedRow}"/>
-    <!--<aura:handler name="AddRowEvt" event="c:POCH_AddProductsSheet_evt" action="{!c.addNewRow}"/>-->
     <aura:attribute name="ventasMostrador" type="SObject"/> 
     <aura:attribute name="ventasMostradorListTemp" type="SObject[]"/> 
     <aura:attribute name="ventasMostradorList" type="SObject[]"/> 
@@ -54,18 +52,6 @@
             </div>
         </div>
     </aura:renderIf>
-
-    <!-- <aura:if isTrue="{!v.showSpinner}">
-        <div class="slds-spinner_container">
-            <div role="status" class="slds-spinner slds-spinner_large">
-                <span class="slds-assistive-text">Loading</span>
-                <div class="slds-spinner__dot-a"></div>
-                <div class="slds-spinner__dot-b"></div>
-            </div>
-        </div>
-        <div style="width: 25%; margin-left: auto; margin-right: auto; z-index: 100; ">
-        </div>
-    </aura:if> -->
     <lightning:card variant="Narrow">
         <div class="slds-page-header">
             <div class="slds-page-header__row">
@@ -86,7 +72,6 @@
                                     <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate">
                                         {!(v.blnRecordExisteShowDetail ? v.simpleRecord.Name : 'Venta Mostrador')}
                                     </h1>
-                                    <!--$Label.c.POCH_InventorySheet -->
                                 </div>
                             </div>
                         </div>
@@ -136,7 +121,6 @@
                                         onclick="{!c.cancel}"
                                         label="Cancelar Venta"
                                         />
-                                        <!-- disabled="{!v.blnShowButtons}" -->
                         
                         <lightning:button
                                         variant="brand"
@@ -144,14 +128,12 @@
                                         onclick="{!c.update}"
                                         label="Actualizar"
                                         />
-                                        <!-- disabled="{!v.blnShowButtons}" -->
                         <lightning:button
                                         variant="brand"
                                         title="Procesar"
                                         label="Procesar"
                                         onclick="{!c.sendSap}"
                                         />
-                                        <!-- disabled="{!v.blnShowButtons}" -->
                     </aura:if>
                 </aura:if>
             </div>
@@ -174,7 +156,6 @@
                     <div class="slds-form-element"> 
                         <label class="slds-form-element__label" for="Subtotal"><Strong>Línea de crédito del cliente</Strong></label> 
                         <div class="slds-form-element__control">
-                            <!-- <input type="number" id="Credito_disponible__c" readonly="true" class="slds-input" value="{!v.ventasMostrador.Credito_disponible__c}" /> -->
                             <ui:outputNumber value="{!v.ventasMostrador.Credito_disponible__c}" format="#,###.00" class="myFontSizeLC" />
                         </div>
                     </div>
@@ -215,7 +196,6 @@
                         </div>
                     </div>
                 </lightning:layoutItem>
-                <!-- Select -->
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
                     <label class="slds-form-element__label" for="Subtotal"><strong>Vía de pago</strong></label>
                     <lightning:select aura:id="requiredInputMonedaComp" name="viaPago" 
@@ -231,22 +211,14 @@
                         <label class="slds-form-element__label" for="Valor_Neto__c"><strong>Valor Neto</strong></label>
                         <div class="slds-form-element__control">
                             <ui:outputNumber value="{!v.ventasMostrador.Valor_Neto__c}" format="#,###.00" class="myFontSize" />
-                            <!--<input type="number" id="Valor_Neto__c" readonly="true" class="slds-input" value="{!v.ventasMostrador.Valor_Neto__c}" />-->
                         </div>
                     </div>
                 </lightning:layoutItem>
             </lightning:layout>
             <lightning:layout multipleRows="true">
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
-                    <!--<div class="slds-form-element">-->
                         <label class="slds-form-element__label" for="email"><strong>Correo electrónico</strong></label>
-                        <!--<div class="slds-form-element__control">-->
-                            <ui:inputEmail aura:id="email" class="field" value="{!v.ventasMostrador.Email__c}" disabled="{!v.isStatusCancel}" />
-                                <!-- label="Correo electronico" /> -->
-                            <!--<input type="email" id="email" class="slds-input" value="{!v.ventasMostrador.Email__c}" disabled="{!v.isStatusCancel}"
-                                    onchange="{c.validarEmail}"/>-->
-                        <!--</div>-->
-                    <!--</div>-->
+                        <ui:inputEmail aura:id="email" class="field" value="{!v.ventasMostrador.Email__c}" disabled="{!v.isStatusCancel}" />
                 </lightning:layoutItem>
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
                     <label class="slds-form-element__label" for="Subtotal"><strong>Uso de CFDI</strong></label>
@@ -274,7 +246,6 @@
                 </lightning:layoutItem>
             </lightning:layout>
             <br />
-            <!-- <div class="myDiv">Métodos de Pago</div> -->
             <lightning:layout multipleRows="true" class="myArrow4">
                 <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" class="selectwithoutlabel">
                     <label class="slds-form-element__label" for="Subtotal"><strong>Métodos de Pago</strong></label>    
@@ -417,11 +388,6 @@
                         <c:POCH_VentaMostradorAddAndDeleteStock_cmp strIdSucursalAmp="{!v.strIdSucursal}" VentaInstance="{!item}" rowIndex="{!index}"
                                                                     ListaVentaSelected="{!v.ventasMostradorList}" organizacionVentas="{!v.organizacionVentas}"
                                                                     oficinaVentas="{!v.oficinaVentas}" ventasMostrador="{!v.ventasMostrador}"/>
-                    <!--<aura:iteration items="{!v.ventasMostradorList}" var="item" indexVar="index">
-                        <c:POCH_VentaMostradorAddAndDeleteStock_cmp VentaInstance="{!item}" rowIndex="{!index}" strIdVentaMostrador="{!v.simpleRecord.Id}" 
-                                                                    ListaVentaSelected="{!v.ventasMostradorList}" blnBorderColorCP="{!v.blnBorderColorDesc}"
-                                                                    strIdSucursalAmp="{!v.strIdSucursal}"/>      
-                    </aura:iteration>-->
                     </aura:iteration>
                 </aura:if>
                 <!-- Editar -->
@@ -431,7 +397,6 @@
                                                             ListaVentaSelected="{!v.ventasMostradorList}" ventasMostrador="{!v.ventasMostrador}"
                                                             organizacionVentas="{!v.organizacionVentas}" oficinaVentas="{!v.oficinaVentas}" 
                                                             strIdSucursalAmp="{!v.strIdSucursal}"/>
-                                                            <!-- organizacionVentas="{!v.organizacionVentas}" oficinaVentas="{!v.oficinaVentas}" /> -->
                     </aura:iteration>
                 </aura:if>  
             </tbody>
