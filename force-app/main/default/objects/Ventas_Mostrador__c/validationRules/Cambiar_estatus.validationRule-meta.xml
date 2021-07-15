@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cambiar_estatus</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(ISCHANGED( Status__c ),
+NOT(OR(ISPICKVAL(Status__c, &quot;Alta&quot;),
+ISPICKVAL(Status__c, &quot;Liberado a SAP&quot;),
+ISPICKVAL(Status__c, &quot;Cancelado&quot;))),
+$Profile.Name &lt;&gt; &apos;Administrador del sistema&apos;)</errorConditionFormula>
+    <errorMessage>El estatus sera asignado por Sistema</errorMessage>
+</ValidationRule>

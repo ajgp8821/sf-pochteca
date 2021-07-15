@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CP__c</fullName>
+    <description>Codigo Postal de la dirección del cliente</description>
+    <externalId>false</externalId>
+    <formula>Cliente__r.POCH_CodigoPostal__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Codigo Postal de la dirección del cliente</inlineHelpText>
+    <label>CP</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

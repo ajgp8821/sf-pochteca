@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Venta_mostrador_con_ID_SAP</fullName>
+    <columns>NAME</columns>
+    <columns>CREATEDBY_USER</columns>
+    <columns>CREATED_DATE</columns>
+    <columns>LAST_UPDATE</columns>
+    <columns>Status__c</columns>
+    <columns>Id_Registro_SAP__c</columns>
+    <columns>Numero_de_Factura__c</columns>
+    <columns>Fecha_de_Factura__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Enviado_SAP__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>Id_Registro_SAP__c</field>
+        <operation>notEqual</operation>
+    </filters>
+    <filters>
+        <field>LAST_UPDATE</field>
+        <operation>equals</operation>
+        <value>TODAY</value>
+    </filters>
+    <label>Venta mostrador con ID SAP</label>
+</ListView>

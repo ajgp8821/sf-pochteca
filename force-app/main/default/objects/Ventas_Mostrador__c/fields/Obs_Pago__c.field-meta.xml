@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Obs_Pago__c</fullName>
+    <description>Observaciones de la 1er forma de pago</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Observaciones de la 1er forma de pago</inlineHelpText>
+    <label>Obs. Pago</label>
+    <length>50</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

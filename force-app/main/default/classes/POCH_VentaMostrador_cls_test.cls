@@ -176,7 +176,7 @@ public class POCH_VentaMostrador_cls_test {
         
         Test.startTest();
         POCH_InformacionCredito__c infoCredTest = new POCH_InformacionCredito__c();
-        Profile p = [SELECT Id FROM Profile WHERE Name='POCH-Ventas Mostrador']; 
+        Profile p = [SELECT Id FROM Profile WHERE Name='System Administrator']; 
         User u = new User(Alias = 'standt', Email='testuserp@testorg.com', 
             EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US', 
             LocaleSidKey='en_US', ProfileId = p.Id, 

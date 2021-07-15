@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Cliente_SAP__c</fullName>
+    <description>Campo que nos indicará cliente SAP</description>
+    <externalId>false</externalId>
+    <formula>Cliente__r.POCH_IDClienteSAP__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Campo que nos indicará cliente SAP</inlineHelpText>
+    <label>Cliente SAP</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tasa_de_Impuesto__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(Impuesto__c=&apos;0&apos;,0.0,
+IF(AND((IMPUESTO_PRODUCTO__c &lt;&gt; 0), !ISBLANK(IMPUESTO_PRODUCTO__c ) ),
+IMPUESTO_PRODUCTO__c,
+CASE( POCH_Sucursal__r.POCH_ClasificacionFisca__c ,
+&quot;1&quot;,0.15,
+&quot;2&quot;,0.10,
+&quot;4&quot;,0.16,
+&quot;5&quot;,0.11,
+&quot;7&quot;,0.12,
+&quot;8&quot;,0.13,
+&quot;A&quot;,0.08,
+&quot;B&quot;,0.18,
+&quot;C&quot;,0.19,
+&quot;D&quot;,0.21,
+0.00)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Tasa de Impuesto</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>
