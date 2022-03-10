@@ -1,43 +1,82 @@
 public class CopySingleRecord {
+    
     @AuraEnabled
-    public static String copyQuoteSobjet(String recordId){
-        Map<String, Schema.SObjectType> schemaMap = Schema.getGlobalDescribe();
+    public static String copyQuoteSobjet(Id recordId){
         
-        List<SBQQ__Quote__c> quoteList = [SELECT Id, Name,SBQQ__Account__c,SBQQ__EndDate__c,POCH_Sucursal__c,CurrencyIsoCode,
-                                          SBQQ__PrimaryContact__c,POCH_EstatusCotizacion__c,SBQQ__SalesRep__c,Condici_n_de_Pago__c,
-                                          Asunto__c,SBQQ__Notes__c,Canal_de_Distribuci_n__c,Terminos_y_condiciones__c
-                                          FROM SBQQ__Quote__c where id =:recordId];
-        SBQQ__Quote__c clondedParentRecordID = null;
-         Date firstDayOfMonth = Date.today().toStartOfMonth();
-        System.debug('firstDayOfMonth: '+firstDayOfMonth);
-        Date firstDayofNextMonth=firstDayOfMonth.addMonths(1);
-        Date lastDayofMonth = Date.today().toStartOfMonth();
-        System.debug('firstDayofNextMonth: '+firstDayofNextMonth);
-        Date day=Date.today().toStartOfMonth();
-        if(day.month()==1||day.month()==3||day.month()==5||day.month()==7||day.month()==8||day.month()==10||day.month()==12){
-            lastDayofMonth=day.addDays(30);}
-        else if(day.month()==4||day.month()==6||day.month()==9||day.month()==11){
-            lastDayofMonth=day.addDays(29);}
-        else if((math.mod(day.year(),400)==400)&&((math.mod(day.year(),4)==0)||(math.mod(day.year(),100)!=0))){
-            lastDayofMonth=day.addDays(28);}
-        else {lastDayofMonth=day.addDays(27);}
-        for(SBQQ__Quote__c qa:quoteList){
-            clondedParentRecordID = qa.clone();
-            clondedParentRecordID.SBQQ__EndDate__c =lastDayofMonth;
-            clondedParentRecordID.SBQQ__ExpirationDate__c=lastDayofMonth;
-            clondedParentRecordID.SBQQ__Primary__c = false;
-            clondedParentRecordID.SBQQ__PrimaryContact__c = qa.SBQQ__PrimaryContact__c;   
-            clondedParentRecordID.POCH_EstatusCotizacion__c = 'Abierta';
-            clondedParentRecordID.POCH_ValidaAutorizaciones__c = true;
-            clondedParentRecordID.SBQQ__SalesRep__c=qa.SBQQ__SalesRep__c;
-            clondedParentRecordID.OwnerId = qa.SBQQ__SalesRep__c;
-            clondedParentRecordID.Condici_n_de_Pago__c=qa.Condici_n_de_Pago__c;
-            clondedParentRecordID.Asunto__c=qa.Asunto__c;
-            clondedParentRecordID.SBQQ__Notes__c=qa.SBQQ__Notes__c;
-            clondedParentRecordID.Terminos_y_condiciones__c=qa.Terminos_y_condiciones__c;
+        Date firstDayOfMonth = System.today().toStartOfMonth();
+        System.debug('firstDayOfMonth: '+ firstDayOfMonth);
+        Date lastDayOfMonth = firstDayOfMonth.addDays(Date.daysInMonth(firstDayOfMonth.year(), firstDayOfMonth.month()) - 1);
+        System.debug('lastDayOfMonth: '+ lastDayOfMonth);
+
+        SBQQ__Quote__c quoteOriginal = [SELECT Id,
+                                    SBQQ__Account__c,
+                                    POCH_Sucursal__c,
+                                    POCH_Sucursal_Ampliada__c,
+                                    POCH_Sucursal__r.POCH_OrganizacionVentas__c, // obtengo la organización de venta de la Quote
+                                    CurrencyIsoCode,
+                                    Asunto__c,
+                                    Condici_n_de_Pago__c,
+                                    POCH_IdOrgVentas__c,
+                                    SBQQ__PricebookId__c,
+                                    Lead_time__c,
+                                    Lugar_de_entrega__c,
+                                    Lugarentrega__c,
+                                    Medidas_Papel__c,
+                                    SBQQ__Notes__c,
+                                    POCH_NotasCotizacion__c,
+                                    Tiempo_cancelacion__c,
+                                    Tiempo_de_entrega__c,
+                                    Tiempo_entrega__c,
+                                    Tipo_Venta__c,
+                                    Tipo_venta_des__c,
+                                    Terminos_y_condiciones__c,
+                                    POCH_ValidaAutorizaciones__c,
+                                    Validezoferta__c 
+                                FROM SBQQ__Quote__c 
+                                WHERE Id =: recordId];
+        
+        System.debug('q ' + quoteOriginal.POCH_Sucursal__r.POCH_OrganizacionVentas__c );
+        // Validaciones
+        String orgVentas = [SELECT Id, name, POCH_OrganizacionesVentas__c  from User where id =: UserInfo.getUserId()].POCH_OrganizacionesVentas__c;
+        // String orgVentas = [SELECT Id, name, POCH_OrganizacionesVentas__c  from User where id = '0052i0000021KDfAAM'].POCH_OrganizacionesVentas__c;
+        // String orgVentas = [SELECT Id, name, POCH_OrganizacionesVentas__c  from User where id = '0052i000002BTcMAAW'].POCH_OrganizacionesVentas__c;
+        system.debug('orgVentas ' + orgVentas);
+
+        Set<String> multiselectValues = new Set<String>();
+        multiSelectValues.addAll(orgVentas.split(';'));
+        
+        // Debe ser el mismo que tiene el usuario
+        if(multiSelectValues.contains(quoteOriginal.POCH_Sucursal__r.POCH_OrganizacionVentas__c)){
+            System.debug('SI');
+            SBQQ__Quote__c quote = quoteOriginal.clone(false, true);
+            quote.POCH_EstatusCotizacion__c = 'Abierta';
+            quote.Estatus_de_cotizaci_n_anterior__c = 'Abierta';
+            quote.SBQQ__StartDate__c = System.today();
+            quote.SBQQ__EndDate__c = lastDayOfMonth;
+            quote.SBQQ__ExpirationDate__c = lastDayOfMonth;
+            quote.SBQQ__Primary__c = false;
+            quote.SBQQ__Opportunity2__c = null; // SPANCOP
+            quote.Monedaimpresion__c = quote.CurrencyIsoCode;
+            quote.Moneda_documento__c = quote.CurrencyIsoCode;
+            quote.POCH_FechaEntrega__c = null;
+            quote.Impuesto_impreso__c = 0;
+            quote.Motivos_de_Cancelaci_n__c = '';
+            quote.Valor_Neto_impreso__c = 0;
+            quote.Valor_TotalImpreso__c = '';
             
-        }        
-        insert clondedParentRecordID;    
-        return clondedParentRecordID.Id;
-    }   
+            Database.SaveResult saveQuote = Database.insert(quote, false);
+
+            if (saveQuote.isSuccess() == true){
+                return quote.id;
+            }
+            else {
+                return 'error';
+            }
+        }
+        else {
+            System.debug('NO');
+            return 'errorUser';
+        }
+    
+    }
 }

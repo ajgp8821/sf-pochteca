@@ -1,3 +1,4 @@
+// No esta en producción
 trigger pochTriggerValidateAlmacen on OrderItem (after update) {
     // Creamos una lista de ordenItem Vacia
     List<OrderItem> itemsToUpdate = new List<OrderItem>();

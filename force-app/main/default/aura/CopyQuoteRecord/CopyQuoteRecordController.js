@@ -7,31 +7,30 @@
         });
         action.setCallback(this, function(response) {
             var state = response.getState();
-            console.log('state sucess'+state);
+            console.log('state sucess ', state);
             if(state === "SUCCESS") {
                 var result = response.getReturnValue();
-                var sObjectEvent = $A.get("e.force:navigateToSObject");
-                sObjectEvent.setParams({
-                    "recordId": response.getReturnValue(),
-                    "slideDevName": "detail"
-                });
-                sObjectEvent.fire();
-                var toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
-                    "title": "Success!",
-                    "type":"success",
-                    "message": "The record has been created successfully."
-                });
-                toastEvent.fire();
+                
+                console.log('result', result);
+                //debugger;
+                if (result === 'errorUser'){
+                    helper.showToast('error', 'Error!', 'El usuario no tiene permisos para crear documentos de esta sucursal');
+                }
+                else if (result !== "error") {
+                    helper.showToast('success', '', 'Cotización copiada correctamente');
+                    var sObjectEvent = $A.get("e.force:navigateToSObject");
+                    sObjectEvent.setParams({
+                        "recordId": response.getReturnValue(),
+                        "slideDevName": "detail"
+                    });
+                    sObjectEvent.fire();
+                }
+                else {
+                    helper.showToast('error', 'Error!', 'Error al copiar, favor de informar al Administrador');
+                }
                 
             }else if (state === "ERROR"){
-                var toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
-                    "title": "Error!",
-                    "type":"error",
-                    "message": "Some error occured."
-                });
-                toastEvent.fire();
+                helper.showToast('error', 'Error!', 'Error al copiar, favor de informar al Administrador');
             }
             component.set("v.showSpinner",false);
             $A.get("e.force:closeQuickAction").fire();
